@@ -24,12 +24,18 @@ export function isNotificationDeliveryEnabled(
   return preferenceEnabled && setupState === "ready";
 }
 
-export function shouldRestoreNotificationRegistration(args: {
+/**
+ * iOS can forget an app's notification permission, which stops every push
+ * while Apple still accepts them. "undetermined" means it can be asked again;
+ * only an explicit denial is left to Settings.
+ */
+export function getNotificationRegistrationStep(args: {
   isDevice: boolean;
   permission: "denied" | "granted" | "undetermined";
   preferenceEnabled: boolean;
 }) {
-  return (
-    args.isDevice && args.permission === "granted" && args.preferenceEnabled
-  );
+  if (!args.isDevice || !args.preferenceEnabled) return "none";
+  if (args.permission === "granted") return "restore";
+  if (args.permission === "undetermined") return "ask";
+  return "none";
 }
