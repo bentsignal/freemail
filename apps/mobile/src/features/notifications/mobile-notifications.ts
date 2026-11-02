@@ -17,8 +17,8 @@ import {
 } from "./notification-permissions";
 import { MOBILE_THREAD_ROUTE } from "./notification-routing";
 import {
+  getNotificationRegistrationStep,
   resolveNotificationSetupState,
-  shouldRestoreNotificationRegistration,
 } from "./notification-setup";
 import { useNotificationActions } from "./use-notification-actions";
 
@@ -78,19 +78,15 @@ export function useMobileNotifications(isAuthenticated: boolean) {
       if (retryTimer) clearTimeout(retryTimer);
       retryTimer = undefined;
       try {
-        const permission = await getNotificationPermission();
-        if (
-          !shouldRestoreNotificationRegistration({
-            isDevice: Device.isDevice,
-            permission,
-            preferenceEnabled: registrationEnabled,
-          })
-        ) {
-          return;
-        }
+        const step = getNotificationRegistrationStep({
+          isDevice: Device.isDevice,
+          permission: await getNotificationPermission(),
+          preferenceEnabled: registrationEnabled,
+        });
+        if (step === "none") return;
         await registerForNewMailNotifications(registerPushToken, {
           devicePushToken,
-          requestPermission: false,
+          requestPermission: step === "ask",
         });
       } catch {
         scheduleRetry();

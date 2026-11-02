@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getNotificationRegistrationStep,
   isNotificationDeliveryEnabled,
   resolveNotificationSetupState,
-  shouldRestoreNotificationRegistration,
 } from "./notification-setup";
 
 describe("notification setup state", () => {
@@ -47,27 +47,24 @@ describe("notification setup state", () => {
     expect(isNotificationDeliveryEnabled(false, "ready")).toBe(false);
   });
 
-  it("restores registration without prompting only after permission exists", () => {
-    expect(
-      shouldRestoreNotificationRegistration({
+  it("restores granted permission and asks again when iOS has forgotten it", () => {
+    function step(
+      permission: "denied" | "granted" | "undetermined",
+      overrides = {},
+    ) {
+      return getNotificationRegistrationStep({
         isDevice: true,
-        permission: "granted",
+        permission,
         preferenceEnabled: true,
-      }),
-    ).toBe(true);
-    expect(
-      shouldRestoreNotificationRegistration({
-        isDevice: true,
-        permission: "undetermined",
-        preferenceEnabled: true,
-      }),
-    ).toBe(false);
-    expect(
-      shouldRestoreNotificationRegistration({
-        isDevice: true,
-        permission: "granted",
-        preferenceEnabled: false,
-      }),
-    ).toBe(false);
+        ...overrides,
+      });
+    }
+
+    expect(step("granted")).toBe("restore");
+    expect(step("undetermined")).toBe("ask");
+    expect(step("denied")).toBe("none");
+    expect(step("undetermined", { preferenceEnabled: false })).toBe("none");
+    expect(step("granted", { preferenceEnabled: false })).toBe("none");
+    expect(step("undetermined", { isDevice: false })).toBe("none");
   });
 });
