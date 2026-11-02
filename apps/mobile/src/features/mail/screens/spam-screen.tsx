@@ -17,6 +17,7 @@ import { MAIL_SEARCH_DEBOUNCE_MS } from "./inbox-list-state";
 import { filterMailboxThreads } from "./mailbox-controls";
 import { MailboxThreadList } from "./mailbox-thread-list";
 import { filterSpamThreads } from "./spam-mailbox";
+import { getThreadRoute } from "./thread-route";
 
 const pageSize = 30;
 
@@ -75,12 +76,7 @@ export function SpamMailbox({
       <ThreadRow
         mailbox="spam"
         thread={item}
-        onOpen={() =>
-          router.push({
-            pathname: "/(tabs)/(inbox)/thread/[id]",
-            params: { id: item.id, mailbox: "spam" },
-          })
-        }
+        onOpen={() => router.push(getThreadRoute(item, "spam"))}
       />
     );
   }

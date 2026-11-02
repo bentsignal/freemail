@@ -15,6 +15,7 @@ import { useMailStore } from "../store";
 import { MAIL_SEARCH_DEBOUNCE_MS } from "./inbox-list-state";
 import { filterMailboxThreads } from "./mailbox-controls";
 import { MailboxThreadList } from "./mailbox-thread-list";
+import { getThreadRoute } from "./thread-route";
 import { useArchiveActions } from "./use-archive-actions";
 
 const pageSize = 30;
@@ -84,12 +85,7 @@ export function ArchiveMailbox({
         selectionMode={actions.selectionMode}
         thread={item}
         onDelete={() => actions.confirmDelete([item.id])}
-        onOpen={() =>
-          router.push({
-            pathname: "/(tabs)/(inbox)/thread/[id]",
-            params: { id: item.id, mailbox: "archive" },
-          })
-        }
+        onOpen={() => router.push(getThreadRoute(item, "archive"))}
         onRestore={() => void actions.restoreThreads([item.id])}
         onSelect={() => actions.toggleThreadSelection(item.id)}
       />

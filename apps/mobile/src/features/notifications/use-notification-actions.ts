@@ -63,7 +63,11 @@ export function useNotificationActions(isAuthenticated: boolean) {
       if (!action) {
         router.push({
           pathname: MOBILE_THREAD_ROUTE,
-          params: { id: target.threadId, messageId: target.messageId },
+          params: {
+            id: target.threadId,
+            messageId: target.messageId,
+            title: response.notification.request.content.title ?? undefined,
+          },
         });
         return;
       }

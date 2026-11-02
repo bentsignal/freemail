@@ -9,6 +9,35 @@ export interface CleanViewMenuAction {
   onPress: () => void;
 }
 
+function ignore() {
+  return undefined;
+}
+
+/** Mounted with the screen so the native push transition animates the header in. */
+export function ThreadReaderLoadingToolbar({
+  mailbox,
+  title,
+}: {
+  mailbox: MobileMailbox;
+  title: string | undefined;
+}) {
+  return (
+    <ThreadReaderToolbar
+      canMoveToInbox={false}
+      isPinned={false}
+      mailbox={mailbox}
+      title={title ?? ""}
+      onArchive={ignore}
+      onDelete={ignore}
+      onMoveToInbox={ignore}
+      onPin={ignore}
+      onReply={ignore}
+      onRestore={ignore}
+      onUnsubscribe={ignore}
+    />
+  );
+}
+
 export function ThreadReaderToolbar({
   canMoveToInbox,
   cleanViewAction,
