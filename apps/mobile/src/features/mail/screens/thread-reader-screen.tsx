@@ -1,6 +1,5 @@
 import type { FunctionReturnType } from "convex/server";
-import type { LayoutChangeEvent } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
@@ -29,7 +28,11 @@ import {
 import { parseMobileMailbox } from "./mailbox-controls";
 import { MessageViewToolbar } from "./message-view-toolbar";
 import { ThreadMessageBody } from "./thread-message-body";
-import { ThreadReaderToolbar } from "./thread-reader-toolbar";
+import {
+  ThreadReaderLoadingToolbar,
+  ThreadReaderToolbar,
+} from "./thread-reader-toolbar";
+import { useJumpToMessage } from "./use-jump-to-message";
 import { useMoveToInbox } from "./use-move-to-inbox";
 import { useThreadReaderActions } from "./use-thread-reader-actions";
 
@@ -42,10 +45,12 @@ export function ThreadReaderScreen() {
     id,
     mailbox: mailboxParam,
     messageId,
+    title,
   } = useLocalSearchParams<{
     id: string;
     mailbox?: string | string[];
     messageId?: string | string[];
+    title?: string | string[];
   }>();
   const [departingReader, setDepartingReader] = useState<DepartingReader>();
   const mailbox = parseMobileMailbox(firstParam(mailboxParam));
@@ -69,6 +74,7 @@ export function ThreadReaderScreen() {
         mailbox={mailbox}
         targetMessageId={firstParam(messageId)}
         thread={thread}
+        title={firstParam(title)}
         onPermanentDeleteStart={setDepartingReader}
       />
     </ContentReveal>
@@ -87,6 +93,7 @@ function ThreadScreenBody({
   onPermanentDeleteStart,
   targetMessageId,
   thread,
+  title,
 }: {
   departingReader: DepartingReader | undefined;
   isLoading: boolean;
@@ -94,6 +101,7 @@ function ThreadScreenBody({
   onPermanentDeleteStart: (reader: DepartingReader) => void;
   targetMessageId: string | undefined;
   thread: ThreadQueryResult;
+  title: string | undefined;
 }) {
   if (departingReader) {
     return (
@@ -107,7 +115,9 @@ function ThreadScreenBody({
       />
     );
   }
-  if (isLoading) return null;
+  if (isLoading) {
+    return <ThreadReaderLoadingToolbar mailbox={mailbox} title={title} />;
+  }
   if (!thread) return <ThreadNotFound />;
   const mailThread = toMailThreadDetail(thread);
   return (
@@ -160,7 +170,7 @@ function ThreadReader({
 }) {
   const router = useRouter();
   const moveToInbox = useMoveToInbox();
-  const scrollViewRef = useRef<ScrollView>(null);
+  const jump = useJumpToMessage();
   const [viewMode, setViewMode] = useState<MessageViewMode>("clean");
   const actions = useThreadReaderActions(thread, onPermanentDeleteStart);
   const activeMessage = getActiveMessage(thread, targetMessageId);
@@ -201,7 +211,7 @@ function ThreadReader({
       />
       <PostalPaperBackground>
         <ScrollView
-          ref={scrollViewRef}
+          {...jump.scrollViewProps}
           contentContainerClassName="gap-5 px-4 pt-2 pb-32"
           contentInsetAdjustmentBehavior="automatic"
         >
@@ -228,8 +238,8 @@ function ThreadReader({
               showSeparator={index > 0}
               viewMode={viewMode}
               onLayout={
-                message.id === targetMessageId
-                  ? (event) => scrollToMessage(scrollViewRef.current, event)
+                index > 0 && message.id === targetMessageId
+                  ? jump.onMessageLayout
                   : undefined
               }
             />
@@ -270,14 +280,6 @@ function useCleanViewAction(message: MailMessage | undefined) {
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function scrollToMessage(
-  scrollView: ScrollView | null,
-  event: LayoutChangeEvent,
-) {
-  const y = Math.max(0, event.nativeEvent.layout.y - 16);
-  requestAnimationFrame(() => scrollView?.scrollTo({ animated: false, y }));
 }
 
 function ThreadNotFound() {

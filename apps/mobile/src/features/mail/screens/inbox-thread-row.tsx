@@ -15,7 +15,7 @@ export function InboxThreadRow({
   controls: ReturnType<typeof useInboxMailboxControls>;
   isSearch: boolean;
   onMoveToInbox: (threadId: string) => void;
-  onOpen: (threadId: string) => void;
+  onOpen: (thread: MailThread) => void;
   thread: MailThread;
 }) {
   const accounts = useMailStore((store) => store.accounts);
@@ -31,7 +31,7 @@ export function InboxThreadRow({
       selected={controls.selectedIds.has(thread.id)}
       selectionMode={controls.selectionMode}
       thread={thread}
-      onOpen={() => onOpen(thread.id)}
+      onOpen={() => onOpen(thread)}
       onSelect={() => controls.toggleThreadSelection(thread.id)}
     />
   );

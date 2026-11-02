@@ -27,6 +27,7 @@ import { InboxSearchControls } from "./inbox-search-controls";
 import { InboxThreadRow } from "./inbox-thread-row";
 import { MailboxThreadList } from "./mailbox-thread-list";
 import { SpamMailbox } from "./spam-screen";
+import { getThreadRoute } from "./thread-route";
 import { useInboxMailboxControls } from "./use-inbox-mailbox-controls";
 import { useInboxRefresh } from "./use-inbox-refresh";
 import { useMoveToInbox } from "./use-move-to-inbox";
@@ -125,13 +126,10 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
     searchStatus: search.status,
     searchTerm,
   });
-  function openThread(threadId: string) {
-    controls.retainThreadInUnreadSession(threadId);
-    markRead(threadId);
-    router.push({
-      pathname: "/(tabs)/(inbox)/thread/[id]",
-      params: { id: threadId },
-    });
+  function openThread(thread: MailThread) {
+    controls.retainThreadInUnreadSession(thread.id);
+    markRead(thread.id);
+    router.push(getThreadRoute(thread));
   }
   function renderThread({ item }: LegendListRenderItemProps<MailThread>) {
     return (

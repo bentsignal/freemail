@@ -17,6 +17,7 @@ import { useMailStore } from "../store";
 import { MAIL_SEARCH_DEBOUNCE_MS } from "./inbox-list-state";
 import { filterMailboxThreads } from "./mailbox-controls";
 import { MailboxThreadList } from "./mailbox-thread-list";
+import { getThreadRoute } from "./thread-route";
 import { useMoveToInbox } from "./use-move-to-inbox";
 
 const pageSize = 30;
@@ -81,12 +82,7 @@ export function AllMailMailbox({
         mailbox="all"
         thread={item}
         onMoveToInbox={() => moveToInbox(item.id)}
-        onOpen={() =>
-          router.push({
-            pathname: "/(tabs)/(inbox)/thread/[id]",
-            params: { id: item.id, mailbox: "all" },
-          })
-        }
+        onOpen={() => router.push(getThreadRoute(item, "all"))}
       />
     );
   }
