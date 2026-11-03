@@ -3,6 +3,11 @@
 Two iPhone features that come from how iOS treats mail apps. Researched and
 tested in November 2026, against the iOS 27.0 simulator.
 
+Shawn tried the verification code flow on his iPhone in the November 2026
+release and it works. He decided not to pursue default mail app status, because
+he rarely taps mail links from other apps. The research below stays in case that
+changes.
+
 ## Default mail app
 
 iOS lists an app under Settings → Apps → Default Apps → Email only if it has
