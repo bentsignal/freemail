@@ -3,11 +3,13 @@ const MAX_SEARCHED_LENGTH = 20_000;
 const QUALIFIERS =
   "verification|verify|security|confirmation|authentication|auth|access|login|log[- ]?in|sign[- ]?in|one[- ]?time|single[- ]?use|temporary|2fa|two[- ]factor|mfa";
 const CODE_PHRASE = `(?:(?:${QUALIFIERS})[- ]+(?:pass)?code|passcode|otp|one[- ]time[- ](?:password|pin))`;
-const LOOSE_CODE_PHRASE = `(?:${CODE_PHRASE}|(?:your|the|this)[- ]+code)`;
+// "your code" alone also starts "your code review for PR 1234", so it needs a
+// word that introduces the code.
+const LOOSE_CODE_PHRASE = String.raw`(?:your|the|this)\s+code(?:\s+is\b|\s*:|\s+below\b|\s+to\b)`;
 const NUMBER = String.raw`(?<![\w#$.,:/-])(\d{3}[ -]\d{3}|\d{4,8})(?![\w%]|[.,:/-]\d)`;
 
 const NUMBER_AFTER_PHRASE = new RegExp(
-  String.raw`\b${LOOSE_CODE_PHRASE}\b[^\d]{0,80}?${NUMBER}`,
+  String.raw`\b(?:${CODE_PHRASE}\b|${LOOSE_CODE_PHRASE})[^\d]{0,80}?${NUMBER}`,
   "giu",
 );
 // "123456 is your code", and Google's "G-123456 is your verification code".
@@ -21,7 +23,7 @@ const LETTERS_AFTER_PHRASE = new RegExp(
 );
 
 const NOT_A_SIGN_IN_CODE =
-  /\b(?:promo(?:tional)?|discount|coupon|gift|referral|voucher|tracking|zip|postal|redemption)\b/iu;
+  /\b(?:promo(?:tional)?|discount|coupon|gift|referral|voucher|tracking|zip|postal|redemption|order)\b/iu;
 const YEAR = /^(?:19|20)\d\d$/u;
 const LETTERS_AND_DIGITS = /^(?=.*\d)(?=.*[A-Z])[A-Z0-9]+$/u;
 

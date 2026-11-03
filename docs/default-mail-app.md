@@ -83,12 +83,16 @@ Limits:
   previews off the push says "New message", and the code stays out of it.
 - A code in the push passes through Expo and Apple in clear text, as subjects
   already do.
-- It only helps if the mail syncs quickly, since the push is sent after sync.
+- The push is sent after sync, so timing depends on the provider. Gmail gets a
+  Pub/Sub wake-up. Microsoft 365 and iCloud sync on the five-minute cron
+  (`crons.ts`), so a code can arrive up to five minutes late. Real use there
+  needs a faster wake-up, such as Graph change notifications or IMAP IDLE.
 - Detection in the body is deliberately cautious: a code it doesn't recognize
   just means no suggestion.
 - WhatsApp's page says autofill doesn't trigger while the app is in the
   foreground, which matters little here because the code field is in another app.
 
-Another route is a credential provider extension (`ProvidesOneTimeCodes`), but
-that is for password managers, which fill codes from the credential list rather
-than offering a code that just arrived.
+Another route is a credential provider extension (`ProvidesOneTimeCodes`).
+[Apple's docs](https://developer.apple.com/documentation/authenticationservices/providing-one-time-passcodes-to-autofill)
+describe it as a list behind a tap, aimed at password managers, so it wasn't
+tried.
