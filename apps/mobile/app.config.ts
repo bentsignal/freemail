@@ -76,6 +76,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       "./expo-plugins/with-ios-scene-lifecycle.cjs",
+      "./expo-plugins/with-ios-mailto-scheme.cjs",
       "./expo-plugins/with-ios-pods-deployment-target.cjs",
       [
         "expo-image-picker",

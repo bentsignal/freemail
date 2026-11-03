@@ -23,6 +23,7 @@ interface DeliveryInput {
   preference: NotificationPreferenceValues;
   tokens: Doc<"mobilePushTokens">[];
   unsubscribeAvailable: boolean;
+  verificationCode?: string;
 }
 
 interface PushTicketOutcome {
@@ -132,7 +133,7 @@ async function deliverNewMail(
 
   const quickAction = await createQuickActionCapability(ctx, deliveryId);
   const notification = buildNewMailPush(
-    input.message,
+    { ...input.message, verificationCode: input.verificationCode },
     input.preference.includePreview,
     input.unsubscribeAvailable,
     quickAction,

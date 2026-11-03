@@ -71,6 +71,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window.makeKeyAndVisible()
     appDelegate.window = window
     self.window = window
+
+    // A link that launches the app arrives only here. Forwarding it to the
+    // app delegate is what makes it the initial URL Expo Router reads.
+    connectionOptions.urlContexts.forEach { context in
+      _ = appDelegate.application(
+        UIApplication.shared,
+        open: context.url,
+        options: [
+          .sourceApplication: context.options.sourceApplication as Any,
+          .annotation: context.options.annotation as Any,
+        ])
+    }
   }
 
   func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {

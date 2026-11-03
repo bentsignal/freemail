@@ -36,3 +36,16 @@ there's no backfill command.
   you just used under "Website passkeys", with Remove disabled if it's the
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
+
+## Check verification codes and mail links on the phone (#38)
+
+The simulator proved both. These confirm them on Shawn's iPhone.
+
+- When: after the Convex deploy and the phone build
+- Commands: none. Have a site send a sign-in code to an account with new-mail
+  notifications on, with a code field open in Safari. In Rodge Mail, tap a
+  `mailto:` link inside an email.
+- Verify: the keyboard offers the code as "From Rodge Mail", and the link opens
+  Rodge's composer rather than Outlook. Links from other apps keep going to the
+  current default until Apple grants the entitlement
+  ([default-mail-app.md](default-mail-app.md)).

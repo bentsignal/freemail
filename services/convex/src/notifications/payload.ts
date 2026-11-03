@@ -4,6 +4,7 @@ interface NewMailMessage {
   from: { address: string; name?: string };
   snippet: string;
   subject: string;
+  verificationCode?: string;
 }
 
 export const NEW_MAIL_CATEGORY = "newMailActions";
@@ -28,9 +29,7 @@ export function buildNewMailPush(
   const sender = firstNonempty(message.from.name, message.from.address);
   return {
     title: sender,
-    body: includePreview
-      ? firstNonempty(message.subject, message.snippet, "New message")
-      : "New message",
+    body: includePreview ? previewBody(message) : "New message",
     sound: "default" as const,
     categoryId: unsubscribeAvailable
       ? NEW_MAIL_MAILING_LIST_CATEGORY
@@ -48,6 +47,18 @@ export function buildNewMailPush(
       threadId: message.threadId,
     },
   };
+}
+
+function previewBody(message: NewMailMessage) {
+  const preview = firstNonempty(
+    message.subject,
+    message.snippet,
+    "New message",
+  );
+  const code = message.verificationCode;
+  return !code || preview.includes(code)
+    ? preview
+    : `${preview}\nYour verification code is ${code}`;
 }
 
 function firstNonempty(...values: (string | undefined)[]) {
