@@ -45,6 +45,31 @@ describe("new-mail notification payloads", () => {
     expect(buildNewMailPush(message, false).body).toBe("New message");
   });
 
+  it("adds a verification code iOS can offer on the keyboard", () => {
+    expect(
+      buildNewMailPush({ ...message, verificationCode: "483920" }, true).body,
+    ).toBe("Launch plan\nYour verification code is 483920");
+  });
+
+  it("doesn't repeat a code the preview already shows", () => {
+    expect(
+      buildNewMailPush(
+        {
+          ...message,
+          subject: "Your code is 483920",
+          verificationCode: "483920",
+        },
+        true,
+      ).body,
+    ).toBe("Your code is 483920");
+  });
+
+  it("keeps a verification code out of private previews", () => {
+    expect(
+      buildNewMailPush({ ...message, verificationCode: "483920" }, false).body,
+    ).toBe("New message");
+  });
+
   it("exposes unsubscribe only for recognized mailing-list messages", () => {
     expect(buildNewMailPush(message, true, true).categoryId).toBe(
       NEW_MAIL_MAILING_LIST_CATEGORY,

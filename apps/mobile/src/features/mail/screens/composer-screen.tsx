@@ -26,6 +26,9 @@ import { useSendMessage } from "./use-send-message";
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- Expo Router requires an implicit index signature here.
 type ComposerParams = {
   accountId?: string;
+  bcc?: string;
+  body?: string;
+  cc?: string;
   replyToMessageId?: string;
   subject?: string;
   to?: string;

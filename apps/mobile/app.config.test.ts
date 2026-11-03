@@ -40,6 +40,15 @@ describe("mobile development configuration", () => {
     expect(JSON.stringify(config).toLowerCase()).not.toContain("vercel");
   });
 
+  it("registers mailto without claiming the entitlement Apple hasn't granted", () => {
+    const config = createExpoConfig({ config: {} } as ConfigContext);
+
+    expect(config.plugins).toContain(
+      "./expo-plugins/with-ios-mailto-scheme.cjs",
+    );
+    expect(config.ios?.entitlements).toBeUndefined();
+  });
+
   it("rejects an unconfigured production build", () => {
     process.env.EAS_BUILD_PROFILE = "production";
 

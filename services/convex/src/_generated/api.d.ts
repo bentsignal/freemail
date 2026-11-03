@@ -130,6 +130,7 @@ import type * as notifications_quickAction from "../notifications/quickAction.js
 import type * as notifications_quickActionCapability from "../notifications/quickActionCapability.js";
 import type * as notifications_recovery from "../notifications/recovery.js";
 import type * as notifications_validators from "../notifications/validators.js";
+import type * as notifications_verificationCode from "../notifications/verificationCode.js";
 import type * as outbox_queries from "../outbox/queries.js";
 import type * as outbox_recent from "../outbox/recent.js";
 import type * as outbox_sent from "../outbox/sent.js";
@@ -308,6 +309,7 @@ declare const fullApi: ApiFromModules<{
   "notifications/quickActionCapability": typeof notifications_quickActionCapability;
   "notifications/recovery": typeof notifications_recovery;
   "notifications/validators": typeof notifications_validators;
+  "notifications/verificationCode": typeof notifications_verificationCode;
   "outbox/queries": typeof outbox_queries;
   "outbox/recent": typeof outbox_recent;
   "outbox/sent": typeof outbox_sent;

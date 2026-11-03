@@ -33,3 +33,7 @@ classification. The delivery is claimed before the Expo request, preventing
 sync retries from duplicating a send. Push tickets and bounded receipt polling
 distinguish Expo acceptance from device delivery, and `DeviceNotRegistered`
 tokens are disabled automatically.
+
+When a message contains a sign-in code and previews are on, the push adds a line
+with it, so iOS can offer the code above the keyboard
+([default-mail-app.md](../../docs/default-mail-app.md)).

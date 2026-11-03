@@ -1,9 +1,10 @@
 import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 
-import type { Id } from "../_generated/dataModel";
-import type { MutationCtx } from "../_generated/server";
+import type { Doc, Id } from "../_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { internalMutation, internalQuery } from "../_generated/server";
+import { emailHtmlToPlainText } from "../mail/html";
 import {
   archiveOwnedThread,
   setOwnedThreadPinned,
@@ -13,6 +14,7 @@ import { getMailingListInfo } from "../mailingLists/policy";
 import { isNotificationDeliveryFresh } from "./policy";
 import { resolveNotificationPreferences } from "./preferences";
 import { vNotificationQuickAction } from "./validators";
+import { findVerificationCode } from "./verificationCode";
 
 const SEND_NEW_MAIL = makeFunctionReference<
   "action",
@@ -41,6 +43,23 @@ export async function queueNewMailNotification(
   });
   await ctx.scheduler.runAfter(0, SEND_NEW_MAIL, { deliveryId });
   return { deliveryId, queued: true };
+}
+
+async function findMessageVerificationCode(
+  ctx: QueryCtx,
+  message: Doc<"messages">,
+) {
+  const content = await ctx.db
+    .query("messageContents")
+    .withIndex("by_message", (q) => q.eq("messageId", message._id))
+    .first();
+  const plainText = content?.plainText?.trim() ?? "";
+  const html = content?.sanitizedHtml;
+  const body =
+    plainText.length > 0
+      ? plainText
+      : ((html ? emailHtmlToPlainText(html) : undefined) ?? message.snippet);
+  return findVerificationCode(`${message.subject}\n${body}`);
 }
 
 export const getDeliveryInput = internalQuery({
@@ -73,16 +92,20 @@ export const getDeliveryInput = internalQuery({
           .withIndex("by_owner", (q) => q.eq("ownerId", delivery.ownerId))
           .collect(),
       ]);
+    const preference = resolveNotificationPreferences(
+      globalPreference,
+      accountPreference,
+    );
     return {
       delivery,
       message,
-      preference: resolveNotificationPreferences(
-        globalPreference,
-        accountPreference,
-      ),
+      preference,
       unsubscribeAvailable:
         getMailingListInfo(message, classification?.category) !== undefined,
       tokens: tokens.filter((token) => token.enabled),
+      verificationCode: preference.includePreview
+        ? await findMessageVerificationCode(ctx, message)
+        : undefined,
     };
   },
 });

@@ -6,17 +6,23 @@ import type { NativeComposerAttachment } from "./use-native-attachments";
 export type ComposerFieldName = "bcc" | "body" | "cc" | "subject" | "to";
 
 export function createComposerDraft({
+  bcc,
+  body,
+  cc,
   subject,
   to,
 }: {
+  bcc?: string;
+  body?: string;
+  cc?: string;
   subject?: string;
   to?: string;
 }) {
   return {
     attachments: new Array<NativeComposerAttachment>(),
-    bcc: "",
-    body: "",
-    cc: "",
+    bcc: bcc ?? "",
+    body: body ?? "",
+    cc: cc ?? "",
     subject: subject ?? "",
     to: to ?? "",
   };
