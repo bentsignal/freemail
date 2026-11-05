@@ -37,7 +37,7 @@ there's no backfill command.
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
 
-## Passkeys in Rodge Dev (#PR)
+## Passkeys in Rodge Dev (#42)
 
 The Apple app-site association now lists Rodge Dev
 (`39K6A9FP99.com.bentsignal.rodgemail.dev`), so native passkeys work in it.
