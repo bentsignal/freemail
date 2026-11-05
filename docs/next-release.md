@@ -36,17 +36,3 @@ there's no backfill command.
   you just used under "Website passkeys", with Remove disabled if it's the
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
-
-## Passkeys in Rodge Dev (#42)
-
-The Apple app-site association now lists Rodge Dev
-(`39K6A9FP99.com.bentsignal.rodgemail.dev`), so native passkeys work in it.
-iOS caches the association, so Rodge Dev may need reinstalling (or a day)
-before it notices.
-
-- When: after the Convex deploy
-- Commands:
-  `curl -s https://dazzling-dog-633.convex.site/.well-known/apple-app-site-association`
-- Verify: `webcredentials.apps` lists both
-  `39K6A9FP99.com.bentsignal.rodgemail` and
-  `39K6A9FP99.com.bentsignal.rodgemail.dev`.
