@@ -23,7 +23,10 @@
     },
     "development:client": {
       "extends": "development",
-      "developmentClient": true
+      "developmentClient": true,
+      "env": {
+        "APP_VARIANT": "development"
+      }
     },
     "development:client:sim": {
       "extends": "development:client",

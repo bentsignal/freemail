@@ -37,6 +37,20 @@ there's no backfill command.
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
 
+## Passkeys in Rodge Dev (#42)
+
+The Apple app-site association now lists Rodge Dev
+(`39K6A9FP99.com.bentsignal.rodgemail.dev`), so native passkeys work in it.
+iOS caches the association, so Rodge Dev may need reinstalling (or a day)
+before it notices.
+
+- When: after the Convex deploy
+- Commands:
+  `curl -s https://dazzling-dog-633.convex.site/.well-known/apple-app-site-association`
+- Verify: `webcredentials.apps` lists both
+  `39K6A9FP99.com.bentsignal.rodgemail` and
+  `39K6A9FP99.com.bentsignal.rodgemail.dev`.
+
 ## Send email codes through Amazon SES instead of Resend (#44)
 
 Sign-in and verification codes now go out through SES with the hosted mail

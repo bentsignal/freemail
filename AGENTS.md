@@ -15,8 +15,8 @@ and classification. Read [README.md](README.md),
 design or infrastructure questions.
 
 There is **one Convex deployment, `dazzling-dog-633`**. It is called a dev
-deployment, but it serves production: the website and Shawn's phone both
-use it, and it holds his real mail. Never push functions to it
+deployment, but it serves production: the website and both apps on Shawn's
+phone (Rodge Mail and Rodge Dev) use it, and it holds his real mail. Never push functions to it
 (`convex dev`, `convex deploy`) outside a release Shawn asked for, and never
 write to its data except through the app as he would.
 
@@ -86,22 +86,34 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
 - Keep each pull request to one coherent change, with a description covering
   the summary, the evidence, and the validation that was run
   (`.github/pull_request_template.md`).
-- Open the PR, review your own diff as a skeptical reviewer, and wait for
-  CI to pass.
-- **Shawn does not review PRs.** The agent running the work owns review,
-  merging, and releases. Once your self-review is done, CI is green, and
-  the change is verified, merge it yourself with the `merge` skill: squash
-  and merge, delete the branch, devices down, and the thread settled. Then
-  tell Shawn what merged and anything he should try himself.
+- A fix for a GitHub issue says `Fixes #<issue>` in its PR description (one
+  line per issue) and targets `main`.
+- Open the PR, review your own diff as a skeptical reviewer, wait for CI to
+  pass, start the dev server (`scripts/phone.sh up`), then tell Shawn it is
+  ready to test and **stop**. Shawn tests every change on his phone in
+  Rodge Dev before it merges, and you refine it on the branch until he's
+  happy; the release doesn't re-test each change. The dev server stays up
+  through the rounds of feedback and comes down when the PR merges or
+  Shawn drops the work.
+- **Merge only after Shawn approves that PR in the thread** ("merge it",
+  "ship it", "approved"), following the `merge` skill: squash and merge,
+  deleting the branch, then the dev server and devices down and the thread
+  settled. Approval of one PR is not approval of another. CI passing,
+  your own review, and your own simulator checks are never approval.
 
 ## Releases
 
 Merging does not release anything. When Shawn asks for a release, follow
-the `rodge-release` skill ([docs/releasing.md](docs/releasing.md)): Convex
-functions to `dazzling-dog-633`, the website with `vercel deploy --prod`,
-and a new local EAS build for his phone when the mobile app changed. The
-phone runs a standalone build with its JavaScript embedded and no
-over-the-air updates, so a mobile change reaches it only in a new build.
+the `rodge-release` skill ([docs/releasing.md](docs/releasing.md)): list
+what changed since the last release and what to test where those changes
+overlap (each one was already tested on its own before it merged), run
+those tests yourself first in the simulator, put `main` on his phone in
+Rodge Dev for what only he can check, and ship only after he approves the
+release. Shipping is Convex functions to `dazzling-dog-633`, the website
+with `vercel deploy --prod`, and a new local EAS build of Rodge Mail for
+his phone when the mobile app changed. Rodge Mail is a standalone build
+with its JavaScript embedded and no over-the-air updates, so a mobile
+change reaches it only in a new build.
 
 **Extra release steps go in [docs/next-release.md](docs/next-release.md),
 in the PR that needs them.** Convex environment variables, DNS or AWS
@@ -109,6 +121,49 @@ setup, an order to deploy in, or a check after shipping: list each one
 there (what, when, the commands, and how to verify it) in that same PR, and
 say so on the PR's "Extra release steps" line. CI fails a PR without the
 line.
+
+## Phone builds
+
+Shawn's phone has two Rodge apps side by side: **Rodge Mail**
+(`com.bentsignal.rodgemail`, the standalone build he reads his mail in,
+updated only in a release) and **Rodge Dev**
+(`com.bentsignal.rodgemail.dev`, amber icon, a dev client). Both talk to
+`dazzling-dog-633`, so Rodge Dev shows his real mail; it never registers
+for push notifications, or every email would notify twice. Every
+development binary is Rodge Dev, the simulators' too. See
+[docs/phone-testing.md](docs/phone-testing.md).
+
+- **Day to day, Rodge Dev is main's dev client.** When your worktree's work
+  is ready to test, run `scripts/phone.sh up` in it. One Metro serves the
+  Mac's Wi-Fi address and, through a Tailscale proxy, his tailnet for when
+  he's away from home. It prints a block to send him as it is, first in
+  your message, every time: the two **open links** as a Markdown list (one
+  tap on his iPhone opens Rodge Dev on this worktree's server, at home or
+  over Tailscale), then the home and Tailscale server addresses, each in
+  its own code block so he can copy it in one tap. **Keep it exactly as
+  printed**: the links as list items in `[label](url)` form, never in
+  backticks, never bare, never the `rodge-mail-dev://` URL the page opens
+  (his chat only makes http and https links tappable), and each address
+  in its own fenced block. Don't send QR codes unless he asks. JavaScript
+  changes then hot-reload on his phone with no build.
+- **Native builds only when native code changed.** `phone.sh up` compares
+  the worktree's native fingerprint with main's. A worktree that changed
+  native code gets its own dev client (built once, about 15 minutes, and
+  cached); he installs it from the install link, and when he's done,
+  `phone.sh down` prints main's install link to put main's dev client back
+  (`phone.sh main` any time). Tell Shawn when he has to install something,
+  with the install link `phone.sh` prints (a list item too); otherwise he
+  only taps the open link. `phone.sh list` shows every cached dev client.
+- **Releases are tested in Rodge Dev too**, serving `main` (the
+  `rodge-release` skill), so fixes reach his phone without a build. Rodge
+  Mail gets the release build afterwards.
+- When Shawn asks to test something "on his phone", that means
+  `scripts/phone.sh up`. A Rodge Mail build (the `rodge-expo-build`
+  skill) is only for a release, or when he asks for one by name.
+- Keep it up until the PR merges or Shawn drops the work, then
+  `scripts/phone.sh down`. A server the phone hasn't loaded from in 24
+  hours stops on its own (any worktree's `phone.sh up`, `sim.sh up`, or an
+  agent's turn ending checks); `phone.sh up` brings it back.
 
 ## Required validation after changes
 
