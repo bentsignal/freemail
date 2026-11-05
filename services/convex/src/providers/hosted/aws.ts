@@ -1,10 +1,11 @@
 import { AwsClient } from "aws4fetch";
 
-import { requireHostedMailConfig } from "./env";
+import { requireHostedMailConfig, requireSesConfig } from "./env";
 import { sesSendResponseSchema } from "./payloads";
 
-function createClient() {
-  const config = requireHostedMailConfig();
+function createClient<
+  T extends { accessKeyId: string; secretAccessKey: string; region: string },
+>(config: T) {
   return {
     config,
     client: new AwsClient({
@@ -21,7 +22,7 @@ function objectUrl(bucket: string, region: string, key: string) {
 }
 
 export async function getRawMessage(key: string) {
-  const { client, config } = createClient();
+  const { client, config } = createClient(requireHostedMailConfig());
   const response = await client.fetch(
     objectUrl(config.bucket, config.region, key),
     { aws: { service: "s3" } },
@@ -33,7 +34,7 @@ export async function getRawMessage(key: string) {
 }
 
 export async function putRawMessage(key: string, body: Uint8Array) {
-  const { client, config } = createClient();
+  const { client, config } = createClient(requireHostedMailConfig());
   const response = await client.fetch(
     objectUrl(config.bucket, config.region, key),
     {
@@ -64,7 +65,40 @@ export async function sendRawEmail(args: {
   bcc: string[];
   raw: Uint8Array;
 }) {
-  const { client, config } = createClient();
+  return sendSesEmail(requireHostedMailConfig(), {
+    FromEmailAddress: args.from,
+    Destination: {
+      ToAddresses: args.to,
+      CcAddresses: args.cc,
+      BccAddresses: args.bcc,
+    },
+    Content: { Raw: { Data: Buffer.from(args.raw).toString("base64") } },
+  });
+}
+
+export async function sendTextEmail(args: {
+  from: string;
+  to: string;
+  subject: string;
+  text: string;
+}) {
+  return sendSesEmail(requireSesConfig(), {
+    FromEmailAddress: args.from,
+    Destination: { ToAddresses: [args.to] },
+    Content: {
+      Simple: {
+        Subject: { Data: args.subject, Charset: "UTF-8" },
+        Body: { Text: { Data: args.text, Charset: "UTF-8" } },
+      },
+    },
+  });
+}
+
+async function sendSesEmail(
+  sesConfig: ReturnType<typeof requireSesConfig>,
+  request: Record<string, unknown>,
+) {
+  const { client, config } = createClient(sesConfig);
   const response = await client.fetch(
     `https://email.${config.region}.amazonaws.com/v2/email/outbound-emails`,
     {
@@ -72,13 +106,7 @@ export async function sendRawEmail(args: {
       headers: { "Content-Type": "application/json" },
       aws: { service: "ses" },
       body: JSON.stringify({
-        FromEmailAddress: args.from,
-        Destination: {
-          ToAddresses: args.to,
-          CcAddresses: args.cc,
-          BccAddresses: args.bcc,
-        },
-        Content: { Raw: { Data: Buffer.from(args.raw).toString("base64") } },
+        ...request,
         ...(config.configurationSet
           ? { ConfigurationSetName: config.configurationSet }
           : {}),

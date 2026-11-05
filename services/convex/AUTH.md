@@ -4,11 +4,12 @@ Rodge Mail uses Better Auth passkeys backed by a locally installed Convex
 component. Configure these variables on each Convex deployment:
 
 - `BETTER_AUTH_SECRET`: a random Better Auth signing secret.
-- `AUTH_EMAIL_FROM`: a verified Resend sender, such as
-  `Rodge Mail <auth@example.com>`.
+- `AUTH_EMAIL_FROM`: the sender for email codes, on a domain verified in
+  Amazon SES, such as `Rodge Mail <mail@rodgers.dev>`. The codes go out
+  through SES with the hosted mail credentials (`HOSTED_MAIL_AWS_*`, see
+  [PROVIDERS.md](PROVIDERS.md#hosted-mail-amazon-ses)).
 - `PASSKEY_RP_ID`: the browser WebAuthn relying-party domain, without a scheme
   or path. Local web development keeps its `.local` relying party.
-- `RESEND_API_KEY`: the Resend API key used for registration verification codes.
 - `ANDROID_PASSKEY_ORIGINS`: optional comma-separated
   `android:apk-key-hash:<BASE64_SHA256>` origins for every debug, EAS, and Play
   signing certificate that may authenticate on Android versions where

@@ -244,7 +244,8 @@ SES configuration-set events ─> SNS ─> hostedDeliveryEvents
   That message is still stored, with no subject or sender.
 - Read state and archive are local-only; there is no provider to synchronize.
 - Convex uses the `rodge-mail-convex` IAM user, limited to the mail bucket and
-  sending from verified identities.
+  sending from verified identities. The same credentials send Rodge Mail's
+  own sign-in and verification codes from `AUTH_EMAIL_FROM` ([AUTH.md](AUTH.md)).
 
 Provisioning is idempotent and lives in `scripts/hosted-mail.mjs`:
 

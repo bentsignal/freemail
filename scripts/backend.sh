@@ -146,14 +146,13 @@ configure() {
   web="https://$("$ROOT/scripts/worktree-id.sh").www.rodge-mail.local"
   # What convex.env.ts declares (Convex checks the optional ones too, for
   # the auth config), plus DEV_TOOLS. Nothing that acts on the outside
-  # world: RESEND_API_KEY is a placeholder Resend rejects.
+  # world: with no AWS keys, email codes have nothing to send through.
   convex env set ENVIRONMENT development
   convex env set DEV_TOOLS true
   convex env set PASSKEY_RP_ID "${SITE_URL#https://}"
   convex env set WEB_URL "$web"
   convex env set DESKTOP_BROWSER_AUTH_URL "$web"
   convex env set AUTH_EMAIL_FROM "Rodge Mail <noreply@example.invalid>"
-  convex env set RESEND_API_KEY isolated-backend-placeholder
   if [ -z "$(convex env get BETTER_AUTH_SECRET 2>/dev/null || true)" ]; then
     convex env set BETTER_AUTH_SECRET "$(openssl rand -hex 32)"
   fi

@@ -59,10 +59,7 @@ export function createAuthOptions(
     trustedOrigins,
     plugins: [
       desktopAuth(),
-      passkeyRecovery({
-        apiKey: env.RESEND_API_KEY,
-        from: env.AUTH_EMAIL_FROM,
-      }),
+      passkeyRecovery({ from: env.AUTH_EMAIL_FROM }),
       emailOTP({
         disableSignUp: true,
         allowedAttempts: 3,
@@ -82,7 +79,6 @@ export function createAuthOptions(
           }
 
           await sendRegistrationEmail({
-            apiKey: env.RESEND_API_KEY,
             from: env.AUTH_EMAIL_FROM,
             otp,
             to: email,
