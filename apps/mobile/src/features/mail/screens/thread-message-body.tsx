@@ -9,13 +9,13 @@ import { api } from "@rodge-mail/convex/api";
 
 import { MobileEmailBody } from "../components/mobile-email-body";
 import { toConvexId } from "../lib/convex-id";
+import { formatMessageTime } from "../lib/mail-format";
 import { openEmailLink } from "../lib/open-email-link";
 import {
   createOriginalHtmlDocument,
   parseOriginalHtmlMessage,
 } from "../lib/original-html-document";
 import { MessageAttachments } from "./message-attachments";
-import { MessageHeader } from "./message-header";
 import { SwitchedContent } from "./switched-content";
 
 export type MessageViewMode = "clean" | "original";
@@ -45,6 +45,48 @@ export function ThreadMessageBody({
       <MessageAttachments attachments={message.attachments} />
     </View>
   );
+}
+
+function MessageHeader({ message }: { message: MailMessage }) {
+  const senderName = message.from.name || message.from.address;
+  return (
+    <View className="flex-row items-start gap-3">
+      <View className="bg-muted size-10 items-center justify-center rounded-full">
+        <Text className="text-foreground text-[17px] font-semibold">
+          {senderName.slice(0, 1).toUpperCase()}
+        </Text>
+      </View>
+      <View className="min-w-0 flex-1">
+        <View className="flex-row items-baseline gap-2">
+          <Text
+            className="text-foreground min-w-0 flex-1 text-[17px] leading-[22px] font-semibold"
+            numberOfLines={1}
+          >
+            {senderName}
+          </Text>
+          <Text className="text-muted-foreground text-[15px] leading-5">
+            {formatMessageTime(message.sentAt)}
+          </Text>
+        </View>
+        <Text
+          className="text-muted-foreground text-[15px] leading-5"
+          numberOfLines={2}
+        >
+          {formatRecipients(message)}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function formatRecipients(message: MailMessage) {
+  const to = `To: ${names(message.to)}`;
+  if (message.cc.length === 0) return to;
+  return `${to}  Cc: ${names(message.cc)}`;
+}
+
+function names(addresses: MailMessage["to"]) {
+  return addresses.map((address) => address.name || address.address).join(", ");
 }
 
 function MessageContent({
