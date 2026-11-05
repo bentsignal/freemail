@@ -37,7 +37,7 @@ there's no backfill command.
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
 
-## Send email codes through Amazon SES instead of Resend (#PR)
+## Send email codes through Amazon SES instead of Resend (#44)
 
 Sign-in and verification codes now go out through SES with the hosted mail
 credentials, from `AUTH_EMAIL_FROM`. `rodgers.dev` is already verified in
