@@ -20,8 +20,9 @@ the release build.
 "Rodge Dev", bundle ID and package `com.bentsignal.rodgemail.dev`, scheme
 `rodge-mail-dev`, the amber icon (`assets/icons/rodge-dev.icon`, and
 `rodge-dev-android-background.png` on Android), and `extra.appVariant`.
-Without it the config is unchanged, so Rodge Mail's native fingerprint
-doesn't move.
+Without it Rodge Mail's resolved config is unchanged, though its native
+fingerprint still hashes the config files and icons, so adding the variant
+counted as a native change.
 
 Every development binary is Rodge Dev: the phone dev client
 (`development:client`) and the simulators' (`development:client:sim`),
