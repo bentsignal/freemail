@@ -23,14 +23,15 @@ emulator yourself: no `xcrun simctl boot`, no XcodeBuildMCP `boot_sim` or
 - App directory: `apps/mobile`
 - Expo config: `apps/mobile/app.config.ts`
 - EAS config: `apps/mobile/eas.json`
-- Slug and scheme: `rodge-mail`
-- iOS bundle identifier: `com.bentsignal.rodgemail`
-- Android package: `com.bentsignal.rodgemail`
-- Simulator profile: `development:client:sim`
-- Standalone physical-device profile: `development`
-- Development-client physical-device profile: `development:client`. Don't
-  install it on Shawn's phone unless he asks: it has the same bundle ID, so
-  it replaces his everyday standalone app with one that needs Metro
+- Slug: `rodge-mail`
+- Rodge Mail (Shawn's everyday app): bundle identifier and package
+  `com.bentsignal.rodgemail`, scheme `rodge-mail`, built with the
+  standalone `development` profile.
+- Rodge Dev (every development binary): `APP_VARIANT=development`, bundle
+  identifier and package `com.bentsignal.rodgemail.dev`, scheme
+  `rodge-mail-dev`. The phone dev client is the `development:client`
+  profile, built and served by `scripts/phone.sh` (never by hand); the
+  simulators' is `development:client:sim`, built by `scripts/sim.sh`
   ([docs/phone-testing.md](../../../docs/phone-testing.md)).
 
 ## Standard checks
@@ -53,7 +54,7 @@ Follow the repository `AGENTS.md` validation sequence after source changes.
 eas build --local --non-interactive --profile development:client:sim --platform ios --output <tmp>/client.tar.gz
 ```
 
-It extracts `RodgeMail.app` into `~/Library/Caches/rodge-mail/dev-client-ios/<fingerprint>/`
+It extracts `RodgeDev.app` into `~/Library/Caches/rodge-mail/dev-client-ios/<fingerprint>/`
 (the Android APK goes to `dev-client-android/`), under the heavy-work lock
 every repo shares, then installs it on this worktree's queued simulator and
 starts the worktree's own Metro on a plain port. `scripts/sim.sh build`
