@@ -9,6 +9,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@rodge-mail/convex/api";
 
 import type { NotificationSetupState } from "./notification-setup";
+import { isRodgeDev } from "../dev/app-variant";
 import { getExpoProjectId } from "./expo-project-id";
 import { NEW_MAIL_CATEGORY } from "./notification-actions";
 import {
@@ -25,6 +26,11 @@ import { useNotificationActions } from "./use-notification-actions";
 const installationIdKey = "rodge-mail.notification-installation-id";
 const pushTokenKey = "rodge-mail.expo-push-token";
 const registrationRetryDelayMs = 30_000;
+/**
+ * Rodge Dev signs in to the same mail as Rodge Mail, so it never registers
+ * for pushes: every email would notify twice.
+ */
+const canReceivePushes = Device.isDevice && !isRodgeDev;
 const setupStateListeners = new Set<() => void>();
 let notificationSetupSnapshot: NotificationSetupState | undefined;
 
@@ -79,7 +85,7 @@ export function useMobileNotifications(isAuthenticated: boolean) {
       retryTimer = undefined;
       try {
         const step = getNotificationRegistrationStep({
-          isDevice: Device.isDevice,
+          isDevice: canReceivePushes,
           permission: await getNotificationPermission(),
           preferenceEnabled: registrationEnabled,
         });
@@ -131,6 +137,7 @@ export async function registerForNewMailNotifications(
     requestPermission?: boolean;
   } = {},
 ) {
+  if (isRodgeDev) return { kind: "simulator" as const };
   const permissionGranted = await prepareNotificationPermissions(
     options.requestPermission ?? true,
   );
@@ -208,7 +215,7 @@ export async function getNotificationSetupState() {
   ]);
   return resolveNotificationSetupState({
     hasStoredToken: token !== null,
-    isDevice: Device.isDevice,
+    isDevice: canReceivePushes,
     permission,
   });
 }

@@ -71,6 +71,46 @@ describe("mobile development configuration", () => {
   });
 });
 
+describe("Rodge Dev variant", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  async function loadConfig() {
+    vi.resetModules();
+    const { default: create } = await import("./app.config");
+    return create({ config: {} } as ConfigContext);
+  }
+
+  it("leaves Rodge Mail unchanged without APP_VARIANT", async () => {
+    vi.stubEnv("APP_VARIANT", "");
+    const config = await loadConfig();
+
+    expect(config.name).toBe("Rodge Mail");
+    expect(config.scheme).toBe("rodge-mail");
+    expect(config.ios?.bundleIdentifier).toBe("com.bentsignal.rodgemail");
+    expect(config.android?.package).toBe("com.bentsignal.rodgemail");
+    expect(config.ios?.icon).toBe("./assets/icons/rodge-mail.icon");
+    expect(config.extra).not.toHaveProperty("appVariant");
+  });
+
+  it("builds Rodge Dev beside it with APP_VARIANT=development", async () => {
+    vi.stubEnv("APP_VARIANT", "development");
+    const config = await loadConfig();
+
+    expect(config.name).toBe("Rodge Dev");
+    expect(config.scheme).toBe("rodge-mail-dev");
+    expect(config.ios?.bundleIdentifier).toBe("com.bentsignal.rodgemail.dev");
+    expect(config.android?.package).toBe("com.bentsignal.rodgemail.dev");
+    expect(config.ios?.icon).toBe("./assets/icons/rodge-dev.icon");
+    expect(config.extra?.appVariant).toBe("development");
+    expect(config.ios?.associatedDomains).toEqual([
+      "webcredentials:dazzling-dog-633.convex.site",
+    ]);
+  });
+});
+
 describe("Android network security config", () => {
   it("blocks cleartext traffic in release builds", () => {
     const release = networkSecurityConfig({ debug: false });

@@ -63,8 +63,9 @@ EVIDENCE="$ROOT/.cache/evidence"
 CACHE="$HOME/Library/Caches/rodge-mail"
 # Vera's cache, for the simulator template every repo clones from.
 VERA_CACHE="$HOME/Library/Caches/vera"
-BUNDLE_ID="com.bentsignal.rodgemail"
-SCHEME="rodge-mail"
+# Every development binary is Rodge Dev (app.config.ts, docs/phone-testing.md).
+BUNDLE_ID="com.bentsignal.rodgemail.dev"
+SCHEME="rodge-mail-dev"
 IOS_DEVICE_TYPE="com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro"
 ANDROID_BASE_AVD="Pixel_9"
 export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
@@ -152,7 +153,7 @@ ensure_client() {
     exit 1
   }
   dir="$CACHE/dev-client-$PLATFORM/$hash"
-  artifact="$dir/$([ "$PLATFORM" = ios ] && echo RodgeMail.app || echo rodge-mail.apk)"
+  artifact="$dir/$([ "$PLATFORM" = ios ] && echo RodgeDev.app || echo rodge-dev.apk)"
   CLIENT="$artifact"
   [ -e "$artifact" ] && return
   mkdir -p "$(dirname "$dir")"
@@ -344,7 +345,7 @@ require_app() {
   app_running && return
   local hint
   if [ "$PLATFORM" = ios ]; then
-    hint="$(ls -t "$HOME"/Library/Logs/DiagnosticReports/RodgeMail-*.ips 2>/dev/null | head -20 |
+    hint="$(ls -t "$HOME"/Library/Logs/DiagnosticReports/RodgeDev-*.ips 2>/dev/null | head -20 |
       while read -r report; do grep -q "$DEVICE" "$report" && echo "crash report: $report" && break; done || true)"
   else
     hint="crash log: adb -s $SERIAL logcat -b crash -d"
@@ -410,6 +411,7 @@ launch() {
 
 up() {
   load
+  "$ROOT/scripts/phone.sh" sweep || true
   ensure_client
   rm -f "$STATE_DIR/$PLATFORM.reclaimed"
   queue acquire "$PLATFORM"

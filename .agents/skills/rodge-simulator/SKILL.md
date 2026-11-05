@@ -90,7 +90,7 @@ serial `up` prints (`emulator-55xx`), with `platform: "android"`.
   red boxes and warnings you introduced.
 - `open`, `reload`, `signin`, and `frames` go through the dev-only
   `globalThis.rodgeDev` hook (`apps/mobile/src/features/dev/automation.ts`)
-  over Metro's debugger connection, because iOS asks "Open in Rodge Mail?"
+  over Metro's debugger connection, because iOS asks "Open in Rodge Dev?"
   before every `simctl openurl`.
 - **Signing in needs an isolated backend.** The default backend is the
   production deployment with Shawn's real mail, so there the simulator
@@ -104,7 +104,7 @@ signin` signs in as that owner, and evidence of it is safe to publish
 - Let Shawn watch: call the T3 `device_open` tool with the simulator UDID
   that `up` prints, once (rule 6). It returns the exact `agent-device`
   command and flags; keep them for the rest of your session. Run
-  `agent-device open com.bentsignal.rodgemail "${F[@]}"` once before other
+  `agent-device open com.bentsignal.rodgemail.dev "${F[@]}"` once before other
   agent-device commands. Use agent-device for taps, typing, scrolling, and
   gestures (`snapshot -i`, `press @e3`, `fill`, `scroll`); take a fresh
   `snapshot -i` before each tap, since refs expire after every action. In
@@ -146,7 +146,7 @@ When you have your evidence, and in any case before you end your turn:
 - **`up` says Metro didn't start:** read `.cache/sim/metro.log`. Kill only
   the PID in `.cache/sim/metro`, never by pattern (other worktrees run
   Metro too).
-- **The app shows the dev launcher instead of Rodge Mail:**
+- **The app shows the dev launcher instead of Rodge Dev:**
   `scripts/sim.sh relaunch`.
 - **The dev client build fails:** it's a local EAS build; the log is in
   the `up` output. See the `rodge-expo-build` skill. A missing fastlane or

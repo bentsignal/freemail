@@ -1,6 +1,6 @@
 ---
 name: rodge-feature
-description: The end-to-end workflow for building a Rodge Mail feature or fix in a T3 Code worktree, from planning through simulator and browser verification, PR evidence, CI, and merging it yourself (Shawn does not review PRs). Use at the start of any feature, bug fix, or UI change in this repo, and whenever you need screenshots or videos for a PR, touch Convex functions, or are about to open or merge a PR. Simulator and emulator use also requires the rodge-simulator skill.
+description: The end-to-end workflow for building a Rodge Mail feature or fix in a T3 Code worktree, from planning through simulator and browser verification, PR evidence, CI, Shawn's test on his phone in Rodge Dev, and his approval to merge. Use at the start of any feature, bug fix, or UI change in this repo, and whenever you need screenshots or videos for a PR, touch Convex functions, or are about to open or merge a PR. Simulator and emulator use also requires the rodge-simulator skill.
 ---
 
 # Building a Rodge Mail change
@@ -89,6 +89,103 @@ interaction (`scripts/sim.sh frames start` / `stop`, the `rodge-simulator`
 skill) before and after the change, and put both reports in the PR. `slow`
 must be 0 while things move.
 
+## 4b. Shawn tests it on his phone
+
+The simulator is your check. Every change also gets Shawn's own test on his
+phone, in its worktree, before it merges: the release no longer re-tests
+each change, so this is where a change gets right. He tests in Rodge Dev
+(`com.bentsignal.rodgemail.dev`, amber icon; Rodge Mail stays beside it),
+which shows his real mail from `dazzling-dog-633`
+([docs/phone-testing.md](../../../docs/phone-testing.md)).
+
+**Serve it as soon as the work is ready to test** (step 7), and keep it up
+through every round of feedback. It comes down when the PR merges (the
+`merge` skill) or Shawn drops the work. A server the phone hasn't loaded
+from in 24 hours stops on its own; `phone.sh up` brings it back, so run it
+again at the start of each feedback round and when Shawn says the link
+doesn't load.
+
+```sh
+scripts/phone.sh up             # iPhone; --android for an Android phone
+scripts/phone.sh link           # the links again
+scripts/phone.sh down           # when the PR merges or the work is dropped
+scripts/phone.sh main           # main's dev client, to put back on his phone
+scripts/phone.sh list           # every cached dev client, marking main's
+```
+
+- Before serving, merge `origin/main` into the branch (fix conflicts,
+  re-run the validation, push), so he tests what will merge.
+- Rodge Dev on his phone is normally **main's dev client**, which runs
+  every worktree that hasn't changed native code. `up` compares this
+  worktree's native fingerprint with main's and says which case it is:
+  - **Main's dev client:** he only taps the open link.
+  - **This worktree's own dev client** (native code changed): `up` builds
+    it if needed (about 15 minutes, cached for every worktree) and he
+    installs it first. Afterwards he needs main's back (see `down`).
+  - **A new dev client for main** (main's native code changed since he last
+    installed one): he installs it once; it serves every worktree after.
+- `up` starts the worktree's Metro (the same one the simulators use). One
+  Metro serves both the Mac's Wi-Fi, for when Shawn is home, and his
+  tailnet, for when he's out: `up` puts `tailscale serve` (HTTPS, tailnet
+  only) in front of it. An open link is an https page that opens Rodge Dev
+  on this worktree's server in one tap. `up` prints what to send him
+  between the `----` lines:
+
+  ````
+  ---- send Shawn this as it is ----
+  - [Open in Rodge Dev on iPhone](https://vera-evidence.b-cdn.net/rodge-mail/dev-client/open-….html?url=http%3A%2F%2F10.0.0.124%3A8651)
+  - [Open in Rodge Dev on iPhone over Tailscale](https://vera-evidence.b-cdn.net/rodge-mail/dev-client/open-….html?url=https%3A%2F%2Fairshawn.tailf45482.ts.net%3A8651)
+
+  Home Wi-Fi:
+
+  ```text
+  http://10.0.0.124:8651
+  ```
+
+  Tailscale:
+
+  ```text
+  https://airshawn.tailf45482.ts.net:8651
+  ```
+  ---- end ----
+  add when he has to install first:
+  - [Install Rodge Dev on iPhone](https://vera-evidence.b-cdn.net/rodge-mail/dev-client/ios/…/index.html)
+  ````
+
+  Put it first in your message, every time, copied exactly as printed
+  (without the `----` lines). He's usually home; the Tailscale link and
+  address are for when he isn't, and need Tailscale on on his phone. Each
+  part has to keep its form, or he's back to copying and pasting by hand:
+  - **The open links are a Markdown list of clickable links.** One `- `
+    item per line, each `[label](url)`. Never in backticks or a code
+    block, never the bare URL, and never the `rodge-mail-dev://` URL: his
+    chat only makes http and https links tappable, and the page opens
+    `rodge-mail-dev://` for him. Don't edit a URL; a space or line break
+    inside the parentheses breaks it.
+  - **Each server address is in its own fenced code block** (` ```text `),
+    which T3 gives a copy button. Inline code has none.
+
+  If Tailscale isn't running on the Mac, `up` prints no Tailscale link or
+  address; say so. Add the install link only when he has to install, and
+  say plainly whether he does. Don't send QR codes unless he asks.
+
+- JavaScript edits hot-reload on his phone. Re-run `up` after native
+  changes or `app.config.ts`.
+- Rodge Dev signs in to his real account, so it runs this worktree's app
+  against the functions already on `dazzling-dog-633`. `up` refuses in a
+  worktree with an isolated backend: Rodge Dev would load that backend,
+  which has no account he can sign in to from the phone. A PR that changes
+  Convex functions is tested in the simulator on its isolated backend;
+  tell Shawn what he can only try on the phone after the release that
+  deploys it, and keep the app compatible with the functions already
+  deployed so the rest of the change can be served.
+- Leave it up while you work on his feedback. If this worktree has its own
+  dev client, `down` at close-out prints main's install link: send it so
+  he can put main's dev client back.
+- Never build or install Rodge Mail (the `rodge-expo-build` skill's
+  standalone build) for this. That's the release's job, or when Shawn
+  asks for one by name.
+
 ## 5. Capture evidence
 
 ```sh
@@ -171,19 +268,29 @@ for CI (`gh pr checks --watch`) and fix failures; make sure the CI workflow
 actually ran (lint, typecheck, test, format, build, react-doctor, bundle),
 not just the fingerprint and release-steps checks.
 
-Shawn does not review PRs. Once your review is done and CI is green, merge
-it yourself (the `merge` skill), then tell Shawn: the PR link, a two-line
-summary, the evidence highlights, what you couldn't check (what doesn't
-run on an isolated backend), what to try
-himself (on the website, or on the phone once it's released), and any extra
-release steps.
+Then start the dev server (step 4b) and tell Shawn it's ready to test:
+the block `phone.sh up` prints first (the open links as a list of
+clickable links, then each address in its own code block), then the PR
+link, a two-line summary, what to try on his phone (concrete steps for
+this change), whether he has to install its own dev client, anything he
+can't try on the phone yet (a Convex change waiting for a release), and
+anything he should look at closely. **Stop there.** Don't merge.
 
 ## 8. Feedback and merge
 
-- Feedback: make the changes on the same branch, refresh the evidence if
-  the UI changed (devices up, then down), push, and report again.
-- Feedback after a merge goes in a new PR. Merging does not release
-  anything; releases are separate (the `rodge-release` skill).
+- Feedback: make the changes on the same branch with the dev server still
+  up (JavaScript hot-reloads on his phone; re-run `phone.sh up` after
+  native changes, or if it stopped for being idle). `scripts/sim.sh up`
+  again, refresh the evidence if the UI changed, `scripts/sim.sh down`,
+  push, and report again. Expect a few rounds; refining the change here is
+  cheaper than finding it in the release.
+- Merge only when Shawn approves this PR in the thread ("merge it",
+  "approved", "ship it"), normally after testing it on his phone. Then
+  follow the `merge` skill: it merges, stops the dev server and devices,
+  tears down an isolated backend, and settles the thread. CI passing, your
+  review, and your simulator checks are never approval. Merging does not
+  release anything; releases are separate (the `rodge-release` skill).
 - If Shawn drops the work instead (closes the PR, abandons it, or replaces
   it with another thread), wind it down the same way without merging: the
-  `merge` skill's steps 1 and 4.
+  `merge` skill's steps 1 and 4, plus `scripts/backend.sh teardown` if the
+  worktree has an isolated backend.

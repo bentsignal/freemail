@@ -1,6 +1,6 @@
 ---
 name: rodge-release
-description: Run a Rodge Mail release end to end, covering what changed since the last release, what to test where those changes meet, Convex functions to the one deployment, the website to mail.rodgers.dev, and a new local EAS build on Shawn's iPhone. Use when Shawn asks to release, ship, deploy, push the backend or website, or put a new build on his phone, or asks what changed since the last release.
+description: Run a Rodge Mail release end to end, covering what changed since the last release, what to test where those changes meet, a first pass of those tests in the simulator, testing main in Rodge Dev on Shawn's phone, then (after his go-ahead) Convex functions to the one deployment, the website to mail.rodgers.dev, and a new local EAS build of Rodge Mail on his iPhone. Use when Shawn asks to release, ship, deploy, push the backend or website, or put a new build on his phone, or asks what changed since the last release.
 ---
 
 # Releasing Rodge Mail
@@ -12,7 +12,7 @@ point it says, and verify each one. A step you can't do blocks the release:
 tell Shawn. After shipping, open a PR that removes the finished ones.
 
 Releases always come from `origin/main`, never from a feature branch.
-Step 3 decides when to ship; ask Shawn only for what needs him.
+Nothing ships without Shawn's explicit go-ahead at step 4.
 
 ## 0. Get onto main
 
@@ -39,8 +39,11 @@ merged PR's description ends with release notes; start from those and
   (any change under `apps/mobile` or `shared/`; a "Native change: yes" means
   the build needs the native acceptance checks too).
 - **What's new:** a short list in his words, not PR titles.
-- **What to test:** only what merging could have broken: files, components,
-  or Convex functions more than one PR touched
+- **What to test:** only what merging could have broken. Shawn already
+  tested each change on his phone in Rodge Dev before it merged (the
+  `rodge-feature` skill), so don't list every change again, and don't list
+  a regression pass. Look at files, components, or Convex functions more
+  than one PR touched
   (`git log --format='%h %s' --name-only "$last"..origin/main`), changes
   to the same flow from different ends, and backend changes paired with app
   changes that didn't test against each other. If nothing overlaps, say so.
@@ -48,25 +51,59 @@ merged PR's description ends with release notes; start from those and
   phone's installed build keep working between the Convex deploy and their
   own updates.
 
-## 2. Check it yourself first
+## 2. Run the test list yourself first
 
-Run what you can of the test list before sending it: the website against
-the worktree's Portless origin (`pnpm exec portless proxy start --lan`,
-then `pnpm -F @rodge-mail/web dev`; never `pnpm dev`, which runs
-`convex dev`), and the mobile app in the simulator (the `rodge-simulator`
-skill; signed in on an isolated backend, `scripts/backend.sh isolate`,
-with seeded mail). Fix what fails
-the usual way (a PR, the `rodge-feature` skill) before Shawn sees it.
-Then send him the write-up, split into what you checked (with evidence)
-and what's for him.
+Before sending Shawn anything, run every step of that list yourself: the
+website against the worktree's Portless origin (`pnpm exec portless proxy
+start --lan`, then `pnpm -F @rodge-mail/web dev`; never `pnpm dev`, which
+runs `convex dev`), and the mobile app in the simulator (the
+`rodge-simulator` skill; signed in on an isolated backend,
+`scripts/backend.sh isolate`, with seeded mail, which also has the
+release's Convex functions). Take a screenshot of each result and upload
+them with `scripts/evidence.sh`. Fix what fails the usual way (a PR, the
+`rodge-feature` skill, which Shawn approves like any other) before he sees
+it, then `scripts/backend.sh teardown` and `sim.sh down`.
 
-## 3. Decide
+Send Shawn the write-up with the list in two parts:
 
-Shawn delegates releases. When your own checks pass and nothing in the
-plan needs him (a phone install, an account login, a decision only he can
-make), ship. Tell him what shipped, and ask only for what needs him.
+- **Checked:** each step you ran, what you saw, any fix, and its evidence.
+- **For you:** only what the simulator can't settle, each with why: how
+  motion and gestures feel on a real phone, his real mail and accounts,
+  real push notifications (in Rodge Mail, after it's built), and anything
+  you ran but couldn't judge.
 
-## 4. Ship
+## 3. Put main on his phone in Rodge Dev
+
+From the release checkout (detached at `origin/main`, no isolated
+backend):
+
+```sh
+scripts/phone.sh up
+```
+
+It builds a dev client only when `main`'s native fingerprint has none yet
+(about 15 minutes); otherwise Shawn just taps the open link. Send him the
+block it prints, first and exactly as printed (the `rodge-feature` skill,
+step 4b). Rodge Dev runs `main`'s JavaScript against the functions already
+on `dazzling-dog-633`. If the release has Convex changes, the parts of the
+list that need them can't be tried there yet: say which, and ask whether to
+deploy Convex first (step 5's Convex part, safe for the installed apps
+because every Convex change stays compatible with them) so he can test
+them before the website and the Rodge Mail build ship.
+
+Then wait. He works through the "For you" list at his own pace and either
+approves ("ship it", "release it", "looks good") or asks for fixes. Fixes
+found during the release test go through PRs he approves (the
+`rodge-feature` skill); once they merge, update the write-up and serve
+`main` again. Don't ship without an explicit approval of this release.
+`scripts/phone.sh down` once he's done.
+
+## 4. Go-ahead
+
+Ship only after Shawn approves this release in the thread. Approval of an
+earlier release, or of a PR, is not approval of this one.
+
+## 5. Ship
 
 In this order, skipping parts the plan doesn't need, doing each
 `docs/next-release.md` step where it says:
