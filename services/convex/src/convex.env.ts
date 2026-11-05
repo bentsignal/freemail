@@ -9,5 +9,4 @@ export const env = createEnv({
   AUTH_ALLOWED_USER_ID: v.string(),
   WEB_URL: v.optional(v.string()),
   PASSKEY_RP_ID: v.string(),
-  RESEND_API_KEY: v.string(),
 });

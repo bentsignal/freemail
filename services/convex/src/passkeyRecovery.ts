@@ -28,7 +28,6 @@ const verifyRecoverySchema = z.object({
 });
 
 interface RecoveryOptions {
-  apiKey: string;
   from: string;
 }
 
@@ -118,7 +117,6 @@ export function passkeyRecovery(options: RecoveryOptions) {
             }),
           });
           await sendRecoveryEmail({
-            apiKey: options.apiKey,
             from: options.from,
             otp: code,
             to: ctx.body.email,

@@ -29,8 +29,8 @@ scripts/backend.sh teardown   # delete it; the worktree goes back to the default
    `ENVIRONMENT=development`, a fresh random `BETTER_AUTH_SECRET`,
    `PASSKEY_RP_ID` (the deployment's `.convex.site` host), `WEB_URL` and
    `DESKTOP_BROWSER_AUTH_URL` (this worktree's Portless origin),
-   `AUTH_EMAIL_FROM` (`noreply@example.invalid`), and a placeholder
-   `RESEND_API_KEY`. No production setting is copied.
+   and `AUTH_EMAIL_FROM` (`noreply@example.invalid`). No production
+   setting is copied.
 3. Pushes the functions (`convex dev --once`).
 4. Runs `devTools:ensureOwner`, an internal mutation that creates the test
    user `alex.rivera@example.com` through Better Auth's raw adapter
@@ -87,7 +87,7 @@ No provider, AI, email, push, or AWS secret is set there, on purpose:
 - Sending mail (the outbox has no provider to send through).
 - Classification, clean view, summaries, and semantic search
   (no `OPENAI_API_KEY`); lexical search over the seed works.
-- Email codes and passkey recovery emails (placeholder `RESEND_API_KEY`).
+- Email codes and passkey recovery emails (no SES keys).
 - Push notifications (simulators can't register for them anyway).
 - Passkeys on the simulator (the dev client isn't associated with the
   isolated `.convex.site` domain). Use `scripts/sim.sh signin`.
