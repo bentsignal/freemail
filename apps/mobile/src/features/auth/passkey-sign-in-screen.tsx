@@ -1,4 +1,11 @@
-import { Image, Text, View } from "react-native";
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import roundedIcon from "../../../assets/icon.png";
 import { EmailCodeSignIn } from "./email-code-sign-in";
@@ -9,21 +16,30 @@ export function PasskeySignInScreen() {
   const auth = usePasskeyAuth();
 
   return (
-    <View className="bg-background flex-1 justify-center px-6 py-10">
-      <View className="mx-auto w-full max-w-sm gap-8">
-        <BrandHeader />
-        <View className="gap-3">
-          <NativeAuthButton
-            disabled={auth.isSigningIn}
-            label="Sign in with passkey"
-            onPress={() => void auth.signIn()}
-            variant="filled"
-          />
-          <AuthMessage message={auth.message} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      className="bg-background flex-1"
+    >
+      <ScrollView
+        contentContainerClassName="grow justify-center px-6 py-10"
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="mx-auto w-full max-w-sm gap-8">
+          <BrandHeader />
+          <View className="gap-3">
+            <NativeAuthButton
+              disabled={auth.isSigningIn}
+              label="Sign in with passkey"
+              onPress={() => void auth.signIn()}
+              variant="filled"
+            />
+            <AuthMessage message={auth.message} />
+          </View>
+          <EmailCodeSignIn />
         </View>
-        <EmailCodeSignIn />
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
