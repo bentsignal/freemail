@@ -1,5 +1,16 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
 
+/**
+ * `APP_VARIANT=development` builds "Rodge Dev": its own bundle ID, name,
+ * scheme, and icon, so the phone dev client (scripts/phone.sh) installs next
+ * to the everyday Rodge Mail build. Without it the config is unchanged. See
+ * docs/phone-testing.md.
+ */
+const dev = process.env.APP_VARIANT === "development";
+const BUNDLE_ID = dev
+  ? "com.bentsignal.rodgemail.dev"
+  : "com.bentsignal.rodgemail";
+
 export default ({ config }: ConfigContext): ExpoConfig => {
   const buildProfile = process.env.EAS_BUILD_PROFILE;
   if (buildProfile && !buildProfile.startsWith("development")) {
@@ -10,10 +21,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return {
     ...config,
-    name: "Rodge Mail",
+    name: dev ? "Rodge Dev" : "Rodge Mail",
     slug: "rodge-mail",
     owner: "directedbyshawn",
-    scheme: "rodge-mail",
+    scheme: dev ? "rodge-mail-dev" : "rodge-mail",
     version: "0.1.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
@@ -25,24 +36,29 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     extra: {
       ...config.extra,
       deploymentEnvironment: "development",
+      ...(dev ? { appVariant: "development" } : {}),
       eas: {
         projectId: "4273bb9c-b86a-419b-8b0a-ac4180f0b9bd",
       },
     },
     ios: {
       associatedDomains: ["webcredentials:dazzling-dog-633.convex.site"],
-      bundleIdentifier: "com.bentsignal.rodgemail",
+      bundleIdentifier: BUNDLE_ID,
       supportsTablet: true,
       // Liquid Glass icon from Icon Composer; see assets/icons/README.md.
-      icon: "./assets/icons/rodge-mail.icon",
+      icon: dev
+        ? "./assets/icons/rodge-dev.icon"
+        : "./assets/icons/rodge-mail.icon",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {
-      package: "com.bentsignal.rodgemail",
+      package: BUNDLE_ID,
       adaptiveIcon: {
-        backgroundImage: "./assets/icons/rodge-mail-android-background.png",
+        backgroundImage: dev
+          ? "./assets/icons/rodge-dev-android-background.png"
+          : "./assets/icons/rodge-mail-android-background.png",
         foregroundImage: "./assets/icons/rodge-mail-android-foreground.png",
         monochromeImage: "./assets/icons/rodge-mail-android-monochrome.png",
       },

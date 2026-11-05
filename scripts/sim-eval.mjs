@@ -18,7 +18,7 @@ const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((r) =>
 const device = process.env.RODGE_DEVICE;
 const target = targets.find(
   (t) =>
-    t.appId === "com.bentsignal.rodgemail" &&
+    t.appId === "com.bentsignal.rodgemail.dev" &&
     t.webSocketDebuggerUrl &&
     (device === undefined || device === "" || t.deviceName?.startsWith(device)),
 );

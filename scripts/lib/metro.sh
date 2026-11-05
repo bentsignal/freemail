@@ -4,10 +4,15 @@
 # simulators load their own JavaScript. Metro listens on every interface and
 # answers with bundle URLs on whatever host the device used. Its state is
 # $STATE_DIR/metro; each device using it keeps a file in $STATE_DIR (ios,
-# android, and phone-ios or phone-android once scripts/phone.sh exists), and
-# Metro stops when the last one goes.
+# android, phone-ios, phone-android: scripts/phone.sh serves Shawn's phone
+# from the same Metro), and Metro stops when the last one goes.
 #
 # Sourced with ROOT, MOBILE, and STATE_DIR set.
+
+# Every development binary is Rodge Dev (app.config.ts), and Metro serves its
+# config, so Metro, fingerprints, and dev client builds all use the dev
+# variant.
+export APP_VARIANT=development
 
 hash_of() { printf '%s' "$1" | cksum | cut -d' ' -f1; }
 
