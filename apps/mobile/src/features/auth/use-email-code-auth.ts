@@ -17,17 +17,20 @@ export function useEmailCodeAuth() {
   async function run(action: () => Promise<void>) {
     setIsBusy(true);
     setMessage(undefined);
+    let succeeded = false;
     try {
       await action();
+      succeeded = true;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Sign-in failed");
     }
     setIsBusy(false);
+    return succeeded;
   }
 
-  function sendCode(email: string) {
-    return run(async () => {
-      const normalized = email.trim().toLowerCase();
+  async function sendCode(email: string) {
+    const normalized = email.trim().toLowerCase();
+    const sent = await run(async () => {
       const result = await authClient.$fetch("/passkey-recovery/request", {
         body: { email: normalized },
         method: "POST",
@@ -35,8 +38,8 @@ export function useEmailCodeAuth() {
       if (result.error) {
         throw new Error(result.error.message ?? "Could not send the code");
       }
-      setCodeSentTo(normalized);
     });
+    if (sent) setCodeSentTo(normalized);
   }
 
   function verifyCode(code: string) {
