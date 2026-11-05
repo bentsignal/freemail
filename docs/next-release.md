@@ -50,28 +50,3 @@ before it notices.
 - Verify: `webcredentials.apps` lists both
   `39K6A9FP99.com.bentsignal.rodgemail` and
   `39K6A9FP99.com.bentsignal.rodgemail.dev`.
-
-## Send email codes through Amazon SES instead of Resend (#44)
-
-Sign-in and verification codes now go out through SES with the hosted mail
-credentials, from `AUTH_EMAIL_FROM`. `rodgers.dev` is already verified in
-SES with production access, and the `rodge-mail-convex` IAM user may send
-from any verified identity, so no AWS change is needed.
-
-- When: right after the Convex deploy (the new functions send through SES
-  as soon as they're live; the old ones still need the Resend key until
-  then).
-- Commands, from `services/convex`:
-
-  ```sh
-  pnpm exec convex env set AUTH_EMAIL_FROM 'Rodge Mail <mail@rodgers.dev>'
-  pnpm exec convex env remove RESEND_API_KEY
-  ```
-
-- Verify: open `https://mail.rodgers.dev/recover`, request a code for
-  Shawn's address, and check it arrives from `mail@rodgers.dev` (not in
-  spam). The send also shows up in
-  `aws sesv2 get-account --region us-east-1 --query SendQuota.SentLast24Hours`.
-  Then Shawn can close the Resend account. Neither `rodgers.dev` nor
-  `bentsignal.com` has Resend DNS records; if the old sender's domain was
-  another one, remove its `resend._domainkey` and `send.` records there.
