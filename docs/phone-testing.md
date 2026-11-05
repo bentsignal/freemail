@@ -30,11 +30,14 @@ because one Metro per worktree serves both and Metro serves the variant's
 config (`scripts/lib/metro.sh` exports `APP_VARIANT`). Only Rodge Mail's
 standalone `development` build is Rodge Mail.
 
-Sign-in is unchanged: the auth client still sends the `rodge-mail://`
-origin the backend trusts, so email codes work in Rodge Dev right away.
 Native passkeys need `com.bentsignal.rodgemail.dev` in the Apple
 app-site association (`services/convex/src/http.ts`), which reaches
-`dazzling-dog-633` in the release after it merged. Android passkeys in
+`dazzling-dog-633` in the release after it merged; until then iOS refuses
+them ("not associated with domain"). Rodge Dev also offers an emailed
+sign-in code (`email-code-sign-in.tsx`, shown only in Rodge Dev), which
+uses the existing passkey recovery endpoints, so it works without a
+deploy. The auth client still sends the `rodge-mail://` origin the backend
+trusts. Android passkeys in
 Rodge Dev would also need its signing certificate in
 `ANDROID_PASSKEY_ORIGINS` and `assetlinks.json` (services/convex/AUTH.md);
 not done.
