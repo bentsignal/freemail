@@ -3,10 +3,10 @@
 Shawn tests every change on his phone before it merges, the way Vera does
 it. His phone has two Freemail apps side by side:
 
-| App        | Bundle ID and package          | What it is                                                                 | Updated by                    |
-| ---------- | ------------------------------ | -------------------------------------------------------------------------- | ----------------------------- |
-| Freemail | `com.bentsignal.rodgemail`     | The standalone `development` build he reads his mail in, JavaScript embedded | a release (`freemail-release`)   |
-| Freemail Dev  | `com.bentsignal.rodgemail.dev` | A dev client, amber icon, loading a worktree's JavaScript from its Metro   | `scripts/phone.sh up`         |
+| App          | Bundle ID and package          | What it is                                                                   | Updated by                     |
+| ------------ | ------------------------------ | ---------------------------------------------------------------------------- | ------------------------------ |
+| Freemail     | `com.bentsignal.rodgemail`     | The standalone `development` build he reads his mail in, JavaScript embedded | a release (`freemail-release`) |
+| Freemail Dev | `com.bentsignal.rodgemail.dev` | A dev client, amber icon, loading a worktree's JavaScript from its Metro     | `scripts/phone.sh up`          |
 
 Both talk to `dazzling-dog-633`, so Freemail Dev shows his real mail. Freemail
 Dev never registers for push notifications (`isFreemailDev` in

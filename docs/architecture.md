@@ -16,7 +16,7 @@ iCloud IMAP/SMTP ────┘                          │
 
 TanStack Start web ──┐
 Expo mobile ─────────┼─> Convex queries, mutations, and auth
-freemail CLI ───────────┘
+freemail CLI ────────┘
 ```
 
 ## Identity and mailbox access
@@ -110,3 +110,27 @@ Header search remains available for every message.
   files, and encrypted credentials in batches. It doesn't revoke the
   provider's grant or delete anything at the provider
   ([PROVIDERS.md](../services/convex/PROVIDERS.md#removing-an-account)).
+
+## Names from before Freemail
+
+The project was called Rodge Mail. A few identifiers keep that name because
+installed apps, stored data, or live infrastructure depend on them, and
+renaming them would sign the phone out, break stored credentials, or orphan
+AWS resources. A fork should pick its own values for the first three before
+it ships.
+
+- Bundle IDs and Android packages `com.bentsignal.rodgemail` and
+  `com.bentsignal.rodgemail.dev` (`app.config.ts`, the `.well-known` files,
+  `services/convex/src/http.ts`), the EAS project slug `rodge-mail`, and the
+  URL schemes `rodge-mail://` and `rodge-mail-dev://`.
+- The AWS resource names in `scripts/hosted-mail.mjs` (`rodge-mail` receipt
+  rule set, configuration set, bucket prefix, and `rodge-mail-convex` IAM
+  user).
+- Storage keys on the phone and the website (`rodge-mail.palette`, the auth
+  `storagePrefix`, ...), agent token prefixes (`rodge_agent_`), and the
+  salts for agent tokens, provider credentials, and OAuth state.
+- Message ID and idempotency header formats on outgoing mail, which a
+  retried send looks up to find mail it already sent, and the `removeThreadFromRodge`
+  Convex function, which installed apps call by name.
+- The backend still trusts `*.rodge-mail.local` origins so worktrees from
+  before the rename keep signing in.

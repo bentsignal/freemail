@@ -69,18 +69,18 @@ way.
 
 What the simulator showed, pushing to Freemail with a code field focused in Safari:
 
-| Notification body                    | Offered |
-| ------------------------------------ | ------- |
-| `Your verification code is 483920`   | yes     |
-| `Verification code: 111201`          | yes     |
-| `Sign in to GitHub⏎Your verification code is 444504` | yes |
-| `555605 is your security code`       | yes     |
-| `Your login code is 999109`          | yes     |
-| `Your confirmation code: 121314`     | yes     |
-| `Your verification code is AB77CD`   | yes     |
-| `Launch plan 222302`                 | no      |
-| `Invoice 333403 is ready`            | no      |
-| `888908` (titled "Verification")     | no      |
+| Notification body                                    | Offered |
+| ---------------------------------------------------- | ------- |
+| `Your verification code is 483920`                   | yes     |
+| `Verification code: 111201`                          | yes     |
+| `Sign in to GitHub⏎Your verification code is 444504` | yes     |
+| `555605 is your security code`                       | yes     |
+| `Your login code is 999109`                          | yes     |
+| `Your confirmation code: 121314`                     | yes     |
+| `Your verification code is AB77CD`                   | yes     |
+| `Launch plan 222302`                                 | no      |
+| `Invoice 333403 is ready`                            | no      |
+| `888908` (titled "Verification")                     | no      |
 
 Limits:
 

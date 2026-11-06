@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="apps/mobile/assets/icons/previews/freemail-dark.png">
-    <img src="apps/mobile/assets/icons/previews/freemail-light.png" alt="Freemail" width="120" height="120">
-  </picture>
+  <img src="docs/images/readme-header.jpg" alt="Freemail on iPhone: All Inboxes, switching accounts, a newsletter, Settings, and a reply" width="100%">
 </p>
 
 <br>

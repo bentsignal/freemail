@@ -36,3 +36,17 @@ there's no backfill command.
   you just used under "Website passkeys", with Remove disabled if it's the
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
+
+## Rename to Freemail (#PRNUM)
+
+The app, website, email codes, and passkey prompts now say Freemail. Bundle
+IDs and URL schemes didn't change, so the new phone build installs over the
+current one and stays signed in with notifications on.
+
+- When: after the Convex deploy, the website deploy, and the phone build
+- Commands: none beyond the normal release.
+- Verify: the home screen icon is named "Freemail"; the website's top-left
+  says Freemail and the tab title ends in "Freemail"; Settings on the phone
+  shows "Freemail Account". Shawn's Mac: the CLI is now `freemail`
+  (`pnpm --filter @freemail/cli link --global`, then `freemail auth login`,
+  since its session moved from `~/.config/rodge` to `~/.config/freemail`).

@@ -7,11 +7,11 @@ the release tests where the merged changes meet, first in the simulator,
 then `main` in Freemail Dev on his phone, and ships only after he approves it.
 A release has up to three parts, always from `origin/main`, in this order:
 
-| Part          | What it updates                                 | Command                                                     | Needed when                                 |
-| ------------- | ----------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------- |
-| Convex        | functions and schema on `dazzling-dog-633`      | `pnpm exec convex dev --once` from `services/convex`        | a merged PR said "Convex deploy needed: yes" |
-| Website       | `https://mail.rodgers.dev` (Vercel `bsx-sh/rodge-mail`) | `vercel deploy --prod` from the repository root       | `apps/web` or a package it uses changed     |
-| Shawn's phone | Freemail, the standalone build on his iPhone  | local EAS `development` IPA (the `freemail-expo-build` skill)  | `apps/mobile` or a package it uses changed  |
+| Part          | What it updates                                         | Command                                                       | Needed when                                  |
+| ------------- | ------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------- |
+| Convex        | functions and schema on `dazzling-dog-633`              | `pnpm exec convex dev --once` from `services/convex`          | a merged PR said "Convex deploy needed: yes" |
+| Website       | `https://mail.rodgers.dev` (Vercel `bsx-sh/rodge-mail`) | `vercel deploy --prod` from the repository root               | `apps/web` or a package it uses changed      |
+| Shawn's phone | Freemail, the standalone build on his iPhone            | local EAS `development` IPA (the `freemail-expo-build` skill) | `apps/mobile` or a package it uses changed   |
 
 Convex goes first so the website and phone never call functions that
 don't exist yet. That only works if every Convex change stays compatible
