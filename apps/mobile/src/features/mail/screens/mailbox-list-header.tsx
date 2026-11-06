@@ -10,14 +10,11 @@ export function ListHeader({
   accountFilter,
   accounts,
   refreshError,
-  searchMode,
 }: {
   accountFilter: MailAccountFilter;
   accounts: MobileMailAccount[];
   refreshError: string | undefined;
-  searchMode: boolean;
 }) {
-  if (searchMode) return null;
   return (
     <>
       <SelectedAccountLabel accountFilter={accountFilter} accounts={accounts} />
@@ -26,7 +23,7 @@ export function ListHeader({
   );
 }
 
-/** Which account the large title above it is for. */
+/** Which account the title above it is for. */
 export function SelectedAccountLabel({
   accountFilter,
   accounts,

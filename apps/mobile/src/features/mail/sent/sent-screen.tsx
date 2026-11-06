@@ -76,7 +76,7 @@ export function SentMailbox({
               <ActivityIndicator className="py-6" />
             ) : null
           }
-          ListHeaderComponent={<SentListHeader searchMode={searchMode} />}
+          ListHeaderComponent={<SentListHeader />}
           renderItem={({ item }) => (
             <SentListRow
               row={item}
@@ -152,10 +152,9 @@ function useSentSections(searchTerm: string) {
   };
 }
 
-function SentListHeader({ searchMode }: { searchMode: boolean }) {
+function SentListHeader() {
   const accounts = useMailStore((store) => store.accounts);
   const accountFilter = useMailStore((store) => store.accountFilter);
-  if (searchMode) return null;
   return (
     <SelectedAccountLabel accountFilter={accountFilter} accounts={accounts} />
   );
