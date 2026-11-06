@@ -21,12 +21,17 @@ Everything in it comes from an isolated backend's seeded mail
   laptop's 2940×1912.
 - `build_scene.py`: a thin laptop built to a 13-inch MacBook Air's
   proportions (30.41 × 21.5 × 1.13 cm, a 13.6-inch display behind even 5 mm
-  bezels, full keyboard, trackpad, hinge, and feet) on the right, turned
-  toward three of SYNQ's iPhone 17 Pros (`~/projects/SYNQ/3d/3.0/v6`) lying
-  on the left, one resting on the next. All of it sits on a dark table under
-  a soft studio key, a back sheen, and edge strips, rendered in Cycles with
-  AgX and a light bloom. It frames itself: the lens and shift are fitted so
-  everything sits inside even margins.
+  bezels, full keyboard, trackpad, hinge, and feet), turned left on the
+  right of the frame, and three of SYNQ's iPhone 17 Pros
+  (`~/projects/SYNQ/3d/3.0/v6`) on aluminum stands on the left: the code in
+  front, Settings and the inbox behind it, turned in. Each phone is aimed at
+  the camera first, then turned, so it faces the viewer. They sit on a dark
+  table before a far wall that the depth of field softens, under a soft
+  studio key and edge strips, rendered in Cycles with AgX and a light bloom.
+  The lens and shift are fitted so the laptop's screen lands where the
+  layout says.
+- `mockups.py`: every layout tried, by name. `FREEMAIL_MOCKUP=F2b` is the
+  header; the others are the rounds of mockups (`mockups/`).
 - `post.py`: the finish after the render: a soft vignette, a gentle S-curve,
   and fine grain.
 - `freemail_readme_header.blend`: the scene, with the images packed in. F12
@@ -45,12 +50,17 @@ xcrun simctl status_bar <udid> override --time 12:24 \
 B=/Applications/Blender.app/Contents/MacOS/Blender
 $B -b --factory-startup --python add_island.py
 (cd web-capture && node capture.mjs https://<worktree>.www.freemail.local web.png && node frame.mjs)
-$B -b --factory-startup --python build_scene.py -- "$PWD/render.png" 100 256 save
+FREEMAIL_MOCKUP=F2b $B -b --factory-startup --python build_scene.py -- "$PWD/render.png" 100 256 save
 $B -b --factory-startup --python post.py -- "$PWD/render.png" "$PWD/final.png"
 sips -s format jpeg -s formatOptions 88 --resampleWidth 2200 final.png \
   --out <repo>/docs/images/readme-header.jpg
+# GitHub's social preview (Settings → General → Social preview), 1280×640
+sips -s format jpeg -s formatOptions 90 --resampleWidth 1280 final.png \
+  --out <repo>/docs/images/social-preview.jpg
 ```
 
 `build_scene.py` takes the output file, the resolution percentage, and the
 sample count; `save` also writes the `.blend`. Render at 25% with about 48
-samples to check the framing first.
+samples to check the framing first. The scene is in centimeters, so the
+script scales the f-stop by the unit scale; otherwise Blender sizes the
+aperture as if in meters and nothing ever falls out of focus.
