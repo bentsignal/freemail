@@ -9,7 +9,7 @@ import {
 const associationError = {
   error: {
     message:
-      "ERR_GET_PASSKEY: Unable to verify webcredentials association of bundle with domain rodge-mail.local",
+      "ERR_GET_PASSKEY: Unable to verify webcredentials association of bundle with domain freemail.local",
   },
 };
 

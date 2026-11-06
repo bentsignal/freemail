@@ -101,7 +101,7 @@ it("deletes every row an account owns and leaves other accounts alone", async ()
   const { t, owner } = setupConvex();
   const { removed, kept } = await t.run(async (ctx) => ({
     removed: await seedAccount(ctx, {
-      address: "me@rodge.example",
+      address: "me@freemail.example",
       provider: "hosted",
       messageCount: 3,
     }),
@@ -125,7 +125,7 @@ it("deletes every row an account owns and leaves other accounts alone", async ()
   );
   await t.run(async (ctx) => {
     const domain = await ctx.db.query("hostedDomains").unique();
-    expect(domain?.domain).toBe("rodge.example");
+    expect(domain?.domain).toBe("freemail.example");
     expect(domain?.catchAllAccountId).toBeUndefined();
     const events = await ctx.db.query("hostedDeliveryEvents").collect();
     expect(events.map((event) => event.sesMessageId)).toEqual([
@@ -192,7 +192,7 @@ it("drops provider writes and inbound hosted mail once removal starts", async ()
   const { t, owner } = setupConvex();
   const removed = await t.run(async (ctx) =>
     seedAccount(ctx, {
-      address: "me@rodge.example",
+      address: "me@freemail.example",
       provider: "hosted",
       messageCount: 1,
     }),
@@ -205,9 +205,9 @@ it("drops provider writes and inbound hosted mail once removal starts", async ()
   expect(
     await t.query(internal.providers.hosted.internal.resolveRecipients, {
       recipients: [
-        "me@rodge.example",
-        "alias@rodge.example",
-        "other@rodge.example",
+        "me@freemail.example",
+        "alias@freemail.example",
+        "other@freemail.example",
       ],
     }),
   ).toEqual([]);

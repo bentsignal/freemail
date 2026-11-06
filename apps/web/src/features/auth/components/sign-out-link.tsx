@@ -1,6 +1,6 @@
 import { LogOut } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import { useAuthStore } from "../store";
 

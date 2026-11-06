@@ -26,7 +26,7 @@ export async function startAuthCallback(
     );
     if (!parsed) {
       response.writeHead(400, responseHeaders("text/plain; charset=utf-8"));
-      response.end("Invalid Rodge Mail authentication callback.");
+      response.end("Invalid Freemail authentication callback.");
       return;
     }
     response.writeHead(200, responseHeaders("text/html; charset=utf-8"));
@@ -112,7 +112,7 @@ const successPage = `<!doctype html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rodge Mail sign-in complete</title>
+    <title>Freemail sign-in complete</title>
     <style>
       :root { color-scheme: light dark; }
       body { background: #ffffff; color: #0a0a0a; display: grid; font: 16px -apple-system, system-ui, sans-serif; min-height: 100vh; margin: 0; place-items: center; }

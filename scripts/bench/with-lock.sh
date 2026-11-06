@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Serializes native builds across every repo on Shawn's Mac. The lock is
 # Vera's (~/Library/Caches/vera/heavy.lock), which Vera and SYNQ also take,
-# so a Rodge dev client build never overlaps theirs. Keep it in step with
+# so a Freemail dev client build never overlaps theirs. Keep it in step with
 # Vera's scripts/bench/with-lock.sh. Unlike Vera's it is re-entrant, so
 # wrapping scripts/sim.sh in it doesn't deadlock on the build sim.sh locks.
 #
 #   scripts/bench/with-lock.sh <command> [args...]
 set -euo pipefail
-if [ -n "${RODGE_HEAVY_LOCK_HELD:-}" ]; then
+if [ -n "${FREEMAIL_HEAVY_LOCK_HELD:-}" ]; then
   exec "$@"
 fi
 lock="$HOME/Library/Caches/vera/heavy.lock"
@@ -27,6 +27,6 @@ done
 trap 'unlink "$lock/owner"; rmdir "$lock"' EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-printf '%s %s %s\n' "rodge-mail/$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")" "$(date +%H:%M)" "$*" >"$lock/owner"
-export RODGE_HEAVY_LOCK_HELD=1
+printf '%s %s %s\n' "freemail/$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")" "$(date +%H:%M)" "$*" >"$lock/owner"
+export FREEMAIL_HEAVY_LOCK_HELD=1
 "$@"

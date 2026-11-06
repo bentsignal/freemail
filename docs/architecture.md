@@ -1,6 +1,6 @@
-# Rodge Mail architecture
+# Freemail architecture
 
-Rodge Mail treats Convex as the canonical local mailbox and provider APIs as
+Freemail treats Convex as the canonical local mailbox and provider APIs as
 eventually consistent transports. Every client reads the same normalized mail
 model instead of rendering Gmail, Microsoft, or IMAP payloads directly.
 
@@ -16,14 +16,14 @@ iCloud IMAP/SMTP ────┘                          │
 
 TanStack Start web ──┐
 Expo mobile ─────────┼─> Convex queries, mutations, and auth
-rodge CLI ───────────┘
+freemail CLI ───────────┘
 ```
 
 ## Identity and mailbox access
 
-Rodge Mail authentication and mailbox authorization are separate concerns.
+Freemail authentication and mailbox authorization are separate concerns.
 
-- Better Auth protects the Rodge Mail account with email identity and passkeys.
+- Better Auth protects the Freemail account with email identity and passkeys.
 - Gmail uses delegated Google OAuth with offline access.
 - Microsoft 365 uses delegated Microsoft Graph OAuth with offline access.
 - iCloud uses an app-specific password for IMAP and SMTP.

@@ -22,7 +22,7 @@ vi.mock("./env", () => ({
     region: "us-east-1",
     accessKeyId: "AKIDEXAMPLE",
     secretAccessKey: "secret",
-    bucket: "rodge-mail-test",
+    bucket: "freemail-test",
   }),
 }));
 
@@ -370,7 +370,7 @@ async function compose(options: ConstructorParameters<typeof MailComposer>[0]) {
 async function fakeS3(input: string | URL | Request, init?: RequestInit) {
   const request = new Request(input, init);
   const url = new URL(request.url);
-  if (url.hostname !== "rodge-mail-test.s3.us-east-1.amazonaws.com") {
+  if (url.hostname !== "freemail-test.s3.us-east-1.amazonaws.com") {
     return new Response("unexpected host", { status: 500 });
   }
   const key = decodeURIComponent(url.pathname.slice(1));

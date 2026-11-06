@@ -1,7 +1,7 @@
 # Next release: extra steps
 
 One-off steps the next release needs on top of the normal flow in
-[releasing.md](releasing.md). The `rodge-release` skill requires working
+[releasing.md](releasing.md). The `freemail-release` skill requires working
 through this file. Do every step in order, and check each one's **Verify**
 before moving on. A step that fails or can't be done blocks the release;
 tell Shawn instead of skipping it.
@@ -32,7 +32,7 @@ there's no backfill command.
 - Commands: none. On the website, sign out and sign back in with a passkey.
   Don't sign the phone out for this: its passkeys get sorted the next time
   it signs in on its own.
-- Verify: Settings → Rodge Mail account on the website lists the passkey
+- Verify: Settings → Freemail account on the website lists the passkey
   you just used under "Website passkeys", with Remove disabled if it's the
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.

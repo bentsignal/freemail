@@ -1,4 +1,4 @@
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 import type { useInboxMailboxControls } from "./use-inbox-mailbox-controls";
 import { ThreadRow } from "../components/thread-row";

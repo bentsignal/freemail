@@ -1,8 +1,8 @@
 import { useId, useState } from "react";
 import { ArrowUp, Paperclip, X } from "lucide-react";
 
-import { MAX_ATTACHMENT_COUNT } from "@rodge-mail/convex/attachments/constants";
-import * as Dialog from "@rodge-mail/ui-web/dialog";
+import { MAX_ATTACHMENT_COUNT } from "@freemail/convex/attachments/constants";
+import * as Dialog from "@freemail/ui-web/dialog";
 
 import { useLiveMail } from "../live-data";
 import { useMailStore } from "../store";

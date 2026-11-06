@@ -1,6 +1,6 @@
 import { ConvexError } from "convex/values";
 
-import { normalizeRecipientFields } from "@rodge-mail/features/mail";
+import { normalizeRecipientFields } from "@freemail/features/mail";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import type { AuthedMutationCtx } from "../utils";

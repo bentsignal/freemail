@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/tsconfig",
+  "name": "@freemail/tsconfig",
   "private": true,
   "files": [
     "*.json"

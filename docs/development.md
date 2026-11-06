@@ -20,10 +20,10 @@ not required to exercise the application locally.
 start Portless explicitly in LAN mode, making the stable origins available on
 this Mac and other devices on the same Wi-Fi network:
 
-- Web: `https://www.rodge-mail.local`
-- Expo/Metro: `https://mobile.rodge-mail.local`
+- Web: `https://www.freemail.local`
+- Expo/Metro: `https://mobile.freemail.local`
 
-The local `rodge` CLI uses the web origin for browser-handoff authentication,
+The local `freemail` CLI uses the web origin for browser-handoff authentication,
 so keep the web development server and Portless proxy running when signing in.
 See `apps/cli/README.md` for commands and URL overrides.
 
@@ -34,10 +34,10 @@ before it can load the HTTPS Metro origin.
 
 The Expo bridge sets Expo's packager proxy URL to the Portless origin, so the
 development-client QR code and generated manifest use
-`https://mobile.rodge-mail.local` instead of Metro's random internal port.
+`https://mobile.freemail.local` instead of Metro's random internal port.
 
-The Convex development auth deployment trusts `https://www.rodge-mail.local`,
-and its passkey relying-party ID is `rodge-mail.local`. Worktree-specific hosts
+The Convex development auth deployment trusts `https://www.freemail.local`,
+and its passkey relying-party ID is `freemail.local`. Worktree-specific hosts
 remain subdomains of the same relying-party ID.
 
 CLI authentication opens `/desktop-auth` in the system browser. After explicit
@@ -57,13 +57,13 @@ configuration.
 
 The native client uses the iOS AuthenticationServices and Android Credential
 Manager APIs through `expo-better-auth-passkey`. Development credentials use
-`rodge-mail.local` as their relying-party ID while authentication requests go
+`freemail.local` as their relying-party ID while authentication requests go
 to the Convex development deployment.
 
 - iOS fetches the Apple app-site-association file from the local Portless web
   origin. Physical-device builds must use Apple Development signing,
   `get-task-allow=true`, and
-  `webcredentials:rodge-mail.local?mode=developer`.
+  `webcredentials:freemail.local?mode=developer`.
 - Android requires an `assetlinks.json` file at the same local host. Add the
   SHA-256 fingerprints for each development signing certificate used for
   testing.
@@ -84,7 +84,7 @@ fallback behavior, and the selective semantic-indexing boundary.
 
 ## Simulators
 
-Agents and worktrees use `scripts/sim.sh` (the `rodge-simulator` skill)
+Agents and worktrees use `scripts/sim.sh` (the `freemail-simulator` skill)
 instead of `pnpm ios`: it queues devices with every other repo on the Mac,
 clones a per-worktree simulator, installs a cached dev client, and runs the
 worktree's own Metro on a plain port. To test signed in, give the worktree

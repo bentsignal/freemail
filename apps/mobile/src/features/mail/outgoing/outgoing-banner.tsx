@@ -6,8 +6,8 @@ import { useRouter } from "expo-router";
 import { useQuery } from "convex/react";
 import { AlertCircle, Check, RotateCcw, X } from "lucide-react-native";
 
-import { api } from "@rodge-mail/convex/api";
-import { getSentSubject } from "@rodge-mail/features/mail";
+import { api } from "@freemail/convex/api";
+import { getSentSubject } from "@freemail/features/mail";
 
 import type { OutgoingBannerState } from "./outgoing-status";
 import { useColor } from "~/hooks/use-color";

@@ -5,8 +5,8 @@ import { convexClient } from "@convex-dev/better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { ConvexReactClient } from "convex/react";
 
-import { nativeAuthBasePath } from "@rodge-mail/config/auth";
-import { createUrls } from "@rodge-mail/config/urls";
+import { nativeAuthBasePath } from "@freemail/config/auth";
+import { createUrls } from "@freemail/config/urls";
 
 const urls = createUrls({
   nodeEnv: "development",

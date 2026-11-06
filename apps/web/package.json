@@ -1,11 +1,11 @@
 {
-  "name": "@rodge-mail/web",
+  "name": "@freemail/web",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "pnpm with-env vite build",
     "clean": "git clean -xdf .cache dist .turbo node_modules",
-    "dev": "node ../../scripts/web-portless-preflight.mjs && pnpm with-env portless \"$(../../scripts/portless-app-name.sh www.rodge-mail)\" --lan node ../../scripts/web-portless-dev.mjs",
+    "dev": "node ../../scripts/web-portless-preflight.mjs && pnpm with-env portless \"$(../../scripts/portless-app-name.sh www.freemail)\" --lan node ../../scripts/web-portless-dev.mjs",
     "dev:app": "pnpm with-env vite dev",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "lint": "eslint --flag unstable_native_nodejs_ts_config",
@@ -19,12 +19,12 @@
     "@better-auth/utils": "0.4.0",
     "@convex-dev/better-auth": "catalog:",
     "@convex-dev/react-query": "^0.1.0",
+    "@freemail/config": "workspace:*",
+    "@freemail/convex": "workspace:*",
+    "@freemail/features": "workspace:*",
+    "@freemail/std": "workspace:*",
+    "@freemail/ui-web": "workspace:*",
     "@legendapp/list": "catalog:",
-    "@rodge-mail/config": "workspace:*",
-    "@rodge-mail/convex": "workspace:*",
-    "@rodge-mail/features": "workspace:*",
-    "@rodge-mail/std": "workspace:*",
-    "@rodge-mail/ui-web": "workspace:*",
     "@t3-oss/env-core": "^0.13.8",
     "@tanstack/devtools-vite": "^0.5.0",
     "@tanstack/react-devtools": "^0.9.4",
@@ -45,10 +45,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tailwind-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tailwind-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:react19",
@@ -66,9 +66,9 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.17"
   },
-  "prettier": "@rodge-mail/prettier-config",
+  "prettier": "@freemail/prettier-config",
   "portless": {
-    "name": "www.rodge-mail",
+    "name": "www.freemail",
     "script": "dev:app"
   }
 }

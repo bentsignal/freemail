@@ -2,7 +2,7 @@ import { useState } from "react";
 import * as WebBrowser from "expo-web-browser";
 import { useAction, useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import { toConvexId } from "../lib/convex-id";

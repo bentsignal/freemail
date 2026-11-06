@@ -17,7 +17,7 @@ interface UrlOptions {
 
 function webUrl(options: { effectiveWorktreeId?: string }) {
   const prefix = normalizeWorktreeId(options.effectiveWorktreeId);
-  const host = [prefix, "www.rodge-mail", "local"].filter(Boolean).join(".");
+  const host = [prefix, "www.freemail", "local"].filter(Boolean).join(".");
   return `https://${host}`;
 }
 

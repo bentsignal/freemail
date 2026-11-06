@@ -4,12 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { useAction, usePaginatedQuery } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 import {
   getStrongSemanticMessageIds,
   mergeSearchResults,
   readCachedAccountPage,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 import type { InboxMessage } from "./types";
 import { MAIL_PAGE_SIZE } from "./constants";

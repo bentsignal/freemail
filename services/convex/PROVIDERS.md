@@ -1,6 +1,6 @@
 # Mail providers
 
-Rodge Mail's provider boundary keeps OAuth tokens out of public functions and
+Freemail's provider boundary keeps OAuth tokens out of public functions and
 normalizes provider payloads before database writes. Gmail and Microsoft Graph
 implement the same interfaces in `src/providers/types.ts` without changing the
 mail-domain tables.
@@ -15,10 +15,10 @@ mail-domain tables.
 4. Configure these Convex deployment variables:
 
    ```sh
-   pnpm --filter @rodge-mail/convex exec convex env set GOOGLE_OAUTH_CLIENT_ID '<client-id>'
-   pnpm --filter @rodge-mail/convex exec convex env set GOOGLE_OAUTH_CLIENT_SECRET '<client-secret>'
-   pnpm --filter @rodge-mail/convex exec convex env set PROVIDER_ACTIVE_CREDENTIAL_KEY_VERSION 'v1'
-   pnpm --filter @rodge-mail/convex exec convex env set PROVIDER_CREDENTIAL_KEYS '{"v1":"<base64url-encoded-32-byte-key>"}'
+   pnpm --filter @freemail/convex exec convex env set GOOGLE_OAUTH_CLIENT_ID '<client-id>'
+   pnpm --filter @freemail/convex exec convex env set GOOGLE_OAUTH_CLIENT_SECRET '<client-secret>'
+   pnpm --filter @freemail/convex exec convex env set PROVIDER_ACTIVE_CREDENTIAL_KEY_VERSION 'v1'
+   pnpm --filter @freemail/convex exec convex env set PROVIDER_CREDENTIAL_KEYS '{"v1":"<base64url-encoded-32-byte-key>"}'
    ```
 
    Generate a key locally with
@@ -28,7 +28,7 @@ mail-domain tables.
    active version. Keep old keys until all stored envelopes have been refreshed or
    reconnected.
 
-5. Deploy Convex, sign in to Rodge Mail, call
+5. Deploy Convex, sign in to Freemail, call
    `accounts/actions:connectGmail`, and navigate the browser to the returned
    authorization URL.
 
@@ -43,7 +43,7 @@ Google OAuth verification and may require a security assessment.
    this exact value:
    `https://<deployment>.convex.site/providers/microsoft/oauth/callback`.
 2. Add delegated Microsoft Graph permissions `User.Read`, `Mail.ReadWrite`, and
-   `Mail.Send`. Rodge Mail also requests `openid`, `profile`, and
+   `Mail.Send`. Freemail also requests `openid`, `profile`, and
    `offline_access` during authorization. Tenant policy may require an
    administrator to grant consent.
 3. Create a client secret and configure the Convex deployment. The tenant is
@@ -51,28 +51,28 @@ Google OAuth verification and may require a security assessment.
    domain to restrict authorization to one organization.
 
    ```sh
-   pnpm --filter @rodge-mail/convex exec convex env set MICROSOFT_OAUTH_CLIENT_ID '<application-client-id>'
-   pnpm --filter @rodge-mail/convex exec convex env set MICROSOFT_OAUTH_CLIENT_SECRET '<client-secret-value>'
-   pnpm --filter @rodge-mail/convex exec convex env set MICROSOFT_OAUTH_TENANT 'common'
+   pnpm --filter @freemail/convex exec convex env set MICROSOFT_OAUTH_CLIENT_ID '<application-client-id>'
+   pnpm --filter @freemail/convex exec convex env set MICROSOFT_OAUTH_CLIENT_SECRET '<client-secret-value>'
+   pnpm --filter @freemail/convex exec convex env set MICROSOFT_OAUTH_TENANT 'common'
    ```
 
    The Microsoft connector uses the same `PROVIDER_CREDENTIAL_KEYS` keyring as
    Gmail. Do not put the secret, keyring, access token, or refresh token in a
    client-visible environment variable.
 
-4. Deploy Convex, sign in to Rodge Mail, and choose **Connect Microsoft 365** in
+4. Deploy Convex, sign in to Freemail, and choose **Connect Microsoft 365** in
    the account rail. The callback discovers the mailbox through `/me`, stores
    encrypted offline credentials, and schedules the initial Inbox sync.
 
 The initial Graph delta round covers the most recent 90 days of Inbox mail and
-then persists the opaque `@odata.deltaLink`. Every five minutes, Rodge Mail
+then persists the opaque `@odata.deltaLink`. Every five minutes, Freemail
 follows that exact URL until Graph returns a new delta link. `@removed` entries
 delete messages that were deleted or moved out of Inbox. A `410` or invalid
 delta token starts a fresh delta round and reconciles the bounded local Inbox.
 Requests opt into immutable Outlook IDs so moves within the mailbox do not
 change canonical message identifiers.
 
-Microsoft sends use a draft-first flow. Rodge Mail stores the immutable draft
+Microsoft sends use a draft-first flow. Freemail stores the immutable draft
 ID under the outbox lease before calling `send`, so a timeout can check whether
 the same draft is still a draft or already exists in Sent Items before retrying.
 Graph returns `202 Accepted`; that confirms Exchange accepted the send request,
@@ -129,11 +129,11 @@ Primary references:
 
 ## Removing an account
 
-`accounts/mutations:remove` takes an account out of Rodge Mail: Settings → an
+`accounts/mutations:remove` takes an account out of Freemail: Settings → an
 account → Remove Account on the phone, or Remove on an account card in the web
 account manager. Nothing is deleted at the provider and the OAuth grant isn't
-revoked. Rodge Mail only drops its own copy and its stored tokens. To revoke
-access too, remove Rodge Mail at the provider (Google account permissions,
+revoked. Freemail only drops its own copy and its stored tokens. To revoke
+access too, remove Freemail at the provider (Google account permissions,
 Microsoft "My Apps", or delete the iCloud app-specific password).
 
 Removal happens in two steps:
@@ -168,7 +168,7 @@ account; the account upserts ignore rows with `deletingAt`.
 
 Apple exposes iCloud Mail through IMAP and SMTP rather than a mail REST API.
 Apple's documented settings are `imap.mail.me.com:993` with TLS and
-`smtp.mail.me.com:587` with authenticated STARTTLS. Rodge Mail runs these
+`smtp.mail.me.com:587` with authenticated STARTTLS. Freemail runs these
 connections in Convex's opt-in Node.js action runtime; an empirical deployment
 probe confirmed TLS 1.3 IMAP and SMTP connectivity from the hosted development
 runtime.
@@ -193,16 +193,16 @@ requested.
 - Source reads are capped at 5 MB per message and normalized plain text at
   100 KB. Attachment bytes are fetched on demand and cached in private Convex
   storage.
-- SMTP sends use a deterministic RFC 5322 Message-ID. Before every retry, Rodge
+- SMTP sends use a deterministic RFC 5322 Message-ID. Before every retry, Freemail
   Mail searches the Sent mailbox for that ID, preventing a lost acknowledgement
   from blindly sending a duplicate.
 - Sync runs and outbox leases already live in Convex. Scheduled actions repair
   sync every five minutes and recover expired sends without a persistent worker.
 
 The only unavoidable user step is enabling two-factor authentication and
-generating a dedicated Rodge Mail app-specific password at
+generating a dedicated Freemail app-specific password at
 `account.apple.com`. Changing the primary Apple Account password revokes
-app-specific passwords, after which Rodge Mail marks the account for
+app-specific passwords, after which Freemail marks the account for
 reconnection.
 
 Primary Apple references:
@@ -244,7 +244,7 @@ SES configuration-set events ─> SNS ─> hostedDeliveryEvents
   That message is still stored, with no subject or sender.
 - Read state and archive are local-only; there is no provider to synchronize.
 - Convex uses the `rodge-mail-convex` IAM user, limited to the mail bucket and
-  sending from verified identities. The same credentials send Rodge Mail's
+  sending from verified identities. The same credentials send Freemail's
   own sign-in and verification codes from `AUTH_EMAIL_FROM` ([AUTH.md](AUTH.md)).
 
 Provisioning is idempotent and lives in `scripts/hosted-mail.mjs`:
@@ -300,7 +300,7 @@ from S3 on demand), and search work as they do for other hosted mail:
 | Other folders | Out of the inbox, label `folder:<path>`               |
 
 Dates come from the source (`receivedDateTime`, or `sentDateTime` for sent
-mail). Archived mail doesn't get Rodge's `archivedAt`, which deletes mail
+mail). Archived mail doesn't get Freemail's `archivedAt`, which deletes mail
 after 30 days. Imported mail outside the inbox shows up in All Mail and in
 search, tagged with its folder ([SEARCH.md](SEARCH.md#all-mail-and-where-mail-lives)).
 Imports never notify, never request a clean view, and never

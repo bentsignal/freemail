@@ -1,9 +1,9 @@
 ---
-name: rodge-release
-description: Run a Rodge Mail release end to end, covering what changed since the last release, what to test where those changes meet, a first pass of those tests in the simulator, testing main in Rodge Dev on Shawn's phone, then (after his go-ahead) Convex functions to the one deployment, the website to mail.rodgers.dev, and a new local EAS build of Rodge Mail on his iPhone. Use when Shawn asks to release, ship, deploy, push the backend or website, or put a new build on his phone, or asks what changed since the last release.
+name: freemail-release
+description: Run a Freemail release end to end, covering what changed since the last release, what to test where those changes meet, a first pass of those tests in the simulator, testing main in Freemail Dev on Shawn's phone, then (after his go-ahead) Convex functions to the one deployment, the website to mail.rodgers.dev, and a new local EAS build of Freemail on his iPhone. Use when Shawn asks to release, ship, deploy, push the backend or website, or put a new build on his phone, or asks what changed since the last release.
 ---
 
-# Releasing Rodge Mail
+# Releasing Freemail
 
 Read [docs/releasing.md](../../../docs/releasing.md) first, then
 [docs/next-release.md](../../../docs/next-release.md): it lists one-off
@@ -40,8 +40,8 @@ merged PR's description ends with release notes; start from those and
   the build needs the native acceptance checks too).
 - **What's new:** a short list in his words, not PR titles.
 - **What to test:** only what merging could have broken. Shawn already
-  tested each change on his phone in Rodge Dev before it merged (the
-  `rodge-feature` skill), so don't list every change again, and don't list
+  tested each change on his phone in Freemail Dev before it merged (the
+  `freemail-feature` skill), so don't list every change again, and don't list
   a regression pass. Look at files, components, or Convex functions more
   than one PR touched
   (`git log --format='%h %s' --name-only "$last"..origin/main`), changes
@@ -55,13 +55,13 @@ merged PR's description ends with release notes; start from those and
 
 Before sending Shawn anything, run every step of that list yourself: the
 website against the worktree's Portless origin (`pnpm exec portless proxy
-start --lan`, then `pnpm -F @rodge-mail/web dev`; never `pnpm dev`, which
+start --lan`, then `pnpm -F @freemail/web dev`; never `pnpm dev`, which
 runs `convex dev`), and the mobile app in the simulator (the
-`rodge-simulator` skill; signed in on an isolated backend,
+`freemail-simulator` skill; signed in on an isolated backend,
 `scripts/backend.sh isolate`, with seeded mail, which also has the
 release's Convex functions). Take a screenshot of each result and upload
 them with `scripts/evidence.sh`. Fix what fails the usual way (a PR, the
-`rodge-feature` skill, which Shawn approves like any other) before he sees
+`freemail-feature` skill, which Shawn approves like any other) before he sees
 it, then `scripts/backend.sh teardown` and `sim.sh down`.
 
 Send Shawn the write-up with the list in two parts:
@@ -69,10 +69,10 @@ Send Shawn the write-up with the list in two parts:
 - **Checked:** each step you ran, what you saw, any fix, and its evidence.
 - **For you:** only what the simulator can't settle, each with why: how
   motion and gestures feel on a real phone, his real mail and accounts,
-  real push notifications (in Rodge Mail, after it's built), and anything
+  real push notifications (in Freemail, after it's built), and anything
   you ran but couldn't judge.
 
-## 3. Put main on his phone in Rodge Dev
+## 3. Put main on his phone in Freemail Dev
 
 From the release checkout (detached at `origin/main`, no isolated
 backend):
@@ -83,18 +83,18 @@ scripts/phone.sh up
 
 It builds a dev client only when `main`'s native fingerprint has none yet
 (about 15 minutes); otherwise Shawn just taps the open link. Send him the
-block it prints, first and exactly as printed (the `rodge-feature` skill,
-step 4b). Rodge Dev runs `main`'s JavaScript against the functions already
+block it prints, first and exactly as printed (the `freemail-feature` skill,
+step 4b). Freemail Dev runs `main`'s JavaScript against the functions already
 on `dazzling-dog-633`. If the release has Convex changes, the parts of the
 list that need them can't be tried there yet: say which, and ask whether to
 deploy Convex first (step 5's Convex part, safe for the installed apps
 because every Convex change stays compatible with them) so he can test
-them before the website and the Rodge Mail build ship.
+them before the website and the Freemail build ship.
 
 Then wait. He works through the "For you" list at his own pace and either
 approves ("ship it", "release it", "looks good") or asks for fixes. Fixes
 found during the release test go through PRs he approves (the
-`rodge-feature` skill); once they merge, update the write-up and serve
+`freemail-feature` skill); once they merge, update the write-up and serve
 `main` again. Don't ship without an explicit approval of this release.
 `scripts/phone.sh down` once he's done.
 
@@ -128,7 +128,7 @@ vercel deploy --prod
 Open `https://mail.rodgers.dev` and check it loads and is signed in
 (Shawn's session) or shows sign-in.
 
-**Phone:** follow the `rodge-expo-build` skill's physical iPhone workflow:
+**Phone:** follow the `freemail-expo-build` skill's physical iPhone workflow:
 the `development` profile IPA, its entitlement checks, install with
 `xcrun devicectl`, and the notification acceptance gate. The phone has to
 be connected (USB or the same network). If it isn't reachable, ship the

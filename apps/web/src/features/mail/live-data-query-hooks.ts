@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 export function useAccountsQuery() {
   return useQuery({

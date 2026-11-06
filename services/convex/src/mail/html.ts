@@ -1,6 +1,6 @@
 import sanitizeHtml from "sanitize-html";
 
-import { prepareEmailHtmlForDisplay } from "@rodge-mail/features/mail";
+import { prepareEmailHtmlForDisplay } from "@freemail/features/mail";
 
 const BLOCKED_TAGS = [
   "applet",

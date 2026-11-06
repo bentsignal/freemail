@@ -26,8 +26,8 @@ export const restoreArchivedThread = authedMutation({
 });
 
 /**
- * Puts a thread back in the inbox from Rodge's archive, or from an imported
- * folder on a hosted mailbox, where Rodge is the only copy. Other providers
+ * Puts a thread back in the inbox from Freemail's archive, or from an imported
+ * folder on a hosted mailbox, where Freemail is the only copy. Other providers
  * own their folders, and their next sync would move the mail back out.
  */
 export const moveThreadToInbox = authedMutation({

@@ -7,7 +7,7 @@ vi.mock("./providers/hosted/env", () => ({
     region: "us-east-1",
     accessKeyId: "AKIDEXAMPLE",
     secretAccessKey: "secret",
-    configurationSet: "rodge-mail",
+    configurationSet: "freemail",
   }),
   requireHostedMailConfig: () => {
     throw new Error("auth emails must not need the mail bucket");
@@ -36,7 +36,7 @@ afterEach(() => {
 describe("auth code emails", () => {
   it("sends the registration code through Amazon SES", async () => {
     await sendRegistrationEmail({
-      from: "Rodge Mail <mail@example.com>",
+      from: "Freemail <mail@example.com>",
       otp: "123456",
       to: "person@example.com",
     });
@@ -50,29 +50,29 @@ describe("auth code emails", () => {
       /^AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE\/\d{8}\/us-east-1\/ses\//u,
     );
     expect(await request.json()).toEqual({
-      FromEmailAddress: "Rodge Mail <mail@example.com>",
+      FromEmailAddress: "Freemail <mail@example.com>",
       Destination: { ToAddresses: ["person@example.com"] },
       Content: {
         Simple: {
           Subject: {
-            Data: "Your Rodge Mail verification code",
+            Data: "Your Freemail verification code",
             Charset: "UTF-8",
           },
           Body: {
             Text: {
-              Data: "Your Rodge Mail verification code is 123456. It expires in 5 minutes.",
+              Data: "Your Freemail verification code is 123456. It expires in 5 minutes.",
               Charset: "UTF-8",
             },
           },
         },
       },
-      ConfigurationSetName: "rodge-mail",
+      ConfigurationSetName: "freemail",
     });
   });
 
   it("labels sign-in codes and explains unsolicited requests", async () => {
     await sendRecoveryEmail({
-      from: "Rodge Mail <mail@example.com>",
+      from: "Freemail <mail@example.com>",
       otp: "654321",
       to: "person@example.com",
     });
@@ -80,10 +80,10 @@ describe("auth code emails", () => {
     expect(await sentRequest().json()).toMatchObject({
       Content: {
         Simple: {
-          Subject: { Data: "Your Rodge Mail sign-in code" },
+          Subject: { Data: "Your Freemail sign-in code" },
           Body: {
             Text: {
-              Data: "Your Rodge Mail sign-in code is 654321. It expires in 5 minutes. If you did not request this, you can ignore this email.",
+              Data: "Your Freemail sign-in code is 654321. It expires in 5 minutes. If you did not request this, you can ignore this email.",
             },
           },
         },
@@ -106,7 +106,7 @@ describe("auth code emails", () => {
 
     await expect(
       sendRegistrationEmail({
-        from: "Rodge Mail <mail@example.com>",
+        from: "Freemail <mail@example.com>",
         otp: "123456",
         to: "person@example.com",
       }),

@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 function Container({
   ...props

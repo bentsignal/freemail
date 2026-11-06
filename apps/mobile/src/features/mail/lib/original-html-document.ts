@@ -1,4 +1,4 @@
-import { prepareEmailHtmlForDisplay } from "@rodge-mail/features/mail";
+import { prepareEmailHtmlForDisplay } from "@freemail/features/mail";
 
 export type OriginalHtmlMessage =
   | { type: "height"; height: number }

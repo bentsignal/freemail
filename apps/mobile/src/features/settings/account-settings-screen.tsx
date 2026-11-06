@@ -4,7 +4,7 @@ import { Stack, useRouter } from "expo-router";
 import { FieldGroup, Text, TextInput } from "@expo/ui";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { MobileMailAccount } from "~/features/mail/lib/convex-mail";
 import { optimisticallyRemoveAccount } from "~/features/mail/account-removal-optimistic";
@@ -159,7 +159,7 @@ function RemoveAccountRow({
 }
 
 function getRemovalMessage(account: MobileMailAccount) {
-  const removes = `Removes ${account.address} and its mail from Rodge Mail.`;
+  const removes = `Removes ${account.address} and its mail from Freemail.`;
   if (account.provider === "hosted") {
     return `${removes} The address stops receiving mail.`;
   }

@@ -1,6 +1,6 @@
 # AI classification and semantic search
 
-New provider inbox mail is classified asynchronously while Rodge Mail keeps one
+New provider inbox mail is classified asynchronously while Freemail keeps one
 chronological inbox. Message fields are bounded and normalized before they are
 sent as untrusted JSON to the model. The model receives no tools, URLs are not
 fetched, and its structured response is validated again before storage.
@@ -11,10 +11,10 @@ The first supported provider is OpenAI. Configure these values on each Convex
 deployment:
 
 ```sh
-pnpm --filter @rodge-mail/convex exec convex env set OPENAI_API_KEY
-pnpm --filter @rodge-mail/convex exec convex env set AI_CLASSIFICATION_MODEL gpt-5-mini
-pnpm --filter @rodge-mail/convex exec convex env set AI_CLEAN_VIEW_MODEL gpt-5.6-luna
-pnpm --filter @rodge-mail/convex exec convex env set AI_EMBEDDING_MODEL text-embedding-3-small
+pnpm --filter @freemail/convex exec convex env set OPENAI_API_KEY
+pnpm --filter @freemail/convex exec convex env set AI_CLASSIFICATION_MODEL gpt-5-mini
+pnpm --filter @freemail/convex exec convex env set AI_CLEAN_VIEW_MODEL gpt-5.6-luna
+pnpm --filter @freemail/convex exec convex env set AI_EMBEDDING_MODEL text-embedding-3-small
 ```
 
 The model variables are optional. Classification defaults to `gpt-5-nano`,

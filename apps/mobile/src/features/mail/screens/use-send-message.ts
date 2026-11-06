@@ -4,9 +4,9 @@ import { Alert } from "react-native";
 import { randomUUID } from "expo-crypto";
 import { useRouter } from "expo-router";
 
-import type { ComposerDraft } from "@rodge-mail/features/mail";
-import { getProviderAttachmentError } from "@rodge-mail/convex/attachments/constants";
-import { parseRecipientFields } from "@rodge-mail/features/mail";
+import type { ComposerDraft } from "@freemail/features/mail";
+import { getProviderAttachmentError } from "@freemail/convex/attachments/constants";
+import { parseRecipientFields } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import type { NativeComposerAttachment } from "./use-native-attachments";
@@ -127,5 +127,5 @@ function canQueueDraft(draft: Draft, account: MobileMailAccount | undefined) {
 }
 
 function newIdempotencyKey() {
-  return `rodge-native-${randomUUID()}`;
+  return `freemail-native-${randomUUID()}`;
 }

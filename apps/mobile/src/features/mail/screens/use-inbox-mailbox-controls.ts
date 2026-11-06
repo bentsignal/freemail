@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 import type { MailboxFilter } from "./mailbox-controls";
 import type { MailboxBulkAction } from "./mailbox-thread-list";

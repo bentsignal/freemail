@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useAction } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { ThreadMessageDetail } from "./types";
 import { useMailStore } from "./store";

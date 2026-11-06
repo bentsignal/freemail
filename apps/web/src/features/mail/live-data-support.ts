@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { InboxMessage, MailAccountDocument } from "./types";
 import { env } from "~/env";

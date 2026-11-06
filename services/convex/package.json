@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/convex",
+  "name": "@freemail/convex",
   "private": true,
   "type": "module",
   "exports": {
@@ -27,9 +27,9 @@
   },
   "devDependencies": {
     "@convex-dev/eslint-plugin": "^1.1.1",
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/mailparser": "^3.4.6",
     "@types/node": "^22.19.1",
     "@types/nodemailer": "^8.0.1",
@@ -41,7 +41,7 @@
     "vite": "catalog:",
     "vitest": "^4.0.17"
   },
-  "prettier": "@rodge-mail/prettier-config",
+  "prettier": "@freemail/prettier-config",
   "dependencies": {
     "@better-auth/expo": "catalog:",
     "@better-auth/passkey": "1.6.11",
@@ -49,10 +49,10 @@
     "@convex-dev/aggregate": "^0.2.1",
     "@convex-dev/better-auth": "catalog:",
     "@convex-dev/rate-limiter": "^0.3.2",
-    "@rodge-mail/agent-contract": "workspace:*",
-    "@rodge-mail/config": "workspace:*",
-    "@rodge-mail/features": "workspace:*",
-    "@rodge-mail/std": "workspace:*",
+    "@freemail/agent-contract": "workspace:*",
+    "@freemail/config": "workspace:*",
+    "@freemail/features": "workspace:*",
+    "@freemail/std": "workspace:*",
     "aws4fetch": "^1.0.20",
     "better-auth": "catalog:",
     "convex": "catalog:",

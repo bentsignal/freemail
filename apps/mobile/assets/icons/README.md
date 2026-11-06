@@ -1,6 +1,6 @@
 # App icon
 
-One Liquid Glass icon, `rodge-mail.icon`, made as an Icon Composer document:
+One Liquid Glass icon, `freemail.icon`, made as an Icon Composer document:
 a folded paper plane. One rounded silhouette is cut along the fold into a
 near wing and a far wing, two glass layers that share a single rounded nose.
 The far wing is the near wing's color in shadow. The concepts it was chosen
@@ -36,11 +36,11 @@ alpha instead of gray.
 
 ## Files
 
-- `rodge-mail.icon`: the Icon Composer bundle (`ios.icon` in `app.config.ts`).
+- `freemail.icon`: the Icon Composer bundle (`ios.icon` in `app.config.ts`).
 - `previews/`: 180px light and dark renders.
-- `rodge-mail-android-foreground.png`, `-background.png`, `-monochrome.png`:
+- `freemail-android-foreground.png`, `-background.png`, `-monochrome.png`:
   Android adaptive icon layers.
-- `rodge-mail-android-notification.png`: Android's notification small icon.
+- `freemail-android-notification.png`: Android's notification small icon.
 - `../icon.png`: square, opaque, flat icon (the Expo fallback and the in-app
   logo). The splash has no logo: `../splash-blank.png` is a transparent pixel.
 - `apps/web/public`: touch, PWA, and favicon PNGs. `favicon.ico` comes from
@@ -53,7 +53,7 @@ It writes the bundle, runs `render-flat.swift` for the flat assets, and
 renders the previews. Check every iOS appearance with Apple's renderer:
 
 ```sh
-python3 build-icons.py --check /tmp/rodge-icons   # Default, Dark, Clear*, Tinted*
+python3 build-icons.py --check /tmp/freemail-icons   # Default, Dark, Clear*, Tinted*
 ```
 
 A layer's light fill must be the unqualified entry in its

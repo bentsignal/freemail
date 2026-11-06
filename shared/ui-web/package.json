@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/ui-web",
+  "name": "@freemail/ui-web",
   "private": true,
   "type": "module",
   "exports": {
@@ -17,15 +17,15 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@freemail/std": "workspace:*",
     "@radix-ui/react-dialog": "^1.1.15",
-    "@rodge-mail/std": "workspace:*",
     "radix-ui": "^1.4.3",
     "sonner": "^2.0.7"
   },
   "devDependencies": {
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
@@ -41,5 +41,5 @@
     "react": "catalog:react19",
     "react-dom": "catalog:react19"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }

@@ -3,11 +3,11 @@ import type { FunctionReturnType } from "convex/server";
 import { useEffect, useMemo, useState } from "react";
 import { useAction, useQuery } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 import {
   getStrongSemanticMessageIds,
   mergeSearchResults,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 type InboxItem = FunctionReturnType<
   typeof api.mail.queries.listInbox

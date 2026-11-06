@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useAction } from "convex/react";
 import { Cloud, Loader } from "lucide-react";
 
-import { api } from "@rodge-mail/convex/api";
-import * as Dialog from "@rodge-mail/ui-web/dialog";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import * as Dialog from "@freemail/ui-web/dialog";
+import { toast } from "@freemail/ui-web/toast";
 
 export function ICloudConnectionDialog({
   open,
@@ -42,7 +42,7 @@ export function ICloudConnectionDialog({
             Connect iCloud Mail
           </Dialog.Title>
           <Dialog.Description className="text-muted-foreground mt-2 text-xs leading-5">
-            Use an Apple app-specific password. Rodge Mail verifies it directly
+            Use an Apple app-specific password. Freemail verifies it directly
             with Apple, encrypts it in Convex, and never stores your primary
             Apple Account password.
           </Dialog.Description>
@@ -132,5 +132,5 @@ function ConnectionField({
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error && error.message.trim()) return error.message;
-  return "Rodge Mail could not verify this iCloud account.";
+  return "Freemail could not verify this iCloud account.";
 }

@@ -3,8 +3,8 @@ import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useAction, useMutation } from "convex/react";
 
-import type { MailMessage, MailThread } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+import type { MailMessage, MailThread } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 
 import { toConvexId } from "../lib/convex-id";
 import { optimisticallyDeleteArchivedThread } from "./archive-optimistic";
@@ -59,7 +59,7 @@ export function useThreadReaderActions(
   function confirmPermanentDelete() {
     Alert.alert(
       "Permanently delete this conversation?",
-      "This removes Rodge Mail’s archived copy and cannot be undone. Your provider copy is unchanged.",
+      "This removes Freemail’s archived copy and cannot be undone. Your provider copy is unchanged.",
       [
         { style: "cancel", text: "Cancel" },
         {
@@ -116,7 +116,7 @@ function useUnsubscribeAction() {
     if (!message || !mailingList) return;
     Alert.alert(
       `Unsubscribe from ${mailingList.displayName}?`,
-      "Rodge will ask the sender to remove you. Either way, current and future advertising mail matching this list will go to Spam.",
+      "Freemail will ask the sender to remove you. Either way, current and future advertising mail matching this list will go to Spam.",
       [
         { style: "cancel", text: "Cancel" },
         {

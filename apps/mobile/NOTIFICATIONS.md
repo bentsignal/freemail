@@ -1,6 +1,6 @@
 # Mobile new-mail notifications
 
-Rodge Mail registers an Expo push token after an authenticated user grants
+Freemail registers an Expo push token after an authenticated user grants
 notification permission. iOS and Android devices store an installation ID in
 SecureStore and register the Expo token with the authenticated Convex owner.
 Background registration refreshes an already granted token but never opens the

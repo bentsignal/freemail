@@ -25,7 +25,7 @@
 #   down             delete this platform's device; stops Metro when no device is left
 #
 # `up` and `frames start` wait their turn in the simulator queue
-# (scripts/simq.ts): up to three devices at once on the whole Mac, Rodge's,
+# (scripts/simq.ts): up to three devices at once on the whole Mac, Freemail's,
 # Vera's, and SYNQ's together, and a boot never overlaps a performance
 # measurement. Exit code 75 means still queued: run the same command again
 # to keep your place. VERA_SIMQ=off skips the queue (the daemon sets it when
@@ -44,7 +44,7 @@
 #
 # Each dev client is a local EAS `development:client:sim` build (Debug,
 # expo-dev-client), built once per native fingerprint and cached in
-# ~/Library/Caches/rodge-mail, so worktrees only rebuild when native code
+# ~/Library/Caches/freemail, so worktrees only rebuild when native code
 # changed. The build runs under the heavy-work lock every repo shares
 # (scripts/bench/with-lock.sh). JavaScript comes from this worktree's Metro
 # (scripts/lib/metro.sh), which both platforms share.
@@ -60,10 +60,10 @@ ROOT="$(git rev-parse --show-toplevel)"
 MOBILE="$ROOT/apps/mobile"
 STATE_DIR="$ROOT/.cache/sim"
 EVIDENCE="$ROOT/.cache/evidence"
-CACHE="$HOME/Library/Caches/rodge-mail"
+CACHE="$HOME/Library/Caches/freemail"
 # Vera's cache, for the simulator template every repo clones from.
 VERA_CACHE="$HOME/Library/Caches/vera"
-# Every development binary is Rodge Dev (app.config.ts, docs/phone-testing.md).
+# Every development binary is Freemail Dev (app.config.ts, docs/phone-testing.md).
 BUNDLE_ID="com.bentsignal.rodgemail.dev"
 SCHEME="rodge-mail-dev"
 IOS_DEVICE_TYPE="com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro"
@@ -111,7 +111,7 @@ require_up() {
 
 adb_device() { "$ADB" -s "$SERIAL" "$@"; }
 
-# Expo's own fingerprint CLI (expo/bin/fingerprint): Rodge has no
+# Expo's own fingerprint CLI (expo/bin/fingerprint): Freemail has no
 # expo-updates.
 fingerprint() {
   (cd "$MOBILE" && pnpm exec fingerprint fingerprint:generate --platform "$PLATFORM" </dev/null 2>/dev/null) |
@@ -153,7 +153,7 @@ ensure_client() {
     exit 1
   }
   dir="$CACHE/dev-client-$PLATFORM/$hash"
-  artifact="$dir/$([ "$PLATFORM" = ios ] && echo RodgeDev.app || echo rodge-dev.apk)"
+  artifact="$dir/$([ "$PLATFORM" = ios ] && echo FreemailDev.app || echo freemail-dev.apk)"
   CLIENT="$artifact"
   [ -e "$artifact" ] && return
   mkdir -p "$(dirname "$dir")"
@@ -241,8 +241,8 @@ ios_template() {
 
 ensure_ios_device() {
   if [ -z "$DEVICE" ] || ! xcrun simctl list devices -j | grep -q "\"$DEVICE\""; then
-    DEVICE="$(xcrun simctl clone "$(ios_template)" "Rodge $(slug)")"
-    echo "created simulator Rodge $(slug) ($DEVICE)"
+    DEVICE="$(xcrun simctl clone "$(ios_template)" "Freemail $(slug)")"
+    echo "created simulator Freemail $(slug) ($DEVICE)"
   fi
   # Saved before booting, so the queue can reclaim it if `up` fails.
   save
@@ -253,7 +253,7 @@ ensure_ios_device() {
 # and hardware profile. `down` deletes it.
 ensure_android_device() {
   local avd_home="$HOME/.android/avd" base_ini name
-  name="Rodge_$(slug | tr '-' '_')"
+  name="Freemail_$(slug | tr '-' '_')"
   DEVICE="$name"
   if [ ! -d "$avd_home/$name.avd" ]; then
     base_ini="$avd_home/$ANDROID_BASE_AVD.avd/config.ini"
@@ -324,7 +324,7 @@ install_client() {
 # only has to tell the two platforms apart.
 target_name() {
   if [ "$PLATFORM" = ios ]; then
-    echo "Rodge $(slug)"
+    echo "Freemail $(slug)"
   else
     adb_device shell getprop ro.product.model | tr -d '\r'
   fi
@@ -345,7 +345,7 @@ require_app() {
   app_running && return
   local hint
   if [ "$PLATFORM" = ios ]; then
-    hint="$(ls -t "$HOME"/Library/Logs/DiagnosticReports/RodgeDev-*.ips 2>/dev/null | head -20 |
+    hint="$(ls -t "$HOME"/Library/Logs/DiagnosticReports/FreemailDev-*.ips 2>/dev/null | head -20 |
       while read -r report; do grep -q "$DEVICE" "$report" && echo "crash report: $report" && break; done || true)"
   else
     hint="crash log: adb -s $SERIAL logcat -b crash -d"
@@ -356,7 +356,7 @@ require_app() {
 }
 
 cdp_eval() {
-  RODGE_DEVICE="$(target_name)" node "$ROOT/scripts/sim-eval.mjs" "$PORT" "$1"
+  FREEMAIL_DEVICE="$(target_name)" node "$ROOT/scripts/sim-eval.mjs" "$PORT" "$1"
 }
 
 app_eval() {
@@ -375,13 +375,13 @@ front() {
   fi
 }
 
-# Moves the app to a route through the dev-only `rodgeDev` hook over Metro's
+# Moves the app to a route through the dev-only `freemailDev` hook over Metro's
 # debugger connection. Deep links would work too, but iOS asks "Open in
-# Rodge Mail?" before every `simctl openurl`, which scripts cannot answer.
+# Freemail?" before every `simctl openurl`, which scripts cannot answer.
 open_path() {
   local path="/${1#/}"
   front
-  app_eval "globalThis.rodgeDev.open($(node -p 'JSON.stringify(process.argv[1])' "$path"))" >/dev/null
+  app_eval "globalThis.freemailDev.open($(node -p 'JSON.stringify(process.argv[1])' "$path"))" >/dev/null
   echo "opened $path"
 }
 
@@ -399,7 +399,7 @@ launch() {
       "$BUNDLE_ID" >/dev/null
   fi
   for _ in $(seq 1 180); do
-    if cdp_eval "typeof globalThis.rodgeDev" 2>/dev/null | grep -q object; then
+    if cdp_eval "typeof globalThis.freemailDev" 2>/dev/null | grep -q object; then
       front
       return
     fi
@@ -459,7 +459,7 @@ const [platform, device, adb, serial, name, evidence, state, owner] = process.ar
 const output = openSync(`${state}/${platform}.recording.log`, "w");
 const command = platform === "ios" ? "xcrun" : adb;
 const quote = (value) => `'${value.replaceAll("'", "'\\''")}'`;
-const androidCommand = `screenrecord --bit-rate 8000000 ${quote(`/sdcard/${name}.mp4`)} & recording_pid=$!; echo "$recording_pid" > /data/local/tmp/rodge-recording-${owner}.pid; wait "$recording_pid"`;
+const androidCommand = `screenrecord --bit-rate 8000000 ${quote(`/sdcard/${name}.mp4`)} & recording_pid=$!; echo "$recording_pid" > /data/local/tmp/freemail-recording-${owner}.pid; wait "$recording_pid"`;
 const args = platform === "ios"
   ? ["simctl", "io", device, "recordVideo", "--codec", "h264", "--force", `${evidence}/${name}.mp4`]
   : ["-s", serial, "shell", androidCommand];
@@ -480,7 +480,7 @@ stop() {
   if [ -n "$RECORD_PID" ]; then
     if [ "$PLATFORM" = android ]; then
       local remote_pid
-      remote_pid="$(adb_device shell cat "/data/local/tmp/rodge-recording-$(hash_of "$ROOT").pid" 2>/dev/null | tr -d '\r' || true)"
+      remote_pid="$(adb_device shell cat "/data/local/tmp/freemail-recording-$(hash_of "$ROOT").pid" 2>/dev/null | tr -d '\r' || true)"
       # Leave the Device panel's separate screenrecord process alone.
       if [[ "$remote_pid" =~ ^[0-9]+$ ]]; then
         adb_device shell kill -INT "$remote_pid" >/dev/null 2>&1 || true
@@ -513,7 +513,7 @@ stop() {
     done
     [ "$transferred" = 1 ] || return 1
     adb_device shell rm "/sdcard/$name.mp4"
-    adb_device shell rm -f "/data/local/tmp/rodge-recording-$(hash_of "$ROOT").pid"
+    adb_device shell rm -f "/data/local/tmp/freemail-recording-$(hash_of "$ROOT").pid"
   fi
   rm -f "$STATE_DIR/$PLATFORM.recording"
   [ -n "$name" ] && echo "$EVIDENCE/$name.mp4"
@@ -548,7 +548,7 @@ frames() {
   case "${1:-}" in
     start)
       queue perf-start "$PLATFORM"
-      if app_eval "globalThis.rodgeDev.frames.start()" >/dev/null; then
+      if app_eval "globalThis.freemailDev.frames.start()" >/dev/null; then
         echo "recording frames"
       else
         queue perf-stop "$PLATFORM" || true
@@ -556,9 +556,9 @@ frames() {
       fi
       ;;
     stop)
-      if app_eval "globalThis.rodgeDev.frames.stop()" >/dev/null; then
+      if app_eval "globalThis.freemailDev.frames.stop()" >/dev/null; then
         for _ in $(seq 1 20); do
-          report="$(app_eval "globalThis.rodgeDev.frames.report()")" || break
+          report="$(app_eval "globalThis.freemailDev.frames.report()")" || break
           [ -n "$report" ] && echo "$report" && break
           sleep 0.25
         done
@@ -591,7 +591,7 @@ case "$command" in
   shot) shot "${1:?name}" ;;
   record) record "${1:?name}" ;;
   stop) stop ;;
-  reload) require_up && app_eval "globalThis.rodgeDev.reload()" ;;
+  reload) require_up && app_eval "globalThis.freemailDev.reload()" ;;
   signin)
     require_up
     if [ ! -f "$ROOT/.cache/backend/isolated" ]; then
@@ -599,9 +599,9 @@ case "$command" in
       exit 1
     fi
     front
-    app_eval "globalThis.rodgeDev.signIn()" >/dev/null
+    app_eval "globalThis.freemailDev.signIn()" >/dev/null
     for _ in $(seq 1 30); do
-      result="$(app_eval "globalThis.rodgeDev.signInStatus()" | tr -d '"')"
+      result="$(app_eval "globalThis.freemailDev.signInStatus()" | tr -d '"')"
       [ "$result" != pending ] && break
       sleep 1
     done

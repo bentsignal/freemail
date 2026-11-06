@@ -1,8 +1,8 @@
 import { useMutation } from "convex/react";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
-import { toast } from "@rodge-mail/ui-web/toast";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
+import { toast } from "@freemail/ui-web/toast";
 
 import { getErrorMessage } from "./live-data-utils";
 import { markOutboxSending } from "./outbox-optimistic";

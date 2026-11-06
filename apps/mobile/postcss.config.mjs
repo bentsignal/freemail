@@ -1,1 +1,1 @@
-export { default } from "@rodge-mail/tailwind-config/postcss-config";
+export { default } from "@freemail/tailwind-config/postcss-config";

@@ -3,7 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { MenuView } from "@expo/ui/community/menu";
 import { ChevronDown } from "lucide-react-native";
 
-import type { MailAccount, MailAccountFilter } from "@rodge-mail/features/mail";
+import type { MailAccount, MailAccountFilter } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
 import { useColor } from "~/hooks/use-color";

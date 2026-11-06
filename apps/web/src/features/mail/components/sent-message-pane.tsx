@@ -9,14 +9,14 @@ import {
   Send,
 } from "lucide-react";
 
-import type { api } from "@rodge-mail/convex/api";
-import type { Id } from "@rodge-mail/convex/model";
+import type { api } from "@freemail/convex/api";
+import type { Id } from "@freemail/convex/model";
 import {
   formatRecipientAddresses,
   getSentStatusLabel,
   getSentSubject,
-} from "@rodge-mail/features/mail";
-import { cn } from "@rodge-mail/std/cn";
+} from "@freemail/features/mail";
+import { cn } from "@freemail/std/cn";
 
 import { QuickLink } from "~/components/quick-link";
 import { formatFullDate } from "../format";
@@ -31,7 +31,7 @@ type SentMessage = NonNullable<
 
 /**
  * Delivered mail whose provider copy is in the mailbox opens in the reader;
- * everything else shows what Rodge queued or sent.
+ * everything else shows what Freemail queued or sent.
  */
 export function SentReader() {
   const outboxId = useSelectedOutboxId();

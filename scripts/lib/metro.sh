@@ -9,7 +9,7 @@
 #
 # Sourced with ROOT, MOBILE, and STATE_DIR set.
 
-# Every development binary is Rodge Dev (app.config.ts), and Metro serves its
+# Every development binary is Freemail Dev (app.config.ts), and Metro serves its
 # config, so Metro, fingerprints, and dev client builds all use the dev
 # variant.
 export APP_VARIANT=development

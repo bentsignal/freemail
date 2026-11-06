@@ -4,9 +4,9 @@ import { parseEnv } from "node:util";
 
 const localEnv = await readLocalEnv();
 
-const WEB_ORIGIN = process.env.RODGE_WEB_ORIGIN ?? "https://www.rodge-mail.local";
+const WEB_ORIGIN = process.env.FREEMAIL_WEB_ORIGIN ?? "https://www.freemail.local";
 const MOBILE_ORIGIN =
-  process.env.RODGE_MOBILE_ORIGIN ?? "https://mobile.rodge-mail.local";
+  process.env.FREEMAIL_MOBILE_ORIGIN ?? "https://mobile.freemail.local";
 const AUTH_ORIGIN = process.env.CONVEX_SITE_URL ?? localEnv.CONVEX_SITE_URL;
 
 const checks = [

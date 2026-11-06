@@ -11,13 +11,13 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery } from "convex/react";
 import { AlertCircle, Check, Paperclip } from "lucide-react-native";
 
-import type { api as Api } from "@rodge-mail/convex/api";
-import { api } from "@rodge-mail/convex/api";
+import type { api as Api } from "@freemail/convex/api";
+import { api } from "@freemail/convex/api";
 import {
   formatRecipientAddresses,
   getSentStatusLabel,
   getSentSubject,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 import { ContentReveal } from "~/components/content-reveal";
 import { useColor } from "~/hooks/use-color";

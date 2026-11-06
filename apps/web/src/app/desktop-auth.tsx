@@ -113,8 +113,8 @@ function CliAuthStatus({
     return (
       <AuthPage
         action={{ label: "Continue", onClick: authorize }}
-        detail="Continue only if you started this sign-in from the Rodge Mail CLI."
-        title="Sign in to Rodge Mail?"
+        detail="Continue only if you started this sign-in from the Freemail CLI."
+        title="Sign in to Freemail?"
       />
     );
   }
@@ -153,7 +153,7 @@ function AuthPage({
   return (
     <main className="bg-background flex min-h-dvh items-center justify-center px-5 py-10">
       <section className="bg-background w-full max-w-sm rounded-[18px] border p-8 text-center">
-        <p className="text-xl font-semibold tracking-tight">Rodge Mail</p>
+        <p className="text-xl font-semibold tracking-tight">Freemail</p>
         <h1 className="mt-8 text-2xl font-semibold tracking-tight">{title}</h1>
         <p className="mail-label mt-3 text-sm leading-6">{detail}</p>
         <CliAuthAction action={action} />

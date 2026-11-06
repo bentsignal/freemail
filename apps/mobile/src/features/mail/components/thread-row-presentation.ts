@@ -1,5 +1,5 @@
-import type { MailAccount, MailThread } from "@rodge-mail/features/mail";
-import { getMailLocationTag } from "@rodge-mail/features/mail";
+import type { MailAccount, MailThread } from "@freemail/features/mail";
+import { getMailLocationTag } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
 

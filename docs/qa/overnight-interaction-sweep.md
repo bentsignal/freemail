@@ -4,8 +4,8 @@ Date: 2026-07-11 (America/New_York)
 
 Environment:
 
-- Electron development app launched with `pnpm --filter @rodge-mail/desktop dev`
-- Authenticated local web origin at `https://www.rodge-mail.local`
+- Electron development app launched with `pnpm --filter @freemail/desktop dev`
+- Authenticated local web origin at `https://www.freemail.local`
 - Three connected accounts: Gmail, iCloud, and Microsoft 365
 - Desktop window exercised at approximately 1170 × 768 in system dark mode
 
@@ -18,7 +18,7 @@ Environment:
 | Reload | Pass | Reloaded an open message with Cmd-R. Authentication, route, list, reader selection, and message body were preserved. |
 | Deep links | Pass | `open rodge-mail://messages/js7ddbw4ts1ww4zwc3yxh7jsvn8abrat` focused the existing instance and navigated to the requested message. |
 | Pinning | Pass | Pinned and then unpinned the open Gmail attachment message. The reader action changed from `Pin message` to `Unpin message`, then returned to `Pin message` after the server update settled. |
-| Context menu | Pass | Right-clicking a message exposed only `Pin message` and `Remove from Rodge`; the menu dismissed cleanly without invoking either action. |
+| Context menu | Pass | Right-clicking a message exposed only `Pin message` and `Remove from Freemail`; the menu dismissed cleanly without invoking either action. |
 | Pagination | Pass | Scrolling the message list loaded successive pages. The visible count advanced from 30 to 60 and then 90 messages while the reader remained usable. |
 | Search and debounce | Pass | Search for deployment-related messages returned matching results. Rapidly replacing `Ama` with `Amazon` produced only the final Amazon result set. Clearing search restored the normal 30-message page. |
 | Composer | Pass | New message opened as a sized desktop modal with visible From, To, Cc, Bcc, Subject, body, attachment, and disabled Send controls. The From selector listed Gmail, iCloud, and Microsoft 365. Closed without editing or sending. |

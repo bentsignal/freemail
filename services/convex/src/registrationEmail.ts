@@ -14,8 +14,8 @@ export async function sendRegistrationEmail({
   await sendTextEmail({
     from,
     to,
-    subject: "Your Rodge Mail verification code",
-    text: `Your Rodge Mail verification code is ${otp}. It expires in 5 minutes.`,
+    subject: "Your Freemail verification code",
+    text: `Your Freemail verification code is ${otp}. It expires in 5 minutes.`,
   });
 }
 
@@ -27,7 +27,7 @@ export async function sendRecoveryEmail({
   await sendTextEmail({
     from,
     to,
-    subject: "Your Rodge Mail sign-in code",
-    text: `Your Rodge Mail sign-in code is ${otp}. It expires in 5 minutes. If you did not request this, you can ignore this email.`,
+    subject: "Your Freemail sign-in code",
+    text: `Your Freemail sign-in code is ${otp}. It expires in 5 minutes. If you did not request this, you can ignore this email.`,
   });
 }

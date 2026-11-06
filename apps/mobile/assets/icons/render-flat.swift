@@ -7,13 +7,13 @@
 //   ../icon.png                      square, opaque fallback icon
 //   apps/web/public icons            touch, PWA, and favicon PNGs
 // The white plane shades its far wing with alpha, from the tinted fills.
-// Usage: swift render-flat.swift "$PWD" rodge-mail (build-icons.py runs it).
+// Usage: swift render-flat.swift "$PWD" freemail (build-icons.py runs it).
 import AppKit
 import ImageIO
 import UniformTypeIdentifiers
 
 let root = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
-let name = CommandLine.arguments.count > 2 ? CommandLine.arguments[2] : "rodge-mail"
+let name = CommandLine.arguments.count > 2 ? CommandLine.arguments[2] : "freemail"
 let bundle = root.appendingPathComponent("\(name).icon")
 let space = CGColorSpace(name: CGColorSpace.sRGB)!
 let document = try! JSONSerialization.jsonObject(

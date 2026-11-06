@@ -4,7 +4,7 @@ import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { Check, Copy } from "lucide-react-native";
 
-import type { MailMessage } from "@rodge-mail/features/mail";
+import type { MailMessage } from "@freemail/features/mail";
 
 import type { MessageViewMode } from "./thread-message-body";
 import { useColor } from "~/hooks/use-color";

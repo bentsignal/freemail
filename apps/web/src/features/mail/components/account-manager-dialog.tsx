@@ -8,7 +8,7 @@ import {
   Settings2,
 } from "lucide-react";
 
-import * as Dialog from "@rodge-mail/ui-web/dialog";
+import * as Dialog from "@freemail/ui-web/dialog";
 
 import type { MailAccountView } from "../types";
 import { AccountLabelForm } from "./account-label-settings";

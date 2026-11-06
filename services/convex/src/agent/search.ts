@@ -1,8 +1,8 @@
 import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 
-import type { SearchMailOutput } from "@rodge-mail/agent-contract";
-import { MAX_AGENT_SEARCH_RESULTS } from "@rodge-mail/agent-contract";
+import type { SearchMailOutput } from "@freemail/agent-contract";
+import { MAX_AGENT_SEARCH_RESULTS } from "@freemail/agent-contract";
 
 import type { Id } from "../_generated/dataModel";
 import type { ActionCtx } from "../_generated/server";

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { usePaginatedQuery } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
-import { dedupeThreadRows } from "@rodge-mail/features/mail";
+import { api } from "@freemail/convex/api";
+import { dedupeThreadRows } from "@freemail/features/mail";
 
 import type { LiveMailContextValue } from "./live-data-types";
 import type { InboxMessage } from "./types";

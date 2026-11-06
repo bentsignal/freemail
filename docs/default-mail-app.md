@@ -42,14 +42,14 @@ block every phone build.
    `entitlements: { "com.apple.developer.mail-client": true }` under `ios` in
    `apps/mobile/app.config.ts`, change the `app.config.test.ts` check, and list
    the phone build in `docs/next-release.md`.
-4. Verify on the phone: Rodge Mail appears under Default Apps → Email, and after
+4. Verify on the phone: Freemail appears under Default Apps → Email, and after
    choosing it, a `mailto:` link in Safari opens the composer. `codesign -d
 --entitlements :-` on the build should list the entitlement.
 
 Apple's stated requirements are the `mailto:` scheme, sending to any recipient,
 and receiving from any sender
 ([entitlement docs](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.mail-client)).
-Rodge Mail meets all three. Nothing Apple publishes says whether it grants this
+Freemail meets all three. Nothing Apple publishes says whether it grants this
 to an app that isn't on the App Store. If it refuses ad hoc, TestFlight is the
 fallback, which needs a new EAS profile (`app.config.ts` allows only
 `development*` today).
@@ -57,17 +57,17 @@ fallback, which needs a new EAS profile (`app.config.ts` allows only
 ## Verification codes on the keyboard
 
 Since iOS 26, the system picks codes out of delivered notifications from any
-app, with no entitlement or API, and offers them as "From Rodge Mail" above the
+app, with no entitlement or API, and offers them as "From Freemail" above the
 keyboard ([WhatsApp's description](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/authentication-templates/keyboard-suggestions)
 is the best public one; Apple doesn't document it for iOS). So iOS sees only what
-the push says, and Rodge's push used to show just the subject.
+the push says, and Freemail's push used to show just the subject.
 
 The push now adds a line when the mail has a code
 (`services/convex/src/notifications/verificationCode.ts`): the subject, then
 `Your verification code is 483920`. Codes further down the message reach iOS this
 way.
 
-What the simulator showed, pushing to Rodge with a code field focused in Safari:
+What the simulator showed, pushing to Freemail with a code field focused in Safari:
 
 | Notification body                    | Offered |
 | ------------------------------------ | ------- |

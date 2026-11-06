@@ -9,7 +9,7 @@ interface Recording {
 }
 
 declare global {
-  var rodgeFrames: Recording | undefined;
+  var freemailFrames: Recording | undefined;
 }
 
 let report: FrameReport | null | undefined;
@@ -26,10 +26,10 @@ export function startFrames() {
       intervals: new Array<number>(),
       last: 0,
     } satisfies Recording;
-    globalThis.rodgeFrames = recording;
+    globalThis.freemailFrames = recording;
     function tick(time: number) {
       "worklet";
-      if (globalThis.rodgeFrames !== recording) return;
+      if (globalThis.freemailFrames !== recording) return;
       if (recording.last > 0) recording.intervals.push(time - recording.last);
       recording.last = time;
       requestAnimationFrame(tick);
@@ -47,8 +47,8 @@ export function stopFrames() {
   report = undefined;
   scheduleOnUI(() => {
     "worklet";
-    const recording = globalThis.rodgeFrames;
-    globalThis.rodgeFrames = undefined;
+    const recording = globalThis.freemailFrames;
+    globalThis.freemailFrames = undefined;
     scheduleOnRN(
       setReport,
       recording === undefined ? null : summarize(recording.intervals),

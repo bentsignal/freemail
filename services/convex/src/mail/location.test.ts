@@ -16,7 +16,7 @@ const incoming = {
 } satisfies Parameters<typeof resolveMessageLocation>[0];
 
 describe("message location", () => {
-  it("puts inbox and Rodge-archived mail first", () => {
+  it("puts inbox and Freemail-archived mail first", () => {
     expect(
       resolveMessageLocation(
         { ...incoming, inInbox: true, remoteLabelIds: ["SPAM"] },

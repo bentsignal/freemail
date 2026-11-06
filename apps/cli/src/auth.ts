@@ -147,5 +147,5 @@ function isTokenResponse(value: unknown): value is { token: string } {
 }
 
 function notAuthenticatedError() {
-  return new Error("Not signed in. Run `rodge auth login` first.");
+  return new Error("Not signed in. Run `freemail auth login` first.");
 }

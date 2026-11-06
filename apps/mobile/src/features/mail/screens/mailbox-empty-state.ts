@@ -37,7 +37,7 @@ export function getEmptyMailboxCopy({
   if (mailbox === "spam") {
     return {
       detail:
-        "Messages Rodge Mail flags as spam are quarantined here, away from your inbox.",
+        "Messages Freemail flags as spam are quarantined here, away from your inbox.",
       title: "No spam",
     };
   }

@@ -1,7 +1,7 @@
 import { ActivityIndicator, View } from "react-native";
 import { SegmentedControl } from "@expo/ui/community/segmented-control";
 
-import type { MailMessage } from "@rodge-mail/features/mail";
+import type { MailMessage } from "@freemail/features/mail";
 
 import type { MessageViewMode } from "./thread-message-body";
 import { useResolvedMobileColorScheme } from "~/features/theme/mobile-theme";

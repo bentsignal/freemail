@@ -1,7 +1,7 @@
 import type { AuthConfig } from "convex/server";
 import { getAuthConfigProvider } from "@convex-dev/better-auth/auth-config";
 
-import { sharedAuthIssuer, sharedAuthJwksUri } from "@rodge-mail/config/auth";
+import { sharedAuthIssuer, sharedAuthJwksUri } from "@freemail/config/auth";
 
 import { env } from "./convex.env";
 

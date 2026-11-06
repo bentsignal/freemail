@@ -1,6 +1,6 @@
 import { defineConfig } from "eslint/config";
 
-import { baseConfig, strictConfig } from "@rodge-mail/eslint-config/base";
+import { baseConfig, strictConfig } from "@freemail/eslint-config/base";
 
 export default defineConfig(
   {

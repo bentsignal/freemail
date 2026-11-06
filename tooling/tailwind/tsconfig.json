@@ -1,5 +1,5 @@
 {
-  "extends": "@rodge-mail/tsconfig/base.json",
+  "extends": "@freemail/tsconfig/base.json",
   "include": ["."],
   "exclude": ["node_modules"]
 }

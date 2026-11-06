@@ -1,4 +1,4 @@
-import type { AgentToolName } from "@rodge-mail/agent-contract";
+import type { AgentToolName } from "@freemail/agent-contract";
 
 export function createAuditValues(args: {
   argsHash: string;

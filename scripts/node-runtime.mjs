@@ -43,7 +43,7 @@ export function findSupportedNodeBinary({
   if (isSupportedNodeVersion(currentVersion)) return currentBinary;
 
   const candidates = [
-    environment.RODGE_NODE_BINARY,
+    environment.FREEMAIL_NODE_BINARY,
     environment.NVM_BIN ? join(environment.NVM_BIN, "node") : undefined,
     ...nvmCandidates(environment.NVM_DIR ?? join(homeDirectory, ".nvm")),
     "/opt/homebrew/opt/node@22/bin/node",
@@ -57,6 +57,6 @@ export function findSupportedNodeBinary({
   }
 
   throw new Error(
-    `Rodge Mail web development requires Node 22.12 or newer within the Node 22 line. Current runtime: ${currentVersion}. Run \`nvm install 22 && nvm use 22\`, or set RODGE_NODE_BINARY to a compatible Node executable.`,
+    `Freemail web development requires Node 22.12 or newer within the Node 22 line. Current runtime: ${currentVersion}. Run \`nvm install 22 && nvm use 22\`, or set FREEMAIL_NODE_BINARY to a compatible Node executable.`,
   );
 }

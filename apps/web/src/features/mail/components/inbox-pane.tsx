@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { MailOpen, PenLine, Search, X } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { MailMode } from "../live-data-types";
 import { useLiveMail } from "../live-data";
@@ -190,7 +190,7 @@ function SearchResultsLabel() {
 function MobileBrand() {
   return (
     <img
-      alt="Rodge Mail"
+      alt="Freemail"
       className="size-6 rounded-[7px] md:hidden"
       src="/icon-192.png"
     />

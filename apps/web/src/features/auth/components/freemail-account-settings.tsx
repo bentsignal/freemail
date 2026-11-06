@@ -1,23 +1,23 @@
 import { KeyRound, Loader, Plus } from "lucide-react";
 
-import type { PasskeyListItem, PasskeyRow } from "@rodge-mail/std/passkeys";
+import type { PasskeyListItem, PasskeyRow } from "@freemail/std/passkeys";
 import {
   formatPasskeyAdded,
   getPasskeyLabel,
   useOptimisticPasskeys,
-} from "@rodge-mail/std/passkeys";
-import { toast } from "@rodge-mail/ui-web/toast";
+} from "@freemail/std/passkeys";
+import { toast } from "@freemail/ui-web/toast";
 
 import { urls } from "~/urls";
 import { authClient } from "../lib/client";
 import { useAuthStore } from "../store";
 import { SignOutLink } from "./sign-out-link";
 
-export function RodgeAccountSettings() {
+export function FreemailAccountSettings() {
   return (
-    <section aria-labelledby="rodge-account-heading">
-      <h2 className="text-sm font-semibold" id="rodge-account-heading">
-        Rodge Mail account
+    <section aria-labelledby="freemail-account-heading">
+      <h2 className="text-sm font-semibold" id="freemail-account-heading">
+        Freemail account
       </h2>
       <OwnerIdentity />
       <Passkeys />

@@ -5,9 +5,9 @@ import * as Sharing from "expo-sharing";
 import { useAction } from "convex/react";
 import { Download, Paperclip } from "lucide-react-native";
 
-import type { MailAttachment } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
-import { normalizeAttachmentFileName } from "@rodge-mail/convex/attachments/constants";
+import type { MailAttachment } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
+import { normalizeAttachmentFileName } from "@freemail/convex/attachments/constants";
 
 import { useColor } from "~/hooks/use-color";
 import { toConvexId } from "../lib/convex-id";

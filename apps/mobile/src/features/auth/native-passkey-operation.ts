@@ -7,7 +7,7 @@ const authorizationCanceled =
   /AuthenticationServices\.AuthorizationError(?:,| error)\s*1001/i;
 
 export const incompatiblePasskeyMessage =
-  "No compatible passkey was selected. Choose a Rodge Mail passkey saved on this device.";
+  "No compatible passkey was selected. Choose a Freemail passkey saved on this device.";
 
 export async function retryTransientPasskeyAssociation<
   Result extends PasskeyOperationResult,

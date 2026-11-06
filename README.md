@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="apps/mobile/assets/icons/previews/rodge-mail-dark.png">
-    <img src="apps/mobile/assets/icons/previews/rodge-mail-light.png" alt="Rodge Mail" width="120" height="120">
+    <source media="(prefers-color-scheme: dark)" srcset="apps/mobile/assets/icons/previews/freemail-dark.png">
+    <img src="apps/mobile/assets/icons/previews/freemail-light.png" alt="Freemail" width="120" height="120">
   </picture>
 </p>
 

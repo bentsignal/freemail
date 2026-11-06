@@ -1,4 +1,4 @@
-const redirectBase = new URL("https://rodge-mail.invalid");
+const redirectBase = new URL("https://freemail.invalid");
 
 export function getSafeAppRedirect(value: string | null | undefined) {
   if (!value?.startsWith("/") || value.startsWith("//")) return "/";

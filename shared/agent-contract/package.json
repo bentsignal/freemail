@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/agent-contract",
+  "name": "@freemail/agent-contract",
   "private": true,
   "type": "module",
   "exports": {
@@ -17,14 +17,14 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "^4.0.17"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }

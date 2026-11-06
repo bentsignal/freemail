@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
-import * as Dialog from "@rodge-mail/ui-web/dialog";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import * as Dialog from "@freemail/ui-web/dialog";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { MailAccountView } from "../types";
 import { optimisticallyRemoveAccount } from "../account-removal-optimistic";
@@ -79,7 +79,7 @@ export function RemoveAccountButton({
 }
 
 function getRemovalMessage(account: MailAccountView, providerLabel: string) {
-  const removes = `Removes ${account.address} and its mail from Rodge Mail.`;
+  const removes = `Removes ${account.address} and its mail from Freemail.`;
   if (account.provider === "hosted") {
     return `${removes} The address stops receiving mail.`;
   }

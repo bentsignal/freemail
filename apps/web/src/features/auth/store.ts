@@ -1,9 +1,9 @@
 import { useRouteContext } from "@tanstack/react-router";
 import { createStore } from "rostra";
 
-import { completeAuthSession } from "@rodge-mail/std/auth-session";
-import { useLoading } from "@rodge-mail/std/use-loading";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { completeAuthSession } from "@freemail/std/auth-session";
+import { useLoading } from "@freemail/std/use-loading";
+import { toast } from "@freemail/ui-web/toast";
 
 import { rememberCliAuthAfterSignIn } from "./lib/cli-auto-authorize";
 import { authClient } from "./lib/client";
@@ -173,7 +173,7 @@ async function addPasskey() {
   if (result.error) {
     throw new Error(result.error.message ?? "Passkey setup failed");
   }
-  toast.success("Passkey added to Rodge Mail");
+  toast.success("Passkey added to Freemail");
   return true;
 }
 

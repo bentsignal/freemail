@@ -1,10 +1,10 @@
 import { Settings } from "lucide-react";
 
-import * as Dialog from "@rodge-mail/ui-web/dialog";
+import * as Dialog from "@freemail/ui-web/dialog";
 
 import { AppearanceSettings } from "~/features/theme/components/theme-toggle";
 import { authClient } from "../lib/client";
-import { RodgeAccountSettings } from "./rodge-account-settings";
+import { FreemailAccountSettings } from "./freemail-account-settings";
 
 export function SettingsButton() {
   return (
@@ -29,14 +29,14 @@ export function SettingsButton() {
             Settings
           </Dialog.Title>
           <Dialog.Description className="text-muted-foreground mt-2 text-xs leading-5">
-            Appearance and your Rodge Mail account.
+            Appearance and your Freemail account.
           </Dialog.Description>
         </div>
         <div className="bg-background p-6">
           <AppearanceSettings />
         </div>
         <div className="bg-background border-border border-t p-6">
-          <RodgeAccountSettings />
+          <FreemailAccountSettings />
         </div>
       </Dialog.Content>
     </Dialog.Container>

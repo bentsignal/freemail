@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/tailwind-config",
+  "name": "@freemail/tailwind-config",
   "private": true,
   "type": "module",
   "exports": {
@@ -19,13 +19,13 @@
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }

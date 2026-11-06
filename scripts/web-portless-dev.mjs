@@ -7,16 +7,16 @@ const port = process.env.PORT;
 if (!port) throw new Error("Portless did not provide the web app port");
 
 const portlessHostname = new URL(process.env.PORTLESS_URL).hostname;
-const ownsPasskeyAlias = portlessHostname === "www.rodge-mail.local";
+const ownsPasskeyAlias = portlessHostname === "www.freemail.local";
 
 if (ownsPasskeyAlias) {
   const alias = spawnSync(
     "pnpm",
-    ["exec", "portless", "alias", "rodge-mail", port],
+    ["exec", "portless", "alias", "freemail", port],
     { stdio: "ignore" },
   );
   if (alias.status !== 0) {
-    throw new Error("Could not register the rodge-mail.local passkey alias");
+    throw new Error("Could not register the freemail.local passkey alias");
   }
 }
 
@@ -53,12 +53,12 @@ vite.on("exit", (code, signal) => {
     if (
       routes.status === 0 &&
       routes.stdout.includes(
-        `https://rodge-mail.local  ->  localhost:${port}  (alias)`,
+        `https://freemail.local  ->  localhost:${port}  (alias)`,
       )
     ) {
       spawnSync(
         "pnpm",
-        ["exec", "portless", "alias", "--remove", "rodge-mail"],
+        ["exec", "portless", "alias", "--remove", "freemail"],
         { stdio: "ignore" },
       );
     }

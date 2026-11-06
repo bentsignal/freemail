@@ -1,6 +1,6 @@
 import { Check, Paperclip, Pin } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { InboxMessage } from "../types";
 import { formatInboxDate, getInitials } from "../format";

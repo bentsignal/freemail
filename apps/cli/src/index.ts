@@ -5,6 +5,6 @@ try {
   await main(process.argv.slice(2));
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
-  process.stderr.write(`rodge: ${message}\n`);
+  process.stderr.write(`freemail: ${message}\n`);
   process.exitCode = 1;
 }

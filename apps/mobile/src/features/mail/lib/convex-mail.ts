@@ -1,12 +1,12 @@
 import type { FunctionReturnType } from "convex/server";
 
-import type { api } from "@rodge-mail/convex/api";
-import type { MailAccount, MailAttachment } from "@rodge-mail/features/mail";
+import type { api } from "@freemail/convex/api";
+import type { MailAccount, MailAttachment } from "@freemail/features/mail";
 import {
   canMoveMailThreadToInbox,
   dedupeThreadRows,
   sortPinnedMailRows,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 const attachmentTypes = {
   document: "document",

@@ -53,7 +53,7 @@ Deployments expire on their own after 14 days.
 
 ## How sign-in works, and why it can't reach production
 
-`scripts/sim.sh signin` calls the debug-only `globalThis.rodgeDev.signIn()`
+`scripts/sim.sh signin` calls the debug-only `globalThis.freemailDev.signIn()`
 (`apps/mobile/src/features/dev/automation.ts`) over Metro's debugger
 connection. It POSTs to `/api/mobile-auth/dev/sign-in` through the app's
 own Better Auth client, so `@better-auth/expo` stores the session cookie in

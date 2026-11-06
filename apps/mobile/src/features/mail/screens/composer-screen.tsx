@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 
-import type { ComposerDraft, RecipientFields } from "@rodge-mail/features/mail";
+import type { ComposerDraft, RecipientFields } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import type { ComposerFieldName } from "./composer-helpers";
