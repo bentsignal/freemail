@@ -50,3 +50,22 @@ current one and stays signed in with notifications on.
   shows "Freemail Account". Shawn's Mac: the CLI is now `freemail`
   (`pnpm --filter @freemail/cli link --global`, then `freemail auth login`,
   since its session moved from `~/.config/rodge` to `~/.config/freemail`).
+
+## Call models through the Convex AI Gateway (#49)
+
+Classification, clean views, and embeddings now go through the Convex AI
+Gateway instead of straight to OpenAI, with the same models. The functions
+no longer read `OPENAI_API_KEY`, so it can be removed once the deploy is
+confirmed working.
+
+- When: after the Convex deploy
+- Commands: wait for new mail to arrive (or open an email without a clean
+  view), then, from `services/convex` on main:
+  `pnpm exec convex data aiUsage --limit 5 --order desc`. Once that works:
+  `pnpm exec convex env remove OPENAI_API_KEY`
+- Verify: the newest `aiUsage` rows have `status: "complete"` with real
+  `inputTokens` and `outputTokens`, the newest `messageClassifications` have
+  `source: "model"` with no `error`, and the Convex dashboard's usage page
+  shows AI Gateway spend. After removing the key, `convex env list` has no
+  `OPENAI_API_KEY`. The OpenAI API key can then be revoked in OpenAI's
+  dashboard.

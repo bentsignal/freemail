@@ -68,7 +68,8 @@ export function canReserveDailyUsage(
   );
 }
 
-function pricingForModel(model: string) {
+function pricingForModel(gatewayOrOpenAiModel: string) {
+  const model = gatewayOrOpenAiModel.replace(/^openai\//u, "");
   if (model === "gpt-5.6-luna" || model.startsWith("gpt-5.6-luna-")) {
     return {
       inputPerMillion: 1,

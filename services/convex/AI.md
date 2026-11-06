@@ -7,21 +7,29 @@ fetched, and its structured response is validated again before storage.
 
 ## Provider setup
 
-The first supported provider is OpenAI. Configure these values on each Convex
-deployment:
+Model calls go through the [Convex AI Gateway](https://docs.convex.dev/ai-gateway/overview)
+(`src/ai/gateway.ts`), which holds the provider credentials. There is no API
+key to set: each request gets a short-lived token from
+`getServiceToken("ai-gateway")`, so it works on every cloud deployment of the
+team's paid plan, isolated dev deployments included. Usage is billed on the
+Convex invoice. Every request asks for zero-data-retention endpoints
+(`provider: { zdr: true }`).
+
+The models are OpenAI's, addressed as `openai/<model>`. Override them per
+deployment with bare OpenAI names (the `openai/` prefix is added for you):
 
 ```sh
-pnpm --filter @freemail/convex exec convex env set OPENAI_API_KEY
 pnpm --filter @freemail/convex exec convex env set AI_CLASSIFICATION_MODEL gpt-5-mini
 pnpm --filter @freemail/convex exec convex env set AI_CLEAN_VIEW_MODEL gpt-5.6-luna
 pnpm --filter @freemail/convex exec convex env set AI_EMBEDDING_MODEL text-embedding-3-small
 ```
 
 The model variables are optional. Classification defaults to `gpt-5-nano`,
-while clean-view generation defaults to `gpt-5.6-luna`. The API
-key is optional for local fixture work: classification falls back to
-deterministic rules, while embedding and semantic search report that AI is not
-configured. Never put the API key in a client environment variable.
+clean-view generation to `gpt-5.6-luna`, and embeddings to
+`text-embedding-3-small`. A model needs an entry in `aiUsage/pricing.ts`
+before it can be used. If the gateway is unreachable (a self-hosted or
+anonymous local backend), classification falls back to deterministic rules
+after its retries, and embedding jobs fail.
 
 ## Classification lifecycle
 

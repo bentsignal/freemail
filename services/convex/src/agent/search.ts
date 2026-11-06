@@ -7,8 +7,8 @@ import { MAX_AGENT_SEARCH_RESULTS } from "@freemail/agent-contract";
 import type { Id } from "../_generated/dataModel";
 import type { ActionCtx } from "../_generated/server";
 import { internalAction } from "../_generated/server";
+import { createEmbedding } from "../ai/models";
 import { stableHash } from "../classification/normalize";
-import { createEmbedding, isAiConfigured } from "../classification/openai";
 import { rateLimiter } from "../limiter";
 import { vAgentAccountAccess } from "./validators";
 
@@ -87,7 +87,7 @@ export const searchMail = internalAction({
       paginationOpts: { cursor: args.cursor ?? null, numItems: args.limit },
     });
     if (!lexical) return null;
-    if (args.cursor || !lexical.searchPlan.lexicalQuery || !isAiConfigured()) {
+    if (args.cursor || !lexical.searchPlan.lexicalQuery) {
       return publicSearchResult(lexical, "unavailable");
     }
     try {

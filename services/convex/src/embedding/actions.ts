@@ -4,8 +4,8 @@ import type { Id } from "../_generated/dataModel";
 import type { ActionCtx } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { internalAction } from "../_generated/server";
+import { createEmbedding } from "../ai/models";
 import { embeddingText, normalizeMail } from "../classification/normalize";
-import { createEmbedding, isAiConfigured } from "../classification/openai";
 
 export const runEmbedding = internalAction({
   args: { messageId: v.id("messages"), jobKey: v.string() },
@@ -20,10 +20,6 @@ export const runEmbedding = internalAction({
       args,
     );
     if (!attempt.ready) return null;
-    if (!isAiConfigured()) {
-      await fail(ctx, args, "OPENAI_API_KEY is not configured", true);
-      return null;
-    }
 
     try {
       const text = embeddingText(normalizeMail(input.message, input.content));

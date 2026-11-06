@@ -1,7 +1,8 @@
+import { getServiceToken, getServiceUrl } from "convex/server";
+
 import type { ActionCtx } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { calculateModelCostUsd } from "../aiUsage/pricing";
-import { openAiApiKey } from "./env";
 
 export type UsageKind = "classification" | "clean_view" | "embedding";
 
@@ -12,18 +13,16 @@ export class AiDailyLimitError extends Error {
   }
 }
 
-export async function postOpenAi(args: {
+export async function postAiGateway(args: {
   ctx: ActionCtx;
   ownerId: string;
-  url: string;
-  body: unknown;
+  path: "/v1/responses" | "/v1/embeddings";
+  body: Record<string, unknown>;
   requestKey: string;
   kind: UsageKind;
   model: string;
   reservedCostUsd: number;
 }) {
-  const apiKey = openAiApiKey();
-  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured");
   const reservation = await args.ctx.runMutation(
     internal.aiUsage.internal.reserve,
     {
@@ -43,9 +42,9 @@ export async function postOpenAi(args: {
 
   let data: unknown;
   try {
-    data = await fetchOpenAi(args, apiKey);
+    data = await fetchAiGateway(args);
   } catch (error) {
-    if (error instanceof DefinitiveOpenAiFailure) {
+    if (error instanceof DefinitiveAiGatewayFailure) {
       await args.ctx.runMutation(internal.aiUsage.internal.release, {
         requestKey: args.requestKey,
       });
@@ -56,41 +55,58 @@ export async function postOpenAi(args: {
   return data;
 }
 
-async function fetchOpenAi(
-  args: Parameters<typeof postOpenAi>[0],
-  apiKey: string,
-) {
+async function fetchAiGateway(args: Parameters<typeof postAiGateway>[0]) {
+  const baseUrl = await beforeSending(() => getServiceUrl("ai-gateway"));
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const response = await fetch(args.url, {
+    const token = await beforeSending(() => getServiceToken("ai-gateway"));
+    const response = await fetch(`${baseUrl}${args.path}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "Idempotency-Key": args.requestKey,
       },
-      body: JSON.stringify(args.body),
+      body: JSON.stringify(gatewayRequestBody(args.body)),
     });
     if (response.ok) return await readJson(response);
     const error = await response.text();
     if (!isRetryable(response.status) || attempt === 1) {
-      throw new DefinitiveOpenAiFailure(
-        `OpenAI request failed (${response.status}): ${error.slice(0, 500)}`,
+      throw new DefinitiveAiGatewayFailure(
+        `AI Gateway request failed (${response.status}): ${error.slice(0, 500)}`,
       );
     }
     await wait(retryDelay(response, attempt));
   }
-  throw new Error("OpenAI request failed");
+  throw new Error("AI Gateway request failed");
 }
 
-class DefinitiveOpenAiFailure extends Error {
+export function gatewayModelId(model: string) {
+  return model.includes("/") ? model : `openai/${model}`;
+}
+
+export function gatewayRequestBody(body: Record<string, unknown>) {
+  return { ...body, provider: { zdr: true } };
+}
+
+async function beforeSending<T>(step: () => Promise<T>) {
+  try {
+    return await step();
+  } catch (error) {
+    throw new DefinitiveAiGatewayFailure(
+      `AI Gateway is unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
+
+class DefinitiveAiGatewayFailure extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "DefinitiveOpenAiFailure";
+    this.name = "DefinitiveAiGatewayFailure";
   }
 }
 
 async function completeUsage(
-  args: Parameters<typeof postOpenAi>[0],
+  args: Parameters<typeof postAiGateway>[0],
   data: unknown,
 ) {
   const usage = extractUsage(data, args.kind);

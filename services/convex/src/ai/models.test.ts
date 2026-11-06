@@ -5,7 +5,7 @@ import {
   cleanViewRequest,
   parseClassification,
   parseCleanView,
-} from "./openai";
+} from "./models";
 
 const classification = {
   schemaVersion: "classification-v4",
@@ -85,7 +85,7 @@ describe("clean view model output", () => {
         bodyWasTruncated: false,
       }),
     ).toMatchObject({
-      model: "gpt-5.6-luna",
+      model: "openai/gpt-5.6-luna",
       max_output_tokens: 2_000,
       reasoning: { effort: "low" },
     });

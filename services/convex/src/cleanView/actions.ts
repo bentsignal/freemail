@@ -2,12 +2,8 @@ import { v } from "convex/values";
 
 import { internal } from "../_generated/api";
 import { internalAction } from "../_generated/server";
+import { configuredCleanViewModel, generateCleanView } from "../ai/models";
 import { normalizeMail } from "../classification/normalize";
-import {
-  configuredCleanViewModel,
-  generateCleanView,
-  isAiConfigured,
-} from "../classification/openai";
 
 export const run = internalAction({
   args: { messageId: v.id("messages"), jobKey: v.string() },
@@ -18,13 +14,6 @@ export const run = internalAction({
     );
     if (!input) return null;
     if (!(await ctx.runMutation(internal.cleanView.internal.begin, args))) {
-      return null;
-    }
-    if (!isAiConfigured()) {
-      await ctx.runMutation(internal.cleanView.internal.fail, {
-        ...args,
-        error: "OPENAI_API_KEY is not configured",
-      });
       return null;
     }
     try {

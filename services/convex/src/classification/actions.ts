@@ -4,14 +4,13 @@ import type { Id } from "../_generated/dataModel";
 import type { ActionCtx } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { internalAction } from "../_generated/server";
-import { classificationRequestKey } from "./jobHelpers";
-import { normalizeMail } from "./normalize";
 import {
   AiDailyLimitError,
   classifyWithModel,
   configuredClassificationModel,
-  isAiConfigured,
-} from "./openai";
+} from "../ai/models";
+import { classificationRequestKey } from "./jobHelpers";
+import { normalizeMail } from "./normalize";
 import { deriveSignals, deterministicClassification } from "./signals";
 
 export const runClassification = internalAction({
@@ -30,17 +29,6 @@ export const runClassification = internalAction({
       args,
     );
     if (!attempt.ready || attempt.attempt === undefined) return null;
-
-    if (!isAiConfigured()) {
-      await completeWithFallback({
-        ctx,
-        args,
-        fallback,
-        signals,
-        error: "OPENAI_API_KEY is not configured",
-      });
-      return null;
-    }
 
     try {
       const result = await classifyWithModel({

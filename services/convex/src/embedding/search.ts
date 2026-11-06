@@ -2,8 +2,8 @@ import { makeFunctionReference } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
+import { createEmbedding } from "../ai/models";
 import { stableHash } from "../classification/normalize";
-import { createEmbedding, isAiConfigured } from "../classification/openai";
 import { rateLimiter } from "../limiter";
 import { parseMailSearch } from "../mail/search";
 import { authedAction } from "../utils";
@@ -60,7 +60,6 @@ export const semanticSearch = authedAction({
       accountId: args.accountId,
     });
     if (!ownsScope) throw new ConvexError("Mail account not found");
-    if (!isAiConfigured()) return [];
 
     const limited = await rateLimiter.limit(ctx, "semanticSearch", {
       key: ctx.ownerId,

@@ -2,12 +2,12 @@ import type {
   ClassificationResult,
   ClassificationSignal,
   CleanViewResult,
-} from "./constants";
-import type { NormalizedMail } from "./normalize";
+} from "../classification/constants";
+import type { NormalizedMail } from "../classification/normalize";
 import {
   CLASSIFICATION_OUTPUT_SCHEMA_VERSION,
   CLEAN_VIEW_OUTPUT_SCHEMA_VERSION,
-} from "./constants";
+} from "../classification/constants";
 
 export function classificationRequest(args: {
   mail: NormalizedMail;

@@ -79,14 +79,16 @@ Several independent checks keep it off production:
 
 ## What doesn't work on an isolated backend
 
-No provider, AI, email, push, or AWS secret is set there, on purpose:
+No provider, email, push, or AWS secret is set there, on purpose. AI does
+work: the seed is already classified, and anything classified, cleaned, or
+searched semantically after that goes through the Convex AI Gateway at real
+cost, under the same daily limit ([AI.md](../services/convex/AI.md)). What
+doesn't work:
 
 - Connecting, syncing, or reconnecting Gmail, Microsoft 365, or iCloud
   (no OAuth clients or `PROVIDER_CREDENTIAL_KEYS`). The seeded accounts
   show as connected but never sync; "Try sync" fails.
 - Sending mail (the outbox has no provider to send through).
-- Classification, clean view, summaries, and semantic search
-  (no `OPENAI_API_KEY`); lexical search over the seed works.
 - Email codes and passkey recovery emails (no SES keys).
 - Push notifications (simulators can't register for them anyway).
 - Passkeys on the simulator (the dev client isn't associated with the
