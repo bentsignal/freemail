@@ -13,6 +13,7 @@ import { useMailStore } from "../store";
 import {
   getAccountAddressDetail,
   getMailboxTitle,
+  getSelectedAccountLabel,
   MAILBOX_OPTIONS,
 } from "./mailbox-scope";
 
@@ -54,7 +55,7 @@ export function MailboxToolbar(props: MailboxToolbarProps) {
           headerShown: true,
           title: selectionMode
             ? getSelectionTitle(props.selectedCount)
-            : getMailboxTitle(props.mailbox, props.accountFilter),
+            : getScopeTitle(props, searchMode),
         }}
       />
       <Stack.Toolbar placement="left">
@@ -197,6 +198,18 @@ export function SelectionToolbar({
       ])}
     </Stack.Toolbar>
   );
+}
+
+// Search has no large title to show the account under, so it joins the title.
+function getScopeTitle(
+  { accountFilter, accounts, mailbox }: MailboxToolbarProps,
+  searchMode: boolean,
+) {
+  const title = getMailboxTitle(mailbox, accountFilter);
+  const account = searchMode
+    ? getSelectedAccountLabel(accountFilter, accounts)
+    : undefined;
+  return account ? `${title} · ${account}` : title;
 }
 
 function getSelectionTitle(count: number) {

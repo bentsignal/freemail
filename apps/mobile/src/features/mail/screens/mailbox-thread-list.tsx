@@ -140,6 +140,7 @@ export function MailboxThreadList({
         refreshControl={refreshControl}
         refreshError={refreshError}
         renderThread={renderThread}
+        searchMode={searchMode}
         searchTerm={searchTerm}
         transition={transition}
       />
@@ -161,6 +162,7 @@ interface MailboxRowsProps {
     | undefined;
   refreshError: string | undefined;
   renderThread: MailboxThreadListProps["renderThread"];
+  searchMode: boolean;
   searchTerm: string | undefined;
   transition: ReturnType<
     typeof useInboxFilterTransition<MailThread, MailboxFilter>
@@ -179,6 +181,7 @@ function MailboxRows({
   refreshControl,
   refreshError,
   renderThread,
+  searchMode,
   searchTerm,
   transition,
 }: MailboxRowsProps) {
@@ -237,6 +240,7 @@ function MailboxRows({
               accountFilter={accountFilter}
               accounts={accounts}
               refreshError={refreshError}
+              searchMode={searchMode}
             />
           }
           ListFooterComponent={
