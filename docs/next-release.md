@@ -51,7 +51,7 @@ current one and stays signed in with notifications on.
   (`pnpm --filter @freemail/cli link --global`, then `freemail auth login`,
   since its session moved from `~/.config/rodge` to `~/.config/freemail`).
 
-## Call models through the Convex AI Gateway (#PR)
+## Call models through the Convex AI Gateway (#49)
 
 Classification, clean views, and embeddings now go through the Convex AI
 Gateway instead of straight to OpenAI, with the same models. The functions
