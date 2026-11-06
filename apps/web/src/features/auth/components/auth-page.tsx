@@ -12,7 +12,7 @@ export function AuthPage({ children }: { children: ReactNode }) {
         <div className="mb-9 flex flex-col items-center text-center">
           <img alt="" className="size-16 rounded-[14px]" src="/icon-192.png" />
           <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-            Rodge Mail
+            Freemail
           </h1>
         </div>
         {children}

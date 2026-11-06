@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import { toConvexId } from "../lib/convex-id";
 import { optimisticallyMoveThreadToInbox } from "./move-to-inbox-optimistic";

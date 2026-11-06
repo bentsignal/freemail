@@ -11,7 +11,7 @@ describe("mailbox empty-state copy", () => {
       }),
     ).toEqual({
       detail:
-        "Messages Rodge Mail flags as spam are quarantined here, away from your inbox.",
+        "Messages Freemail flags as spam are quarantined here, away from your inbox.",
       title: "No spam",
     });
   });

@@ -3,8 +3,8 @@ import type { OptimisticLocalStore } from "convex/browser";
 import { getFunctionName } from "convex/server";
 import { expect, it } from "vitest";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 
 import { optimisticallyRemoveAccount } from "./account-removal-optimistic";
 

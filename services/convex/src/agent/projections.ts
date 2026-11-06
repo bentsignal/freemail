@@ -2,12 +2,12 @@ import type {
   AgentSearchHit,
   AgentThreadMessage,
   MailboxAddress,
-} from "@rodge-mail/agent-contract";
+} from "@freemail/agent-contract";
 import {
   MAX_AGENT_MESSAGE_ATTACHMENTS,
   MAX_AGENT_MESSAGE_BODY_LENGTH,
   UNTRUSTED_MAIL_NOTICE,
-} from "@rodge-mail/agent-contract";
+} from "@freemail/agent-contract";
 
 import type { Doc } from "../_generated/dataModel";
 

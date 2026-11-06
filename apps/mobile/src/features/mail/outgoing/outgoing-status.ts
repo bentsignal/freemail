@@ -1,4 +1,4 @@
-import type { SentStatus } from "@rodge-mail/features/mail";
+import type { SentStatus } from "@freemail/features/mail";
 
 export interface OutgoingSendState {
   error?: string;

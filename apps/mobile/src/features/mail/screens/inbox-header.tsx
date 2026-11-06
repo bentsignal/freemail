@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MenuView } from "@expo/ui/community/menu";
 import { Check, ListChecks, ListFilter } from "lucide-react-native";
 
-import type { MailAccountFilter } from "@rodge-mail/features/mail";
+import type { MailAccountFilter } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import type { MobileMailbox } from "../store";

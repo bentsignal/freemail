@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import { toConvexId } from "../lib/convex-id";

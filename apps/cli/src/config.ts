@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 const defaultUrls = {
   convexCloud: "https://dazzling-dog-633.convex.cloud",
   convexSite: "https://dazzling-dog-633.convex.site",
-  web: "https://www.rodge-mail.local",
+  web: "https://www.freemail.local",
 };
 
 export interface CliSession {
@@ -25,18 +25,20 @@ export function resolveCliUrls(
 ): CliUrls {
   return {
     convexCloud:
-      environment.RODGE_MAIL_CONVEX_CLOUD_URL ?? defaultUrls.convexCloud,
-    convexSite:
-      environment.RODGE_MAIL_CONVEX_SITE_URL ?? defaultUrls.convexSite,
-    web: environment.RODGE_MAIL_WEB_URL ?? defaultUrls.web,
+      environment.FREEMAIL_CONVEX_CLOUD_URL ?? defaultUrls.convexCloud,
+    convexSite: environment.FREEMAIL_CONVEX_SITE_URL ?? defaultUrls.convexSite,
+    web: environment.FREEMAIL_WEB_URL ?? defaultUrls.web,
   };
 }
 
 export function sessionFilePath(environment: NodeJS.ProcessEnv = process.env) {
-  const configured = environment.RODGE_MAIL_CONFIG_DIR;
+  const configured = environment.FREEMAIL_CONFIG_DIR;
   const directory = configured
     ? resolve(configured)
-    : join(environment.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "rodge");
+    : join(
+        environment.XDG_CONFIG_HOME ?? join(homedir(), ".config"),
+        "freemail",
+      );
   return join(directory, "session.json");
 }
 

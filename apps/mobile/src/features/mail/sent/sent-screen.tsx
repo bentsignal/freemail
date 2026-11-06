@@ -9,12 +9,12 @@ import { useRouter } from "expo-router";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { Paperclip, RotateCcw } from "lucide-react-native";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 import {
   formatSentRecipients,
   getSentStatusLabel,
   getSentSubject,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 import type { SentRow } from "./sent-row";
 import { ContentReveal } from "~/components/content-reveal";

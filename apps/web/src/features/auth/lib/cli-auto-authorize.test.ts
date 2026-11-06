@@ -5,7 +5,7 @@ import {
   rememberCliAuthAfterSignIn,
 } from "./cli-auto-authorize";
 
-const origin = "https://www.rodge-mail.local";
+const origin = "https://www.freemail.local";
 const requestId = "a".repeat(43);
 const callbackUrl = "http://127.0.0.1:43123/auth/desktop-complete";
 

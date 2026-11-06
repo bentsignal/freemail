@@ -1,4 +1,4 @@
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 export function Textarea({
   className,

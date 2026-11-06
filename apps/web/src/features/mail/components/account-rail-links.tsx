@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { Archive, Inbox, Mails, Send, ShieldAlert } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { MailMode } from "../live-data-types";
 import { QuickLink } from "~/components/quick-link";
@@ -85,13 +85,13 @@ export function Brand() {
   return (
     <div className="flex min-h-10 items-center justify-center gap-3 xl:justify-start xl:px-1">
       <img
-        alt="Rodge Mail"
+        alt="Freemail"
         className="size-10 shrink-0 rounded-[10px]"
         src="/icon-192.png"
       />
       <div className="hidden min-w-0 xl:block">
         <p className="text-foreground text-[16px] leading-5 font-semibold tracking-[-0.02em] whitespace-nowrap">
-          Rodge Mail
+          Freemail
         </p>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import type { FunctionReturnType } from "convex/server";
 
-import type { api } from "@rodge-mail/convex/api";
+import type { api } from "@freemail/convex/api";
 
 export type SentRow = FunctionReturnType<
   typeof api.outbox.queries.listUnsent

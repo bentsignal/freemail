@@ -1,6 +1,6 @@
-# Rodge Mail architecture
+# Freemail architecture
 
-Rodge Mail treats Convex as the canonical local mailbox and provider APIs as
+Freemail treats Convex as the canonical local mailbox and provider APIs as
 eventually consistent transports. Every client reads the same normalized mail
 model instead of rendering Gmail, Microsoft, or IMAP payloads directly.
 
@@ -16,14 +16,14 @@ iCloud IMAP/SMTP ────┘                          │
 
 TanStack Start web ──┐
 Expo mobile ─────────┼─> Convex queries, mutations, and auth
-rodge CLI ───────────┘
+freemail CLI ────────┘
 ```
 
 ## Identity and mailbox access
 
-Rodge Mail authentication and mailbox authorization are separate concerns.
+Freemail authentication and mailbox authorization are separate concerns.
 
-- Better Auth protects the Rodge Mail account with email identity and passkeys.
+- Better Auth protects the Freemail account with email identity and passkeys.
 - Gmail uses delegated Google OAuth with offline access.
 - Microsoft 365 uses delegated Microsoft Graph OAuth with offline access.
 - iCloud uses an app-specific password for IMAP and SMTP.
@@ -110,3 +110,27 @@ Header search remains available for every message.
   files, and encrypted credentials in batches. It doesn't revoke the
   provider's grant or delete anything at the provider
   ([PROVIDERS.md](../services/convex/PROVIDERS.md#removing-an-account)).
+
+## Names from before Freemail
+
+The project was called Rodge Mail. A few identifiers keep that name because
+installed apps, stored data, or live infrastructure depend on them, and
+renaming them would sign the phone out, break stored credentials, or orphan
+AWS resources. A fork should pick its own values for the first three before
+it ships.
+
+- Bundle IDs and Android packages `com.bentsignal.rodgemail` and
+  `com.bentsignal.rodgemail.dev` (`app.config.ts`, the `.well-known` files,
+  `services/convex/src/http.ts`), the EAS project slug `rodge-mail`, and the
+  URL schemes `rodge-mail://` and `rodge-mail-dev://`.
+- The AWS resource names in `scripts/hosted-mail.mjs` (`rodge-mail` receipt
+  rule set, configuration set, bucket prefix, and `rodge-mail-convex` IAM
+  user).
+- Storage keys on the phone and the website (`rodge-mail.palette`, the auth
+  `storagePrefix`, ...), agent token prefixes (`rodge_agent_`), and the
+  salts for agent tokens, provider credentials, and OAuth state.
+- Message ID and idempotency header formats on outgoing mail, which a
+  retried send looks up to find mail it already sent, and the `removeThreadFromRodge`
+  Convex function, which installed apps call by name.
+- The backend still trusts `*.rodge-mail.local` origins so worktrees from
+  before the rename keep signing in.

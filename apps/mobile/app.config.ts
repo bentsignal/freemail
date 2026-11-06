@@ -1,9 +1,9 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
 
 /**
- * `APP_VARIANT=development` builds "Rodge Dev": its own bundle ID, name,
+ * `APP_VARIANT=development` builds "Freemail Dev": its own bundle ID, name,
  * scheme, and icon, so the phone dev client (scripts/phone.sh) installs next
- * to the everyday Rodge Mail build. Without it the config is unchanged. See
+ * to the everyday Freemail build. Without it the config is unchanged. See
  * docs/phone-testing.md.
  */
 const dev = process.env.APP_VARIANT === "development";
@@ -15,13 +15,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const buildProfile = process.env.EAS_BUILD_PROFILE;
   if (buildProfile && !buildProfile.startsWith("development")) {
     throw new Error(
-      `Rodge Mail only has development builds configured; received EAS profile "${buildProfile}"`,
+      `Freemail only has development builds configured; received EAS profile "${buildProfile}"`,
     );
   }
 
   return {
     ...config,
-    name: dev ? "Rodge Dev" : "Rodge Mail",
+    name: dev ? "Freemail Dev" : "Freemail",
     slug: "rodge-mail",
     owner: "directedbyshawn",
     scheme: dev ? "rodge-mail-dev" : "rodge-mail",
@@ -47,8 +47,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: true,
       // Liquid Glass icon from Icon Composer; see assets/icons/README.md.
       icon: dev
-        ? "./assets/icons/rodge-dev.icon"
-        : "./assets/icons/rodge-mail.icon",
+        ? "./assets/icons/freemail-dev.icon"
+        : "./assets/icons/freemail.icon",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
@@ -57,10 +57,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       package: BUNDLE_ID,
       adaptiveIcon: {
         backgroundImage: dev
-          ? "./assets/icons/rodge-dev-android-background.png"
-          : "./assets/icons/rodge-mail-android-background.png",
-        foregroundImage: "./assets/icons/rodge-mail-android-foreground.png",
-        monochromeImage: "./assets/icons/rodge-mail-android-monochrome.png",
+          ? "./assets/icons/freemail-dev-android-background.png"
+          : "./assets/icons/freemail-android-background.png",
+        foregroundImage: "./assets/icons/freemail-android-foreground.png",
+        monochromeImage: "./assets/icons/freemail-android-monochrome.png",
       },
     },
     experiments: {
@@ -74,7 +74,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-notifications",
         {
           color: "#000000",
-          icon: "./assets/icons/rodge-mail-android-notification.png",
+          icon: "./assets/icons/freemail-android-notification.png",
           defaultChannel: "new-mail",
           enableBackgroundRemoteNotifications: true,
         },
@@ -98,7 +98,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-image-picker",
         {
           photosPermission:
-            "Allow Rodge Mail to access photos you choose to attach to email.",
+            "Allow Freemail to access photos you choose to attach to email.",
         },
       ],
       "./expo-plugins/with-android-network-security.cjs",

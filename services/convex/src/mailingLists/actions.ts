@@ -125,7 +125,7 @@ async function postOneClickUnsubscribe(value: string) {
       headers: {
         Accept: "text/plain, text/html;q=0.9, */*;q=0.1",
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Rodge-Mail-Unsubscribe/1.0",
+        "User-Agent": "Freemail-Unsubscribe/1.0",
       },
       body: "List-Unsubscribe=One-Click",
       signal: controller.signal,

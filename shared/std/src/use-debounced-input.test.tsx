@@ -22,10 +22,10 @@ describe("useDebouncedInput", () => {
     act(() => {
       harness.current.setValue("r");
       harness.current.setValue("ro");
-      harness.current.setValue("rodge");
+      harness.current.setValue("freemail");
     });
 
-    expect(harness.current.value).toBe("rodge");
+    expect(harness.current.value).toBe("freemail");
     expect(harness.current.debouncedValue).toBe("");
 
     act(() => {
@@ -36,7 +36,7 @@ describe("useDebouncedInput", () => {
     act(() => {
       vi.advanceTimersByTime(1);
     });
-    expect(harness.current.debouncedValue).toBe("rodge");
+    expect(harness.current.debouncedValue).toBe("freemail");
 
     act(() => harness.renderer.unmount());
   });

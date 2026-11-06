@@ -1,4 +1,4 @@
-# Rodge Mail rebrand lab
+# Freemail rebrand lab
 
 This lab explores four product-level directions without changing the shipping
 web, desktop, or mobile shells. Open `index.html` in a browser and use the

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { AgentSearchHit } from "@rodge-mail/agent-contract";
+import type { AgentSearchHit } from "@freemail/agent-contract";
 
 import { mergeSearchHits } from "./search";
 

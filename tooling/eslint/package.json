@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/eslint-config",
+  "name": "@freemail/eslint-config",
   "private": true,
   "type": "module",
   "exports": {
@@ -23,12 +23,12 @@
     "typescript-eslint": "^8.46.2"
   },
   "devDependencies": {
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }

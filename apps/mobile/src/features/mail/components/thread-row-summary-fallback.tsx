@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { CheckCircle2, Circle, Pin } from "lucide-react-native";
 
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
 import { useColor } from "~/hooks/use-color";

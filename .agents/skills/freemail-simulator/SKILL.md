@@ -1,11 +1,11 @@
 ---
-name: rodge-simulator
+name: freemail-simulator
 description: Required before you use an iOS simulator or Android emulator in this repo for any reason, such as verifying a change, taking screenshots or videos, measuring an animation, or reproducing a bug. Every worktree of every repo on Shawn's Mac shares one simulator queue, so devices start only through scripts/sim.sh. This skill has the rules that keep the Mac usable, the commands, and how to wait your turn.
 ---
 
 # Simulators and emulators
 
-Many worktrees, in Rodge, Vera, and SYNQ, run at once on Shawn's Mac.
+Many worktrees, in Freemail, Vera, and SYNQ, run at once on Shawn's Mac.
 `scripts/sim.sh up` waits in the simulator queue (`scripts/simq.ts`, a
 verbatim copy of Vera's, so all three repos talk to one daemon), which runs
 **up to three devices at once on the whole Mac**, iOS and Android alike: at
@@ -27,7 +27,7 @@ only works if every agent goes through it.
    the daemon (`simq.ts stop`), and don't edit `~/.config/vera/simq.json`;
    that's Shawn's.
 3. **Only touch your own worktree's device and Metro.** Never use, stop, or
-   screenshot another worktree's simulator (`Rodge <other>`, `Vera ...`,
+   screenshot another worktree's simulator (`Freemail <other>`, `Vera ...`,
    `SYNQ ...`), even one that looks abandoned. The queue cleans those up.
 4. **Wait your turn, and never end your turn while queued.** If `up`
    prints `simulator queue: position N of M`, it's waiting, and says why.
@@ -76,9 +76,9 @@ Every command takes `--android` first for this worktree's Android emulator
 and wait in the same queue. In T3 Code, `device_open` takes the emulator
 serial `up` prints (`emulator-55xx`), with `platform: "android"`.
 
-- The simulator is `Rodge <worktree>` (for example `Rodge t3-80b30f1b`).
+- The simulator is `Freemail <worktree>` (for example `Freemail t3-80b30f1b`).
   The app is a Debug dev client from a local EAS `development:client:sim`
-  build, cached per native fingerprint in `~/Library/Caches/rodge-mail`
+  build, cached per native fingerprint in `~/Library/Caches/freemail`
   and shared by every worktree. The first build of a fingerprint takes 10
   to 20 minutes and runs under the heavy-work lock all repos share
   (`scripts/bench/with-lock.sh`), before `up` joins the queue;
@@ -89,8 +89,8 @@ serial `up` prints (`emulator-55xx`), with `platform: "android"`.
   `http://127.0.0.1:<port>`. Its log is `.cache/sim/metro.log`; check it for
   red boxes and warnings you introduced.
 - `open`, `reload`, `signin`, and `frames` go through the dev-only
-  `globalThis.rodgeDev` hook (`apps/mobile/src/features/dev/automation.ts`)
-  over Metro's debugger connection, because iOS asks "Open in Rodge Dev?"
+  `globalThis.freemailDev` hook (`apps/mobile/src/features/dev/automation.ts`)
+  over Metro's debugger connection, because iOS asks "Open in Freemail Dev?"
   before every `simctl openurl`.
 - **Signing in needs an isolated backend.** The default backend is the
   production deployment with Shawn's real mail, so there the simulator
@@ -146,10 +146,10 @@ When you have your evidence, and in any case before you end your turn:
 - **`up` says Metro didn't start:** read `.cache/sim/metro.log`. Kill only
   the PID in `.cache/sim/metro`, never by pattern (other worktrees run
   Metro too).
-- **The app shows the dev launcher instead of Rodge Dev:**
+- **The app shows the dev launcher instead of Freemail Dev:**
   `scripts/sim.sh relaunch`.
 - **The dev client build fails:** it's a local EAS build; the log is in
-  the `up` output. See the `rodge-expo-build` skill. A missing fastlane or
+  the `up` output. See the `freemail-expo-build` skill. A missing fastlane or
   CocoaPods is usually `PATH` (Homebrew's fastlane first, then rbenv's
   shims, which `sim.sh` sets).
 - **The Mac is slow or a simulator is stuck "Shutting Down":** check for

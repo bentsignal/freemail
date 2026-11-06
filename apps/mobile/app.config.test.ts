@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 import type { ConfigContext } from "expo/config";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createUrls } from "@rodge-mail/config/urls";
+import { createUrls } from "@freemail/config/urls";
 
 import createExpoConfig from "./app.config";
 
@@ -71,7 +71,7 @@ describe("mobile development configuration", () => {
   });
 });
 
-describe("Rodge Dev variant", () => {
+describe("Freemail Dev variant", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.resetModules();
@@ -83,27 +83,27 @@ describe("Rodge Dev variant", () => {
     return create({ config: {} } as ConfigContext);
   }
 
-  it("leaves Rodge Mail unchanged without APP_VARIANT", async () => {
+  it("leaves Freemail unchanged without APP_VARIANT", async () => {
     vi.stubEnv("APP_VARIANT", "");
     const config = await loadConfig();
 
-    expect(config.name).toBe("Rodge Mail");
+    expect(config.name).toBe("Freemail");
     expect(config.scheme).toBe("rodge-mail");
     expect(config.ios?.bundleIdentifier).toBe("com.bentsignal.rodgemail");
     expect(config.android?.package).toBe("com.bentsignal.rodgemail");
-    expect(config.ios?.icon).toBe("./assets/icons/rodge-mail.icon");
+    expect(config.ios?.icon).toBe("./assets/icons/freemail.icon");
     expect(config.extra).not.toHaveProperty("appVariant");
   });
 
-  it("builds Rodge Dev beside it with APP_VARIANT=development", async () => {
+  it("builds Freemail Dev beside it with APP_VARIANT=development", async () => {
     vi.stubEnv("APP_VARIANT", "development");
     const config = await loadConfig();
 
-    expect(config.name).toBe("Rodge Dev");
+    expect(config.name).toBe("Freemail Dev");
     expect(config.scheme).toBe("rodge-mail-dev");
     expect(config.ios?.bundleIdentifier).toBe("com.bentsignal.rodgemail.dev");
     expect(config.android?.package).toBe("com.bentsignal.rodgemail.dev");
-    expect(config.ios?.icon).toBe("./assets/icons/rodge-dev.icon");
+    expect(config.ios?.icon).toBe("./assets/icons/freemail-dev.icon");
     expect(config.extra?.appVariant).toBe("development");
     expect(config.ios?.associatedDomains).toEqual([
       "webcredentials:dazzling-dog-633.convex.site",

@@ -4,13 +4,13 @@ import { Alert, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 
-import type { MailMessage, MailThread } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+import type { MailMessage, MailThread } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 import {
   canMoveMailThreadToInbox,
   getMailThreadPlacement,
   getReplyAddress,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
 import type { MessageViewMode } from "./thread-message-body";

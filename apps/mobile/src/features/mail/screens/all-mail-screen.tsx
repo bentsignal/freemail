@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { usePaginatedQuery } from "convex/react";
 
-import type { MailThread } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+import type { MailThread } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 
 import type { MailboxFilter } from "./mailbox-controls";
 import { useDebouncedValue } from "~/hooks/use-debounced-value";

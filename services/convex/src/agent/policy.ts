@@ -2,7 +2,7 @@ import type {
   AgentAccountAccess,
   AgentScope,
   AgentToolName,
-} from "@rodge-mail/agent-contract";
+} from "@freemail/agent-contract";
 
 export const AGENT_TOKEN_DEFAULT_DAYS = 30;
 export const AGENT_TOKEN_MAX_DAYS = 90;

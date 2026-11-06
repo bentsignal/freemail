@@ -1,9 +1,9 @@
 ---
-name: rodge-feature
-description: The end-to-end workflow for building a Rodge Mail feature or fix in a T3 Code worktree, from planning through simulator and browser verification, PR evidence, CI, Shawn's test on his phone in Rodge Dev, and his approval to merge. Use at the start of any feature, bug fix, or UI change in this repo, and whenever you need screenshots or videos for a PR, touch Convex functions, or are about to open or merge a PR. Simulator and emulator use also requires the rodge-simulator skill.
+name: freemail-feature
+description: The end-to-end workflow for building a Freemail feature or fix in a T3 Code worktree, from planning through simulator and browser verification, PR evidence, CI, Shawn's test on his phone in Freemail Dev, and his approval to merge. Use at the start of any feature, bug fix, or UI change in this repo, and whenever you need screenshots or videos for a PR, touch Convex functions, or are about to open or merge a PR. Simulator and emulator use also requires the freemail-simulator skill.
 ---
 
-# Building a Rodge Mail change
+# Building a Freemail change
 
 Shawn opens one T3 Code thread and worktree per change
 (`~/.t3/worktrees/rodge-mail/<name>`). `t3.json` already ran
@@ -33,7 +33,7 @@ build), the browser for web.
 There is one Convex deployment, `dazzling-dog-633`, and it holds Shawn's
 real mail. **Never push to it from a feature branch**: no `convex dev`, no
 `convex deploy`, no `pnpm dev` or `pnpm dev:web` (both run `convex dev`).
-Functions reach it only in a release (the `rodge-release` skill).
+Functions reach it only in a release (the `freemail-release` skill).
 
 - App-only changes run against it as it is.
 - Convex changes (`services/convex/src`) are proven with Vitest unit tests
@@ -66,7 +66,7 @@ update (AGENTS.md). Keep the change to one concern.
 
 ## 4. Verify
 
-**Mobile: load the `rodge-simulator` skill first and follow its rules.**
+**Mobile: load the `freemail-simulator` skill first and follow its rules.**
 Every worktree in every repo shares Shawn's Mac, so devices start only
 through `scripts/sim.sh` and its queue, and `up` may make you wait your
 turn. For signed-in screens, isolate the backend first (step 2), then
@@ -76,8 +76,8 @@ say plainly in the PR which signed-in screens you couldn't see. Check Android to
 navigation, platform files (`.ios.tsx`/`.android.tsx`), or native config.
 
 **Web:** run only the web app on the worktree's Portless origin
-(`pnpm exec portless proxy start --lan`, then `pnpm -F @rodge-mail/web dev`,
-at `https://<worktree-id>.www.rodge-mail.local`), and check it in a browser.
+(`pnpm exec portless proxy start --lan`, then `pnpm -F @freemail/web dev`,
+at `https://<worktree-id>.www.freemail.local`), and check it in a browser.
 
 Exercise the actual change: the happy path, the empty and loading states,
 errors you can trigger, and dark mode if colors changed.
@@ -85,7 +85,7 @@ errors you can trigger, and dark mode if colors changed.
 **Measure anything that moves.** For any change to an animation, a
 transition, or what moves when something changes (a row archiving, a sheet
 opening, a list scrolling), record the UI thread's frames around the
-interaction (`scripts/sim.sh frames start` / `stop`, the `rodge-simulator`
+interaction (`scripts/sim.sh frames start` / `stop`, the `freemail-simulator`
 skill) before and after the change, and put both reports in the PR. `slow`
 must be 0 while things move.
 
@@ -93,8 +93,8 @@ must be 0 while things move.
 
 The simulator is your check. Every change also gets Shawn's own test on his
 phone, in its worktree, before it merges: the release no longer re-tests
-each change, so this is where a change gets right. He tests in Rodge Dev
-(`com.bentsignal.rodgemail.dev`, amber icon; Rodge Mail stays beside it),
+each change, so this is where a change gets right. He tests in Freemail Dev
+(`com.bentsignal.rodgemail.dev`, amber icon; Freemail stays beside it),
 which shows his real mail from `dazzling-dog-633`
 ([docs/phone-testing.md](../../../docs/phone-testing.md)).
 
@@ -115,7 +115,7 @@ scripts/phone.sh list           # every cached dev client, marking main's
 
 - Before serving, merge `origin/main` into the branch (fix conflicts,
   re-run the validation, push), so he tests what will merge.
-- Rodge Dev on his phone is normally **main's dev client**, which runs
+- Freemail Dev on his phone is normally **main's dev client**, which runs
   every worktree that hasn't changed native code. `up` compares this
   worktree's native fingerprint with main's and says which case it is:
   - **Main's dev client:** he only taps the open link.
@@ -127,14 +127,14 @@ scripts/phone.sh list           # every cached dev client, marking main's
 - `up` starts the worktree's Metro (the same one the simulators use). One
   Metro serves both the Mac's Wi-Fi, for when Shawn is home, and his
   tailnet, for when he's out: `up` puts `tailscale serve` (HTTPS, tailnet
-  only) in front of it. An open link is an https page that opens Rodge Dev
+  only) in front of it. An open link is an https page that opens Freemail Dev
   on this worktree's server in one tap. `up` prints what to send him
   between the `----` lines:
 
   ````
   ---- send Shawn this as it is ----
-  - [Open in Rodge Dev on iPhone](https://vera-evidence.b-cdn.net/rodge-mail/dev-client/open-….html?url=http%3A%2F%2F10.0.0.124%3A8651)
-  - [Open in Rodge Dev on iPhone over Tailscale](https://vera-evidence.b-cdn.net/rodge-mail/dev-client/open-….html?url=https%3A%2F%2Fairshawn.tailf45482.ts.net%3A8651)
+  - [Open in Freemail Dev on iPhone](https://vera-evidence.b-cdn.net/freemail/dev-client/open-….html?url=http%3A%2F%2F10.0.0.124%3A8651)
+  - [Open in Freemail Dev on iPhone over Tailscale](https://vera-evidence.b-cdn.net/freemail/dev-client/open-….html?url=https%3A%2F%2Fairshawn.tailf45482.ts.net%3A8651)
 
   Home Wi-Fi:
 
@@ -149,7 +149,7 @@ scripts/phone.sh list           # every cached dev client, marking main's
   ```
   ---- end ----
   add when he has to install first:
-  - [Install Rodge Dev on iPhone](https://vera-evidence.b-cdn.net/rodge-mail/dev-client/ios/…/index.html)
+  - [Install Freemail Dev on iPhone](https://vera-evidence.b-cdn.net/freemail/dev-client/ios/…/index.html)
   ````
 
   Put it first in your message, every time, copied exactly as printed
@@ -171,9 +171,9 @@ scripts/phone.sh list           # every cached dev client, marking main's
 
 - JavaScript edits hot-reload on his phone. Re-run `up` after native
   changes or `app.config.ts`.
-- Rodge Dev signs in to his real account, so it runs this worktree's app
+- Freemail Dev signs in to his real account, so it runs this worktree's app
   against the functions already on `dazzling-dog-633`. `up` refuses in a
-  worktree with an isolated backend: Rodge Dev would load that backend,
+  worktree with an isolated backend: Freemail Dev would load that backend,
   which has no account he can sign in to from the phone. A PR that changes
   Convex functions is tested in the simulator on its isolated backend;
   tell Shawn what he can only try on the phone after the release that
@@ -182,7 +182,7 @@ scripts/phone.sh list           # every cached dev client, marking main's
 - Leave it up while you work on his feedback. If this worktree has its own
   dev client, `down` at close-out prints main's install link: send it so
   he can put main's dev client back.
-- Never build or install Rodge Mail (the `rodge-expo-build` skill's
+- Never build or install Freemail (the `freemail-expo-build` skill's
   standalone build) for this. That's the release's job, or when Shawn
   asks for one by name.
 
@@ -196,7 +196,7 @@ scripts/sim.sh stop
 scripts/evidence.sh .cache/evidence/*.png .cache/evidence/*.mp4
 ```
 
-`evidence.sh` uploads to bunny.net (`vera-evidence.b-cdn.net/rodge-mail/`,
+`evidence.sh` uploads to bunny.net (`vera-evidence.b-cdn.net/freemail/`,
 unlisted paths) and prints Markdown. Images embed. Videos become a GIF
 preview that links to the MP4. Save web screenshots into
 `.cache/evidence/` too.
@@ -289,7 +289,7 @@ anything he should look at closely. **Stop there.** Don't merge.
   follow the `merge` skill: it merges, stops the dev server and devices,
   tears down an isolated backend, and settles the thread. CI passing, your
   review, and your simulator checks are never approval. Merging does not
-  release anything; releases are separate (the `rodge-release` skill).
+  release anything; releases are separate (the `freemail-release` skill).
 - If Shawn drops the work instead (closes the PR, abandons it, or replaces
   it with another thread), wind it down the same way without merging: the
   `merge` skill's steps 1 and 4, plus `scripts/backend.sh teardown` if the

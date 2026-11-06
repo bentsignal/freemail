@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Text, TextInput, View } from "react-native";
 
 import { useColor } from "~/hooks/use-color";
-import { isRodgeDev } from "../dev/app-variant";
+import { isFreemailDev } from "../dev/app-variant";
 import { NativeAuthButton } from "./native-auth-button";
 import { useEmailCodeAuth } from "./use-email-code-auth";
 
@@ -10,7 +10,7 @@ const inputClassName =
   "bg-muted text-foreground h-[50px] rounded-xl px-4 text-[17px]";
 
 export function EmailCodeSignIn() {
-  if (!isRodgeDev) return null;
+  if (!isFreemailDev) return null;
   return <EmailCodeForm />;
 }
 

@@ -1,13 +1,10 @@
 import { useRef, useState } from "react";
 
-import type {
-  EmailTextBlock,
-  EmailTextInline,
-} from "@rodge-mail/features/mail";
+import type { EmailTextBlock, EmailTextInline } from "@freemail/features/mail";
 import {
   parseEmailText,
   prepareEmailHtmlForDisplay,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 import type { ThreadMessageDetail } from "../types";
 import { formatFullDate, getInitials } from "../format";

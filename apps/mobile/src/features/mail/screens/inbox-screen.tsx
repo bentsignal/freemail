@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { usePaginatedQuery } from "convex/react";
 
-import type { MailAccountFilter, MailThread } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+import type { MailAccountFilter, MailThread } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 
 import type { MobileMailbox } from "../store";
 import { useColor } from "~/hooks/use-color";

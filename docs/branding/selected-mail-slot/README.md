@@ -1,11 +1,11 @@
-# Selected Rodge Mail mark: Mail Slot
+# Selected Freemail mark: Mail Slot
 
-The selected Rodge Mail identity is concept **#08 — Mail Slot** from logo
+The selected Freemail identity is concept **#08 — Mail Slot** from logo
 exploration round three.
 
 ## Locked source
 
-- Selected master: `rodge-mail-mail-slot-source.png`
+- Selected master: `freemail-mail-slot-source.png`
 - Dimensions: 1254 × 1254 pixels
 - Color mode: RGB
 - SHA-256: `6e90be38916cb180846b5072dccf5b37ddf42d30bb57d2831457596215a07e5c`

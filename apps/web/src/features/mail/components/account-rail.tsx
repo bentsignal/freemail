@@ -8,7 +8,7 @@ import {
   PenLine,
 } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { MailMode } from "../live-data-types";
 import type { MailAccountFilter } from "../store";

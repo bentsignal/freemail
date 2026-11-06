@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { createStore } from "rostra";
 
-import type { MailAccountFilter } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+import type { MailAccountFilter } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 import {
   readCachedAccountPage,
   sortPinnedMailRows,
-} from "@rodge-mail/features/mail";
+} from "@freemail/features/mail";
 
 import type { InboxItem } from "./lib/convex-mail";
 import type { SentRow } from "./sent/sent-row";

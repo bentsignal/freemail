@@ -13,8 +13,8 @@ import {
   Send,
 } from "lucide-react";
 
-import { api } from "@rodge-mail/convex/api";
-import { cn } from "@rodge-mail/std/cn";
+import { api } from "@freemail/convex/api";
+import { cn } from "@freemail/std/cn";
 
 import { QuickLink } from "~/components/quick-link";
 import { isOptimisticOutboxId } from "../outbox-optimistic";

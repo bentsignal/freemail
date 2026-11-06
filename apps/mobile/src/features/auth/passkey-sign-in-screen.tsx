@@ -47,12 +47,12 @@ function BrandHeader() {
   return (
     <View className="items-center gap-3">
       <Image
-        accessibilityLabel="Rodge Mail"
+        accessibilityLabel="Freemail"
         className="size-20 rounded-[22px]"
         source={roundedIcon}
       />
       <Text className="text-foreground text-[28px] font-bold tracking-tight">
-        Rodge Mail
+        Freemail
       </Text>
     </View>
   );

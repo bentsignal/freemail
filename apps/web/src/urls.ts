@@ -1,4 +1,4 @@
-import { createUrls } from "@rodge-mail/config/urls";
+import { createUrls } from "@freemail/config/urls";
 
 import { env } from "~/env";
 

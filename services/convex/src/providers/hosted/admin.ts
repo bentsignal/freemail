@@ -167,7 +167,7 @@ export const sendTestMessage = internalMutation({
       bcc: [],
       subject: reply
         ? `Re: ${reply.subject.replace(/^re:\s*/iu, "")}`
-        : `Rodge hosted mail test ${new Date(now).toISOString()}`,
+        : `Freemail hosted mail test ${new Date(now).toISOString()}`,
       plainText: `This test was sent from ${from} at ${new Date(now).toISOString()}.`,
       ...(reply ? resolveReplyMetadata(reply, ownerId, account._id) : {}),
       attachmentIds: [],

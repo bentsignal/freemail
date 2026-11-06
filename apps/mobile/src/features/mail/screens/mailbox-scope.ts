@@ -1,4 +1,4 @@
-import type { MailAccountFilter } from "@rodge-mail/features/mail";
+import type { MailAccountFilter } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
 

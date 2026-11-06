@@ -3,14 +3,11 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
-import { getProviderAttachmentError } from "@rodge-mail/convex/attachments/constants";
-import {
-  getSentSubject,
-  parseRecipientFields,
-} from "@rodge-mail/features/mail";
-import { toast } from "@rodge-mail/ui-web/toast";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
+import { getProviderAttachmentError } from "@freemail/convex/attachments/constants";
+import { getSentSubject, parseRecipientFields } from "@freemail/features/mail";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { ComposerSnapshot } from "../store";
 import { useLiveMail } from "../live-data";

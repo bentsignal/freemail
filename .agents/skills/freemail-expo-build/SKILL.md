@@ -1,9 +1,9 @@
 ---
-name: rodge-expo-build
-description: Build and install Rodge Mail's native binaries through local EAS. Use for physical iPhone development builds (the standalone IPA on Shawn's phone, its entitlement and push-notification checks), dev client build failures, native passkey testing, signing or provisioning diagnostics, and any task that might otherwise run Xcode or generated native projects directly. Simulators and emulators go through scripts/sim.sh and the rodge-simulator skill, never this skill's commands. Always use local EAS builds unless the user explicitly requests a cloud build.
+name: freemail-expo-build
+description: Build and install Freemail's native binaries through local EAS. Use for physical iPhone development builds (the standalone IPA on Shawn's phone, its entitlement and push-notification checks), dev client build failures, native passkey testing, signing or provisioning diagnostics, and any task that might otherwise run Xcode or generated native projects directly. Simulators and emulators go through scripts/sim.sh and the freemail-simulator skill, never this skill's commands. Always use local EAS builds unless the user explicitly requests a cloud build.
 ---
 
-# Rodge Expo Build
+# Freemail Expo Build
 
 ## Core rule
 
@@ -13,7 +13,7 @@ Do not use `expo run:ios`, `expo run:android`, Xcode, Gradle, or direct `xcodebu
 
 **Simulators and emulators start only through `scripts/sim.sh`** and the
 system-wide queue it shares with every repo on Shawn's Mac (the
-`rodge-simulator` skill). Never boot, create, or install onto a simulator or
+`freemail-simulator` skill). Never boot, create, or install onto a simulator or
 emulator yourself: no `xcrun simctl boot`, no XcodeBuildMCP `boot_sim` or
 `build_run_sim`, no `expo run:*`, no `pnpm ios`/`dev:ios`/`dev:android`, no
 `emulator -avd`.
@@ -24,10 +24,10 @@ emulator yourself: no `xcrun simctl boot`, no XcodeBuildMCP `boot_sim` or
 - Expo config: `apps/mobile/app.config.ts`
 - EAS config: `apps/mobile/eas.json`
 - Slug: `rodge-mail`
-- Rodge Mail (Shawn's everyday app): bundle identifier and package
+- Freemail (Shawn's everyday app): bundle identifier and package
   `com.bentsignal.rodgemail`, scheme `rodge-mail`, built with the
   standalone `development` profile.
-- Rodge Dev (every development binary): `APP_VARIANT=development`, bundle
+- Freemail Dev (every development binary): `APP_VARIANT=development`, bundle
   identifier and package `com.bentsignal.rodgemail.dev`, scheme
   `rodge-mail-dev`. The phone dev client is the `development:client`
   profile, built and served by `scripts/phone.sh` (never by hand); the
@@ -39,8 +39,8 @@ emulator yourself: no `xcrun simctl boot`, no XcodeBuildMCP `boot_sim` or
 Run from the repository root before or after meaningful build-facing changes:
 
 ```bash
-pnpm --filter @rodge-mail/mobile lint
-pnpm --filter @rodge-mail/mobile typecheck
+pnpm --filter @freemail/mobile lint
+pnpm --filter @freemail/mobile typecheck
 ```
 
 Follow the repository `AGENTS.md` validation sequence after source changes.
@@ -54,7 +54,7 @@ Follow the repository `AGENTS.md` validation sequence after source changes.
 eas build --local --non-interactive --profile development:client:sim --platform ios --output <tmp>/client.tar.gz
 ```
 
-It extracts `RodgeDev.app` into `~/Library/Caches/rodge-mail/dev-client-ios/<fingerprint>/`
+It extracts `FreemailDev.app` into `~/Library/Caches/freemail/dev-client-ios/<fingerprint>/`
 (the Android APK goes to `dev-client-android/`), under the heavy-work lock
 every repo shares, then installs it on this worktree's queued simulator and
 starts the worktree's own Metro on a plain port. `scripts/sim.sh build`
@@ -74,15 +74,15 @@ embedded:
 
 ```bash
 cd apps/mobile
-pnpm exec eas build --local --platform ios --profile development --output ./build/rodge-mail-development.ipa
+pnpm exec eas build --local --platform ios --profile development --output ./build/freemail-development.ipa
 ```
 
 Verify the embedded provisioning profile and app entitlement before
 installation:
 
 ```bash
-security cms -D -i Payload/RodgeMail.app/embedded.mobileprovision
-codesign -d --entitlements :- Payload/RodgeMail.app
+security cms -D -i Payload/Freemail.app/embedded.mobileprovision
+codesign -d --entitlements :- Payload/Freemail.app
 ```
 
 Do not install an IPA unless both the profile and signed app contain an
@@ -95,13 +95,13 @@ not require Metro, Portless, or access to the development machine.
 Install the verified IPA:
 
 ```bash
-xcrun devicectl device install app --device <device-uuid> ./build/rodge-mail-development.ipa
+xcrun devicectl device install app --device <device-uuid> ./build/freemail-development.ipa
 ```
 
 Launch the installed app, keep the authenticated session active, and complete
 the notification acceptance gate for every physical-iPhone build:
 
-1. Confirm iOS notification permission is authorized and Rodge Mail's `New
+1. Confirm iOS notification permission is authorized and Freemail's `New
    mail` setting reports the device as ready. A denied permission is a device
    blocker, not a successful build result.
 2. Inspect the active Convex deployment's `mobilePushTokens` table and confirm

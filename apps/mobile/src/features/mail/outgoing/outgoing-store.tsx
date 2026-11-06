@@ -3,8 +3,8 @@ import * as Haptics from "expo-haptics";
 import { useMutation } from "convex/react";
 import { createStore } from "rostra";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 
 import type { EnqueueArgs } from "./outbox-optimistic";
 import type { OutgoingSendState } from "./outgoing-status";
@@ -105,7 +105,7 @@ function notify(type: Haptics.NotificationFeedbackType) {
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error && error.message.trim()) return error.message;
-  return "Rodge Mail couldn’t queue this message.";
+  return "Freemail couldn’t queue this message.";
 }
 
 export const { Store: OutgoingMailStore, useStore: useOutgoingMail } =

@@ -4,9 +4,9 @@ export function help(topic?: "auth" | "mail") {
   return rootHelp;
 }
 
-const rootHelp = `Rodge Mail CLI
+const rootHelp = `Freemail CLI
 
-Usage: rodge <command>
+Usage: freemail <command>
 
 Commands:
   auth login               Sign in through your system browser
@@ -18,16 +18,16 @@ Commands:
   mail get <thread-id>     Read a mail thread
   help                     Show this help
 
-Run \`rodge auth help\` or \`rodge mail help\` for details.`;
+Run \`freemail auth help\` or \`freemail mail help\` for details.`;
 
-const authHelp = `Usage: rodge auth <command>
+const authHelp = `Usage: freemail auth <command>
 
 Commands:
-  login    Open the system browser and sign in to Rodge Mail
+  login    Open the system browser and sign in to Freemail
   status   Print whether the current CLI session is authenticated
   logout   Sign out and remove the local session`;
 
-const mailHelp = `Usage: rodge mail <command>
+const mailHelp = `Usage: freemail mail <command>
 
 Commands:
   list [--account ID] [--limit 1-25] [--cursor CURSOR]

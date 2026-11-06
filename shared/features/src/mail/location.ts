@@ -59,8 +59,8 @@ export function getMailThreadPlacement({
 }
 
 /**
- * Rodge can move a thread into the inbox when it archived it itself, or when
- * the mailbox is hosted and Rodge holds the only copy. Gmail, Microsoft, and
+ * Freemail can move a thread into the inbox when it archived it itself, or when
+ * the mailbox is hosted and Freemail holds the only copy. Gmail, Microsoft, and
  * iCloud own their folders.
  */
 export function canMoveMailThreadToInbox({

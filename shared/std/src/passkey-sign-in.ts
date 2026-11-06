@@ -1,7 +1,7 @@
 /**
  * Where a passkey signs in. Website and app passkeys belong to different
  * relying parties, so each platform needs at least one of its own.
- * "unknown" is a passkey stored before Rodge Mail recorded relying
+ * "unknown" is a passkey stored before Freemail recorded relying
  * parties; "nowhere" is one whose relying party neither platform uses.
  */
 export type PasskeySignIn = "app" | "nowhere" | "unknown" | "website";

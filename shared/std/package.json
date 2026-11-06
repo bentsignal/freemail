@@ -1,5 +1,5 @@
 {
-  "name": "@rodge-mail/std",
+  "name": "@freemail/std",
   "private": true,
   "type": "module",
   "exports": {
@@ -24,9 +24,9 @@
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:react19",
     "@types/react-test-renderer": "^19.1.0",
@@ -39,5 +39,5 @@
   "peerDependencies": {
     "react": "catalog:react19"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }

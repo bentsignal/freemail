@@ -2,7 +2,7 @@
 # Claude Code Stop hook: a turn that ends waits on Shawn, and a device left
 # up while he reads holds 2 to 4 GB of the Mac every worktree (in every
 # repo) shares. If this worktree's simulator or emulator is still up, send
-# the agent back once to shut it down (the rodge-simulator skill,
+# the agent back once to shut it down (the freemail-simulator skill,
 # "Shutting down"). It also stops phone servers, in any worktree, that the
 # phone hasn't loaded from in a day (`scripts/phone.sh sweep`).
 set -euo pipefail

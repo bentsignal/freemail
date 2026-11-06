@@ -3,8 +3,8 @@ import type { OptimisticLocalStore } from "convex/browser";
 import { getFunctionName } from "convex/server";
 import { describe, expect, it } from "vitest";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 
 import type { EnqueueArgs } from "./outbox-optimistic";
 import {
@@ -37,7 +37,7 @@ const ACCOUNT = {
 const ARGS = {
   accountId: "account-1" as Id<"mailAccounts">,
   attachmentIds: ["draft-1" as Id<"draftAttachments">],
-  idempotencyKey: "rodge-web-key",
+  idempotencyKey: "freemail-web-key",
   plainText: "Are you free\n\nfor lunch?",
   subject: "Lunch",
   to: [{ address: "jordan@example.com" }],

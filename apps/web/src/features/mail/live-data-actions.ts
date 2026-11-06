@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
-import { getReplyAddress } from "@rodge-mail/features/mail";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import { getReplyAddress } from "@freemail/features/mail";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { MailMode } from "./live-data-types";
 import type { InboxMessage, MailAccountView, MailThreadDetail } from "./types";
@@ -103,7 +103,7 @@ function useArchiveActions({
         to: getMailModePath(mailMode),
         search: (previous) => previous,
       });
-      toast.success("Archived in Rodge. Your provider copy is unchanged.");
+      toast.success("Archived in Freemail. Your provider copy is unchanged.");
     } catch (error) {
       toast.error(
         getErrorMessage(error, "Could not archive the conversation."),
@@ -179,7 +179,7 @@ function useArchiveBulkActions({
       errorLabel: "Could not archive the conversations.",
       messages,
       navigate,
-      successLabel: "archived in Rodge",
+      successLabel: "archived in Freemail",
       to: "/",
     });
   }

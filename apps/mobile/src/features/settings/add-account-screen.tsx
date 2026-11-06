@@ -4,7 +4,7 @@ import * as WebBrowser from "expo-web-browser";
 import { FieldGroup, Text, TextInput } from "@expo/ui";
 import { useAction } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { OAuthMailProvider } from "~/features/mail/screens/provider-connection";
 import {

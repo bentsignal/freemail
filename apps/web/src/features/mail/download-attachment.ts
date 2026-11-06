@@ -1,4 +1,4 @@
-import { normalizeAttachmentFileName } from "@rodge-mail/convex/attachments/constants";
+import { normalizeAttachmentFileName } from "@freemail/convex/attachments/constants";
 
 export async function downloadAttachmentFile({
   fileName,

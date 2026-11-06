@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { MailAccountView } from "./types";
 import { getErrorMessage } from "./live-data-utils";

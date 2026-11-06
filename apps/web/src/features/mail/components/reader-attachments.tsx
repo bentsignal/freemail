@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useAction } from "convex/react";
 import { Download, FileText, Paperclip } from "lucide-react";
 
-import { api } from "@rodge-mail/convex/api";
-import { normalizeAttachmentFileName } from "@rodge-mail/convex/attachments/constants";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import { normalizeAttachmentFileName } from "@freemail/convex/attachments/constants";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { ThreadMessageDetail } from "../types";
 import { downloadAttachmentFile } from "../download-attachment";

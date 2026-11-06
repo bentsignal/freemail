@@ -1,5 +1,5 @@
-import { cn } from "@rodge-mail/std/cn";
-import * as ContextMenu from "@rodge-mail/ui-web/context-menu";
+import { cn } from "@freemail/std/cn";
+import * as ContextMenu from "@freemail/ui-web/context-menu";
 
 import type { MailMode } from "../live-data-types";
 import type { MailRouteSearch } from "../mail-route-search";

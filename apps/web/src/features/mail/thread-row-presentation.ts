@@ -1,4 +1,4 @@
-import { getMailLocationTag } from "@rodge-mail/features/mail";
+import { getMailLocationTag } from "@freemail/features/mail";
 
 import type { MailMode } from "./live-data-types";
 import type { MailAccountFilter } from "./store";

@@ -1,4 +1,4 @@
-import type { MailMessage } from "@rodge-mail/features/mail";
+import type { MailMessage } from "@freemail/features/mail";
 
 export function getMessageAddressRows(
   message: Pick<MailMessage, "cc" | "from" | "replyTo" | "to">,

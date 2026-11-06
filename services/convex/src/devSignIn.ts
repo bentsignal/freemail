@@ -34,7 +34,7 @@ export function requireDevTools() {
  */
 export function devSignIn() {
   return {
-    id: "rodge-dev-sign-in",
+    id: "freemail-dev-sign-in",
     endpoints: {
       devSignIn: createAuthEndpoint(
         "/dev/sign-in",

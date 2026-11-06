@@ -33,7 +33,7 @@ authenticated `embedding/mutations:backfillInboxIndexing` mutation with
 `{"apply": false, "cursor": null}` to preview the first batch. If its counts
 look reasonable, call the same cursor with `apply: true`, then repeat preview
 and apply with each returned `continueCursor` until the desired recent window
-is covered. The traversal is newest-first; Rodge Mail currently backfills only
+is covered. The traversal is newest-first; Freemail currently backfills only
 the latest 200 inbox messages rather than polluting search with an unlimited
 archive. Each call is owner-scoped and processes at most 25 messages, so it can
 be driven from authenticated maintenance tooling without an unbounded
@@ -66,13 +66,13 @@ current clients.
 
 `searchHeaders` and `getMessagesByIds` take an optional `scope`. Without it
 they search the inbox, as builds before All Mail expect. With
-`scope: "all"` they search every stored message: inbox, sent, Rodge's
+`scope: "all"` they search every stored message: inbox, sent, Freemail's
 archive, imported folders, and provider folders. The full-text query drops
 its `inInbox` filter; date-only searches use `by_owner_received` or
 `by_account_received` instead of the inbox indexes. Web and mobile always
 search with `scope: "all"`.
 
-Junk, trash, Rodge's spam classification, and hidden repairs stay out of
+Junk, trash, Freemail's spam classification, and hidden repairs stay out of
 All Mail and search. They are filtered from each page after the index
 lookup, so a page can come back short while later pages exist, as with the
 structured filters above.
@@ -80,7 +80,7 @@ structured filters above.
 Every list row carries a `location`: `{ kind, name? }`, where `kind` is a
 folder kind (`inbox`, `sent`, `drafts`, `archive`, `junk`, `trash`,
 `custom`) and `name` is a custom folder's path. `mail/location.ts` resolves
-it from the message: inbox and Rodge's `archivedAt` first, then the hosted
+it from the message: inbox and Freemail's `archivedAt` first, then the hosted
 import labels (`archive`, `junk`, `sent`, `folder:<path>`), Gmail's system
 labels, and otherwise the account's `mailFolders` row for the label
 (Microsoft folder IDs, iCloud mailbox paths). Mail with no known folder
@@ -92,7 +92,7 @@ thread shows its newest message that isn't junk, trash, or spam, and is
 dropped when it has none.
 
 `archiveMutations:moveThreadToInbox` puts a thread back in the inbox. It
-works for Rodge-archived threads on any account, and for any thread on a
-hosted account, where Rodge holds the only copy. Gmail, Microsoft, and
+works for Freemail-archived threads on any account, and for any thread on a
+hosted account, where Freemail holds the only copy. Gmail, Microsoft, and
 iCloud own their folders, and their next sync would move the mail back out,
 so it refuses those.

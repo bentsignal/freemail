@@ -4,8 +4,8 @@ import { FieldGroup, Picker, Row, Spacer, Switch, Text } from "@expo/ui";
 import { frame } from "@expo/ui/swift-ui/modifiers";
 import { useMutation, useQuery } from "convex/react";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 
 import type { NotificationSetupState } from "~/features/notifications/notification-setup";
 import { ContentReveal } from "~/components/content-reveal";
@@ -154,7 +154,7 @@ function useDeviceNotifications() {
       if (result.kind === "denied" || nextState === "permission-denied") {
         Alert.alert(
           "Notifications Are Off",
-          "Allow notifications for Rodge Mail in Settings.",
+          "Allow notifications for Freemail in Settings.",
         );
         return false;
       }
@@ -221,7 +221,7 @@ function getSetupFooter(setupState: NotificationSetupState | undefined) {
   if (setupState === "permission-denied") {
     return (
       <FieldGroup.SectionFooter>
-        <Text>Notifications are off for Rodge Mail in Settings.</Text>
+        <Text>Notifications are off for Freemail in Settings.</Text>
       </FieldGroup.SectionFooter>
     );
   }

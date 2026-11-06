@@ -54,13 +54,13 @@ function signIn() {
 
 /**
  * Debug builds only: lets `scripts/sim.sh` navigate, reload, sign in, and
- * measure frames over Metro's debugger connection. iOS asks "Open in Rodge
+ * measure frames over Metro's debugger connection. iOS asks "Open in Freemail
  * Mail?" before every `simctl openurl`, which scripts cannot answer.
  */
 export function installDevAutomation() {
   if (!__DEV__) return;
   Object.assign(globalThis, {
-    rodgeDev: {
+    freemailDev: {
       open(path: string) {
         if (!path.startsWith("/")) throw new Error(`Not an app path: ${path}`);
         if (isAppPath(path)) router.push(path);

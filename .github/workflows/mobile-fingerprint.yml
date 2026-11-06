@@ -4,7 +4,7 @@ name: Mobile fingerprint
 # so, the phone only gets it from a new local EAS build, and every
 # simulator dev client is rebuilt for it, so the PR gets the
 # "📱 Native Change" label and a summary of what changed, and its
-# description's "Native change:" line can't say "no". Rodge has no
+# description's "Native change:" line can't say "no". Freemail has no
 # expo-updates, so fingerprints come from Expo's own CLI
 # (`expo/bin/fingerprint`, @expo/fingerprint). Both come from this one job
 # on one OS, so they compare cleanly (fingerprints differ between macOS and

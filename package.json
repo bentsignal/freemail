@@ -1,5 +1,5 @@
 {
-  "name": "rodge-mail",
+  "name": "freemail",
   "description": "A focused, AI-native email client for web and mobile.",
   "private": true,
   "engines": {
@@ -27,7 +27,7 @@
     "clean": "git clean -xdf node_modules .turbo",
     "clean:all": "turbo run clean",
     "dev": "portless proxy start --lan && turbo run dev --parallel --continue",
-    "dev:web": "portless proxy start --lan && turbo run dev --parallel --continue -F @rodge-mail/web...",
+    "dev:web": "portless proxy start --lan && turbo run dev --parallel --continue -F @freemail/web...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
@@ -40,16 +40,16 @@
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "typecheck": "turbo run typecheck",
     "create-package": "turbo gen init",
-    "android": "pnpm --filter @rodge-mail/mobile android",
-    "ios": "pnpm --filter @rodge-mail/mobile ios"
+    "android": "pnpm --filter @freemail/mobile android",
+    "ios": "pnpm --filter @freemail/mobile ios"
   },
   "devDependencies": {
-    "@rodge-mail/prettier-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
     "@turbo/gen": "^2.5.8",
     "portless": "catalog:",
     "prettier": "catalog:",
     "turbo": "^2.5.8",
     "typescript": "catalog:"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }

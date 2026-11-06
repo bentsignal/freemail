@@ -1,8 +1,8 @@
 import type { OptimisticLocalStore } from "convex/browser";
 import type { FunctionArgs } from "convex/server";
 
-import type { Doc, Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Doc, Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 
 import { toConvexId } from "../lib/convex-id";
 

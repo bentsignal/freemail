@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Uploads PR evidence (screenshots and simulator videos) to bunny.net and
 # prints Markdown to paste into the PR description. Evidence never goes in
-# git. It shares Vera's storage zone (`vera-evidence`) under `rodge-mail/`,
+# git. It shares Vera's storage zone (`vera-evidence`) under `freemail/`,
 # which Vera's install-page pruning never touches.
 #
 #   scripts/evidence.sh .cache/evidence/before.png .cache/evidence/after.mp4
@@ -22,7 +22,7 @@ fi
 ROOT="$(git rev-parse --show-toplevel)"
 branch="$(git -C "$ROOT" branch --show-current | sed -E 's/[^A-Za-z0-9]+/-/g')"
 # Unlisted: paths carry a random part, so they aren't guessable.
-prefix="rodge-mail/pr/${branch:-detached}/$(date +%Y%m%d-%H%M%S)-$(openssl rand -hex 4)"
+prefix="freemail/pr/${branch:-detached}/$(date +%Y%m%d-%H%M%S)-$(openssl rand -hex 4)"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 

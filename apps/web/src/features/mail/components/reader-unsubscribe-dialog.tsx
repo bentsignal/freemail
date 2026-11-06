@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import * as Dialog from "@rodge-mail/ui-web/dialog";
+import * as Dialog from "@freemail/ui-web/dialog";
 
 import type { ThreadMessageDetail } from "../types";
 
@@ -35,7 +35,7 @@ export function ReaderUnsubscribeDialog({
             Unsubscribe from {name}?
           </Dialog.Title>
           <Dialog.Description className="text-muted-foreground mt-2 text-xs leading-5">
-            Rodge will ask the sender to remove you using their one-click or
+            Freemail will ask the sender to remove you using their one-click or
             email unsubscribe method. Either way, current and future advertising
             mail matching this list will go to Spam.
           </Dialog.Description>

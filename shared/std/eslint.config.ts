@@ -1,8 +1,8 @@
 import { defineConfig } from "eslint/config";
 
-import { baseConfig, strictConfig } from "@rodge-mail/eslint-config/base";
-import { reactConfig } from "@rodge-mail/eslint-config/react";
-import { createStrictSyntax } from "@rodge-mail/eslint-config/syntax";
+import { baseConfig, strictConfig } from "@freemail/eslint-config/base";
+import { reactConfig } from "@freemail/eslint-config/react";
+import { createStrictSyntax } from "@freemail/eslint-config/syntax";
 
 export default defineConfig(
   {

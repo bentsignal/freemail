@@ -1,4 +1,4 @@
-import { parseRecipientList } from "@rodge-mail/features/mail";
+import { parseRecipientList } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 

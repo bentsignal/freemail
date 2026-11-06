@@ -33,7 +33,7 @@ Run the internal mutation in bounded pages and pass each returned cursor into
 the next call until `isDone` is true:
 
 ```sh
-pnpm --filter @rodge-mail/convex exec convex run mail/maintenance:backfillThreadInboxProjection '{"paginationOpts":{"cursor":null,"numItems":100}}'
+pnpm --filter @freemail/convex exec convex run mail/maintenance:backfillThreadInboxProjection '{"paginationOpts":{"cursor":null,"numItems":100}}'
 ```
 
 The backfill is idempotent and recomputes projection state from messages.

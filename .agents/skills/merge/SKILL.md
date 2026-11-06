@@ -8,7 +8,7 @@ description: Use whenever Shawn asks you to merge this thread's pull request or 
 Shawn's approval to merge covers the PRs linked to this thread and nothing
 else, and everything that follows a merge: the dev server and devices come
 down and the thread is settled. Without his approval in this thread, stop:
-a green PR waits for him. Merging releases nothing (the `rodge-release`
+a green PR waits for him. Merging releases nothing (the `freemail-release`
 skill does that). Once approved, do each step that applies, in order,
 without asking.
 
@@ -23,7 +23,7 @@ panel. Then:
 scripts/phone.sh down; scripts/phone.sh --android down
 scripts/sim.sh down; scripts/sim.sh --android down
 scripts/sim.sh status        # ios: none, android: none, metro: stopped
-xcrun simctl list devices | grep "Rodge $(basename "$PWD")" || echo gone
+xcrun simctl list devices | grep "Freemail $(basename "$PWD")" || echo gone
 ```
 
 Stop a web dev server you started in this worktree (only its own process).
@@ -77,5 +77,5 @@ That happens in the next release.
 ## 5. Report
 
 Say what was merged (PR link), that it isn't released yet (whether it needs
-a Convex deploy, a website deploy, or a Rodge Mail build when it is), and
+a Convex deploy, a website deploy, or a Freemail build when it is), and
 any extra release steps it added to `docs/next-release.md`. Keep it short.

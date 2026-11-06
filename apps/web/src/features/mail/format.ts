@@ -1,4 +1,4 @@
-import { formatRelativeTime } from "@rodge-mail/std/relative-time";
+import { formatRelativeTime } from "@freemail/std/relative-time";
 
 const FULL_DATE_FORMATTER = new Intl.DateTimeFormat("en", {
   weekday: "short",

@@ -5,13 +5,13 @@ import { convexQuery } from "@convex-dev/react-query";
 import { usePaginatedQuery } from "convex/react";
 import { Paperclip, Send } from "lucide-react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 import {
   formatSentRecipients,
   getSentStatusLabel,
   getSentSubject,
-} from "@rodge-mail/features/mail";
-import { cn } from "@rodge-mail/std/cn";
+} from "@freemail/features/mail";
+import { cn } from "@freemail/std/cn";
 
 import { QuickLink } from "~/components/quick-link";
 import { MAIL_PAGE_SIZE } from "../constants";

@@ -1,11 +1,11 @@
 # Passkey authentication
 
-Rodge Mail uses Better Auth passkeys backed by a locally installed Convex
+Freemail uses Better Auth passkeys backed by a locally installed Convex
 component. Configure these variables on each Convex deployment:
 
 - `BETTER_AUTH_SECRET`: a random Better Auth signing secret.
 - `AUTH_EMAIL_FROM`: the sender for email codes, on a domain verified in
-  Amazon SES, such as `Rodge Mail <mail@rodgers.dev>`. The codes go out
+  Amazon SES, such as `Freemail <mail@rodgers.dev>`. The codes go out
   through SES with the hosted mail credentials (`HOSTED_MAIL_AWS_*`, see
   [PROVIDERS.md](PROVIDERS.md#hosted-mail-amazon-ses)).
 - `PASSKEY_RP_ID`: the browser WebAuthn relying-party domain, without a scheme
@@ -39,7 +39,7 @@ registration code to resume interrupted onboarding. Passkey sign-in remains
 usernameless and selects the account from the credential.
 
 Both sign-in screens, web and mobile, offer only **Sign in with passkey**.
-Passkeys are listed, added, and removed in Settings under **Rodge Mail
+Passkeys are listed, added, and removed in Settings under **Freemail
 account**, through Better Auth's passkey client
 (`/passkey/list-user-passkeys`, `/passkey/delete-passkey`).
 
@@ -66,7 +66,7 @@ be removed once both platforms have a passkey with a known `rpId`. A passkey
 whose `rpId` matches neither current relying party (after `PASSKEY_RP_ID`
 changed) signs in nowhere and can be removed.
 
-The rules live in `@rodge-mail/std/passkey-sign-in`, shared by the server and
+The rules live in `@freemail/std/passkey-sign-in`, shared by the server and
 both apps.
 
 ## Recovery: `/recover`
@@ -78,7 +78,7 @@ revealing whether an address exists (`/passkey-recovery/request`). A valid code
 (`/passkey-recovery/verify`) verifies ownership of that address, atomically
 consumes the hashed code, and creates a normal authenticated session. It
 neither replaces nor adds a passkey: after it signs you in, open Settings →
-Rodge Mail account → **Add passkey**. Both recovery endpoints are rate limited
+Freemail account → **Add passkey**. Both recovery endpoints are rate limited
 to three requests per minute.
 
 The mobile app has no recovery screen, and `/recover` can't sign the app in.

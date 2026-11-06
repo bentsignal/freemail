@@ -1,11 +1,11 @@
 {
-  "name": "@rodge-mail/cli",
+  "name": "@freemail/cli",
   "version": "0.1.0",
-  "description": "Local command-line client for Rodge Mail.",
+  "description": "Local command-line client for Freemail.",
   "private": true,
   "type": "module",
   "bin": {
-    "rodge": "./src/index.ts"
+    "freemail": "./src/index.ts"
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
@@ -16,18 +16,18 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@rodge-mail/agent-contract": "workspace:*",
+    "@freemail/agent-contract": "workspace:*",
     "convex": "catalog:"
   },
   "devDependencies": {
-    "@rodge-mail/eslint-config": "workspace:*",
-    "@rodge-mail/prettier-config": "workspace:*",
-    "@rodge-mail/tsconfig": "workspace:*",
+    "@freemail/eslint-config": "workspace:*",
+    "@freemail/prettier-config": "workspace:*",
+    "@freemail/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "^4.0.17"
   },
-  "prettier": "@rodge-mail/prettier-config"
+  "prettier": "@freemail/prettier-config"
 }
