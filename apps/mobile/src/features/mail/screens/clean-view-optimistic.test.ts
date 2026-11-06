@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Doc } from "@rodge-mail/convex/model";
+import type { Doc } from "@freemail/convex/model";
 
 import { toConvexId } from "../lib/convex-id";
 import { markCleanViewPending } from "./clean-view-optimistic";

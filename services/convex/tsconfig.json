@@ -1,5 +1,5 @@
 {
-  "extends": "@rodge-mail/tsconfig/base.json",
+  "extends": "@freemail/tsconfig/base.json",
   "compilerOptions": {
     /* These settings are not required by Convex and can be modified. */
     "allowJs": true,

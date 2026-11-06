@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 import { stableRows } from "./stable-rows";
 

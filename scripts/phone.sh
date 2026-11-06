@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Rodge Dev on Shawn's phone: the dev client for this worktree's native
+# Freemail Dev on Shawn's phone: the dev client for this worktree's native
 # code, loading JavaScript from this worktree's Metro over the Mac's Wi-Fi
 # (the phone has to be on the same network) or Tailscale. JavaScript changes
 # hot-reload with no build; a native build happens only when this
-# fingerprint has no dev client yet. Rodge Dev installs next to Rodge Mail,
+# fingerprint has no dev client yet. Freemail Dev installs next to Freemail,
 # the standalone build Shawn reads his mail in (docs/phone-testing.md).
 #
 #   scripts/phone.sh [--android] <command>     (iPhone without --android)
@@ -21,10 +21,10 @@
 #
 # Dev clients are EAS `development:client` builds (ad hoc), built locally
 # once per fingerprint under the heavy-work lock every repo shares, and
-# cached in ~/Library/Caches/rodge-mail, so every worktree reuses them. Their
+# cached in ~/Library/Caches/freemail, so every worktree reuses them. Their
 # install pages are on bunny.net (scripts/install-page.sh).
 #
-# The phone holds one Rodge Dev at a time, normally main's dev client, which
+# The phone holds one Freemail Dev at a time, normally main's dev client, which
 # serves every worktree that hasn't changed native code. A worktree that
 # has gets its own dev client; once Shawn is done with it, `main` gives him
 # main's back. Main's fingerprint comes from a checkout of origin/main kept
@@ -40,7 +40,7 @@ fi
 ROOT="$(git rev-parse --show-toplevel)"
 MOBILE="$ROOT/apps/mobile"
 STATE_DIR="$ROOT/.cache/sim"
-CACHE_ROOT="$HOME/Library/Caches/rodge-mail"
+CACHE_ROOT="$HOME/Library/Caches/freemail"
 CACHE="$CACHE_ROOT/phone-dev-client-$PLATFORM"
 MAIN_CHECKOUT="$CACHE_ROOT/main-checkout"
 PHONE_NAME="$([ "$PLATFORM" = ios ] && echo iPhone || echo Android)"
@@ -51,7 +51,7 @@ mkdir -p "$STATE_DIR" "$CACHE"
 . "$ROOT/scripts/lib/metro.sh"
 
 # The native fingerprint of the dev variant (metro.sh exports APP_VARIANT),
-# for this checkout or the one at $1. Expo's own fingerprint CLI: Rodge has
+# for this checkout or the one at $1. Expo's own fingerprint CLI: Freemail has
 # no expo-updates.
 fingerprint() {
   (cd "${1:-$ROOT}/apps/mobile" && pnpm exec fingerprint fingerprint:generate --platform "$PLATFORM" </dev/null 2>/dev/null) |
@@ -134,8 +134,8 @@ ensure_client() {
     # upload the cached build again if this one's is gone.
     if ! curl -fsSI "$(cat "$CLIENT_DIR/install-url")" >/dev/null 2>&1; then
       echo "the install page expired; uploading the cached dev client again"
-      "$ROOT/scripts/install-page.sh" "$CLIENT_DIR/rodge-dev.$([ "$PLATFORM" = ios ] && echo ipa || echo apk)" \
-        "rodge-mail/dev-client/$PLATFORM/$hash" "Dev client for native fingerprint ${hash:0:12}." >"$CLIENT_DIR/install-url"
+      "$ROOT/scripts/install-page.sh" "$CLIENT_DIR/freemail-dev.$([ "$PLATFORM" = ios ] && echo ipa || echo apk)" \
+        "freemail/dev-client/$PLATFORM/$hash" "Dev client for native fingerprint ${hash:0:12}." >"$CLIENT_DIR/install-url"
     fi
     return
   fi
@@ -147,14 +147,14 @@ ensure_client() {
   done
   trap 'rmdir "$lock" 2>/dev/null || true' EXIT
   mkdir -p "$CLIENT_DIR.partial"
-  artifact="$CLIENT_DIR.partial/rodge-dev.$([ "$PLATFORM" = ios ] && echo ipa || echo apk)"
+  artifact="$CLIENT_DIR.partial/freemail-dev.$([ "$PLATFORM" = ios ] && echo ipa || echo apk)"
   # EAS writes the artifact only when the build succeeds, so one left by a
   # failed upload is complete.
   if [ ! -f "$artifact" ]; then
     echo "building the $PLATFORM dev client for fingerprint $hash (native code changed, or the first one); about 15 minutes"
     "build_$PLATFORM" "$artifact"
   fi
-  "$ROOT/scripts/install-page.sh" "$artifact" "rodge-mail/dev-client/$PLATFORM/$hash" \
+  "$ROOT/scripts/install-page.sh" "$artifact" "freemail/dev-client/$PLATFORM/$hash" \
     "Dev client for native fingerprint ${hash:0:12}." >"$CLIENT_DIR.partial/install-url"
   git -C "$ROOT" rev-parse HEAD >"$CLIENT_DIR.partial/commit"
   rm -rf "$CLIENT_DIR"
@@ -164,13 +164,13 @@ ensure_client() {
   BUILT=1
 }
 
-# The https page that opens Rodge Dev at a server (scripts/lib/open-page.html),
+# The https page that opens Freemail Dev at a server (scripts/lib/open-page.html),
 # uploaded once per version of the page. Chat apps only make http(s) links
 # tappable, so Shawn gets this instead of a rodge-mail-dev:// link.
 open_page() {
   local file="$ROOT/scripts/lib/open-page.html" hash path log
   hash="$(shasum -a 256 "$file" | cut -c1-12)"
-  path="rodge-mail/dev-client/open-$hash.html"
+  path="freemail/dev-client/open-$hash.html"
   if [ ! -f "$CACHE_ROOT/open-page-$hash" ]; then
     log="$(bunny storage files upload "$file" --zone vera-evidence --to "$path" --content-type text/html 2>&1)" || {
       echo "$log" >&2
@@ -181,7 +181,7 @@ open_page() {
   echo "$CDN/$path"
 }
 
-# What Shawn taps to load the server at $1 in Rodge Dev.
+# What Shawn taps to load the server at $1 in Freemail Dev.
 open_url() {
   echo "$(open_page)?url=$(node -p 'encodeURIComponent(process.argv[1])' "$1")"
 }
@@ -237,13 +237,13 @@ links() {
   "$ROOT/scripts/qr.sh" "$install" "$STATE_DIR/phone-$PLATFORM-install.png" >/dev/null
   "$ROOT/scripts/qr.sh" "$(open_url "$wifi")" "$STATE_DIR/phone-$PLATFORM-open.png" >/dev/null
   echo "---- send Shawn this as it is ----"
-  echo "- [Open in Rodge Dev on iPhone]($(open_url "$wifi"))"
-  [ -z "$tailnet" ] || echo "- [Open in Rodge Dev on iPhone over Tailscale]($(open_url "$tailnet"))"
+  echo "- [Open in Freemail Dev on iPhone]($(open_url "$wifi"))"
+  [ -z "$tailnet" ] || echo "- [Open in Freemail Dev on iPhone over Tailscale]($(open_url "$tailnet"))"
   printf '\nHome Wi-Fi:\n\n```text\n%s\n```\n' "$wifi"
   [ -z "$tailnet" ] || printf '\nTailscale:\n\n```text\n%s\n```\n' "$tailnet"
   echo "---- end ----"
   echo "add when he has to install first:"
-  echo "- [Install Rodge Dev on $PHONE_NAME]($install)"
+  echo "- [Install Freemail Dev on $PHONE_NAME]($install)"
   echo "QR codes: $STATE_DIR/phone-$PLATFORM-open.png"
   echo "          $STATE_DIR/phone-$PLATFORM-install.png"
 }
@@ -275,7 +275,7 @@ sweep() {
         flag="$([ "$platform" = android ] && echo " --android" || true)"
         {
           echo "Stopped serving the $platform phone: nothing loaded from it for a day. \`scripts/phone.sh$flag up\` serves it again."
-          [ -z "$OWN_CLIENT" ] || echo "Rodge Dev on the phone may still be this worktree's dev client; \`scripts/phone.sh$flag main\` gives Shawn main's back."
+          [ -z "$OWN_CLIENT" ] || echo "Freemail Dev on the phone may still be this worktree's dev client; \`scripts/phone.sh$flag main\` gives Shawn main's back."
         } >"$state/phone-$platform.reclaimed"
         rm -f "$state/phone-$platform"
       done
@@ -299,7 +299,7 @@ up() {
   sweep
   address >/dev/null
   if "$ROOT/scripts/backend.sh" status 2>/dev/null | grep -q '^isolated'; then
-    echo "this worktree has an isolated backend, which Rodge Dev would load and Shawn can't sign in to; serve the phone from a worktree on the default backend (docs/phone-testing.md)" >&2
+    echo "this worktree has an isolated backend, which Freemail Dev would load and Shawn can't sign in to; serve the phone from a worktree on the default backend (docs/phone-testing.md)" >&2
     exit 1
   fi
   # Offline or mid-conflict, serve anyway and say main's is unknown.
@@ -309,13 +309,13 @@ up() {
   [ -z "$main" ] || [ "$(basename "$CLIENT_DIR")" = "$main" ] || own=1
   printf 'PLATFORM=%s\nOWN_CLIENT=%s\n' "$PLATFORM" "$own" >"$STATE_DIR/phone-$PLATFORM"
   if [ -z "$main" ]; then
-    echo "couldn't check main's native fingerprint: if Rodge Dev on the phone isn't this worktree's dev client, install it first"
+    echo "couldn't check main's native fingerprint: if Freemail Dev on the phone isn't this worktree's dev client, install it first"
   elif [ -n "$own" ]; then
     echo "this worktree's native code differs from main's, so it has its own dev client: Shawn installs it from the install link first, and gets main's back afterwards (scripts/phone.sh main)"
   elif [ -n "$BUILT" ]; then
     echo "new dev client for main's native code: Shawn installs it from the install link first; it's main's dev client from now on"
   else
-    echo "this worktree uses main's dev client: if Rodge Dev on the phone is main's current dev client, only the open link is needed; otherwise (an older dev client, or another worktree's) install it first"
+    echo "this worktree uses main's dev client: if Freemail Dev on the phone is main's current dev client, only the open link is needed; otherwise (an older dev client, or another worktree's) install it first"
   fi
   links
 }
@@ -325,7 +325,7 @@ up() {
 client() {
   ensure_client
   "$ROOT/scripts/qr.sh" "$(cat "$CLIENT_DIR/install-url")" "$STATE_DIR/phone-$PLATFORM-install.png" >/dev/null
-  echo "- [Install Rodge Dev on $PHONE_NAME]($(cat "$CLIENT_DIR/install-url"))"
+  echo "- [Install Freemail Dev on $PHONE_NAME]($(cat "$CLIENT_DIR/install-url"))"
   echo "QR code:  $STATE_DIR/phone-$PLATFORM-install.png"
 }
 
@@ -375,7 +375,7 @@ down() {
   unserve_tailnet
   release_metro
   if [ -n "$OWN_CLIENT" ]; then
-    echo "Rodge Dev on the phone is this worktree's dev client; give Shawn main's back:"
+    echo "Freemail Dev on the phone is this worktree's dev client; give Shawn main's back:"
     main_client
   fi
 }

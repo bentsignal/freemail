@@ -3,12 +3,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { Code2, LoaderCircle, RefreshCw, Reply, Sparkles } from "lucide-react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 import {
   canMoveMailThreadToInbox,
   getMailThreadPlacement,
-} from "@rodge-mail/features/mail";
-import { cn } from "@rodge-mail/std/cn";
+} from "@freemail/features/mail";
+import { cn } from "@freemail/std/cn";
 
 import type { MailThreadDetail, ThreadMessageDetail } from "../types";
 import type { ReaderViewMode } from "./reader-message";

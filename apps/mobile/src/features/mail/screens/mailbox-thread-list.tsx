@@ -4,7 +4,7 @@ import { Animated, RefreshControl, View } from "react-native";
 import { Easing, LinearTransition } from "react-native-reanimated";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 
-import type { MailAccountFilter, MailThread } from "@rodge-mail/features/mail";
+import type { MailAccountFilter, MailThread } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import type { PageStatus } from "../lib/next-page";

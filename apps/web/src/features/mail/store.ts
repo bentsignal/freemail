@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { createStore } from "rostra";
 
-import type { Id } from "@rodge-mail/convex/model";
+import type { Id } from "@freemail/convex/model";
 import type {
   ComposerAttachment,
   ComposerDraft,
-} from "@rodge-mail/features/mail";
-import { useDebouncedInput } from "@rodge-mail/std/use-debounced-input";
+} from "@freemail/features/mail";
+import { useDebouncedInput } from "@freemail/std/use-debounced-input";
 
 const SEARCH_DEBOUNCE_MS = 600;
 
@@ -149,7 +149,7 @@ function useComposerState() {
 }
 
 function createIdempotencyKey() {
-  return `rodge-web-${crypto.randomUUID()}`;
+  return `freemail-web-${crypto.randomUUID()}`;
 }
 
 function useInternalStore({

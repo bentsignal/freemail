@@ -9,7 +9,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { InboxMessage } from "../types";
 import { useLiveMail } from "../live-data";

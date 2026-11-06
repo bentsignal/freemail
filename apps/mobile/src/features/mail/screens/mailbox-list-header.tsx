@@ -1,6 +1,6 @@
 import { Text } from "react-native";
 
-import type { MailAccountFilter } from "@rodge-mail/features/mail";
+import type { MailAccountFilter } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import { InboxSyncStatus } from "./inbox-sync-status";

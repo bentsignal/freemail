@@ -4,8 +4,8 @@ import { Text, View } from "react-native";
 import { WebView } from "@expo/dom-webview";
 import { useAction } from "convex/react";
 
-import type { MailAttachment, MailMessage } from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+import type { MailAttachment, MailMessage } from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 
 import { MobileEmailBody } from "../components/mobile-email-body";
 import { toConvexId } from "../lib/convex-id";

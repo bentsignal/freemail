@@ -3,8 +3,8 @@ import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import { useAction, useMutation } from "convex/react";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 
 import type { MailNotificationAction } from "./notification-actions";
 import { toConvexId } from "../mail/lib/convex-id";

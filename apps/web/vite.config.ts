@@ -23,7 +23,7 @@ export default defineConfig({
   },
   plugins: [
     {
-      name: "rodge-local-associated-domains",
+      name: "freemail-local-associated-domains",
       configureServer(server) {
         server.middlewares.use((request, response, next) => {
           if (request.url !== "/.well-known/apple-app-site-association") {

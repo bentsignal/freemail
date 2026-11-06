@@ -7,7 +7,7 @@ import {
   MAX_AGENT_THREAD_ATTACHMENTS,
   MAX_AGENT_THREAD_BODY_LENGTH,
   MAX_AGENT_THREAD_MESSAGES,
-} from "@rodge-mail/agent-contract";
+} from "@freemail/agent-contract";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";

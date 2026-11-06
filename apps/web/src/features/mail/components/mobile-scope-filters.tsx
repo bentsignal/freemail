@@ -1,4 +1,4 @@
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import { QuickLink } from "~/components/quick-link";
 import { useLiveMail } from "../live-data";

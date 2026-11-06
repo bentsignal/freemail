@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { usePaginatedQuery } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { LiveMailContextValue } from "./live-data-types";
 import type { InboxMessage } from "./types";

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@rodge-mail/tailwind-config/theme";
+@import "@freemail/tailwind-config/theme";
 
 @source "../../../../shared/ui-web/src/*.{ts,tsx}";
 

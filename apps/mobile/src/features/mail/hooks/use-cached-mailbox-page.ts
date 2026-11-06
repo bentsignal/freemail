@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { readCachedAccountPage } from "@rodge-mail/features/mail";
+import { readCachedAccountPage } from "@freemail/features/mail";
 
 import type { MailStoreValue } from "../store";
 import type { AccountPageCache } from "./use-account-page-cache";

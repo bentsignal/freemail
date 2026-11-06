@@ -560,7 +560,7 @@ function createMimeMessage(payload: OutboxPayload, internetMessageId: string) {
     );
   }
 
-  const boundary = `rodge-mail-${payload._id}`;
+  const boundary = `freemail-${payload._id}`;
   const parts = [
     `--${boundary}\r\nContent-Type: text/plain; charset="UTF-8"\r\nContent-Transfer-Encoding: 8bit\r\n\r\n${normalizeCrlf(payload.plainText)}`,
     ...payload.attachments.map((attachment) =>

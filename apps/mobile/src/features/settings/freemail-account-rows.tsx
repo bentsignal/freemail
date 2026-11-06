@@ -4,13 +4,13 @@ import { useFocusEffect } from "expo-router";
 import { Icon, ListItem, Text } from "@expo/ui";
 import { useMutation } from "convex/react";
 
-import type { PasskeyListItem, PasskeyRow } from "@rodge-mail/std/passkeys";
-import { api } from "@rodge-mail/convex/api";
+import type { PasskeyListItem, PasskeyRow } from "@freemail/std/passkeys";
+import { api } from "@freemail/convex/api";
 import {
   formatPasskeyAdded,
   getPasskeyLabel,
   useOptimisticPasskeys,
-} from "@rodge-mail/std/passkeys";
+} from "@freemail/std/passkeys";
 
 import { authClient, convexUrls } from "~/features/auth/client";
 import { retryTransientPasskeyAssociation } from "~/features/auth/native-passkey-operation";
@@ -80,7 +80,7 @@ export function PasskeyItem({
     }
     Alert.alert(
       "Remove Passkey?",
-      `${label} won't sign you in to Rodge Mail anymore.`,
+      `${label} won't sign you in to Freemail anymore.`,
       [
         { style: "cancel", text: "Cancel" },
         {
@@ -179,7 +179,7 @@ export function SignOutRow() {
   }
 
   function confirm() {
-    Alert.alert("Sign Out of Rodge Mail?", undefined, [
+    Alert.alert("Sign Out of Freemail?", undefined, [
       { style: "cancel", text: "Cancel" },
       { onPress: () => void signOut(), style: "destructive", text: "Sign Out" },
     ]);

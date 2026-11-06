@@ -7,18 +7,18 @@ import * as ImagePicker from "expo-image-picker";
 import { fetch as expoFetch } from "expo/fetch";
 import { useMutation } from "convex/react";
 
-import type { Id } from "@rodge-mail/convex/model";
+import type { Id } from "@freemail/convex/model";
 import type {
   ComposerAttachment,
   ComposerDraft,
-} from "@rodge-mail/features/mail";
-import { api } from "@rodge-mail/convex/api";
+} from "@freemail/features/mail";
+import { api } from "@freemail/convex/api";
 import {
   getProviderAttachmentError,
   MAX_ATTACHMENT_COUNT,
   MAX_TOTAL_ATTACHMENT_BYTES,
   validateAttachmentMetadata,
-} from "@rodge-mail/convex/attachments/constants";
+} from "@freemail/convex/attachments/constants";
 
 export interface NativeComposerAttachment extends ComposerAttachment {
   uri: string;
@@ -276,5 +276,5 @@ function parseStorageId(value: unknown) {
 
 function getAttachmentError(error: unknown) {
   if (error instanceof Error && error.message.trim()) return error.message;
-  return "Rodge Mail could not upload this attachment.";
+  return "Freemail could not upload this attachment.";
 }

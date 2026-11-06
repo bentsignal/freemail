@@ -1,10 +1,7 @@
 import { Text, View } from "react-native";
 
-import type {
-  EmailTextBlock,
-  EmailTextInline,
-} from "@rodge-mail/features/mail";
-import { parseEmailText } from "@rodge-mail/features/mail";
+import type { EmailTextBlock, EmailTextInline } from "@freemail/features/mail";
+import { parseEmailText } from "@freemail/features/mail";
 
 import { openEmailLink } from "../lib/open-email-link";
 

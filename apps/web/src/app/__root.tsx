@@ -13,9 +13,9 @@ import { getCookie } from "@tanstack/react-start/server";
 import { ConvexProviderWithAuth } from "convex/react";
 import { convert } from "great-time";
 
-import { createPageTitle } from "@rodge-mail/config/title";
-import { cn } from "@rodge-mail/std/cn";
-import { Toaster } from "@rodge-mail/ui-web/toast";
+import { createPageTitle } from "@freemail/config/title";
+import { cn } from "@freemail/std/cn";
+import { Toaster } from "@freemail/ui-web/toast";
 
 import type { RouterContext } from "~/router";
 import appStyles from "~/app/styles.css?url";

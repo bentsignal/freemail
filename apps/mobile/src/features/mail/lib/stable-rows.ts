@@ -1,4 +1,4 @@
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 function createStableRows<Row extends { id: string }>() {
   const rows = new Map<string, { json: string; row: Row }>();

@@ -10,9 +10,9 @@ import {
   Plus,
 } from "lucide-react";
 
-import { api } from "@rodge-mail/convex/api";
-import * as Dialog from "@rodge-mail/ui-web/dialog";
-import { toast } from "@rodge-mail/ui-web/toast";
+import { api } from "@freemail/convex/api";
+import * as Dialog from "@freemail/ui-web/dialog";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { MailAccountView } from "../types";
 import { ICloudConnectionDialog } from "./icloud-connection-dialog";

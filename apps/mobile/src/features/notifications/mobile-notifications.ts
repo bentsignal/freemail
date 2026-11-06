@@ -6,10 +6,10 @@ import * as Notifications from "expo-notifications";
 import * as SecureStore from "expo-secure-store";
 import { useMutation, useQuery } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { NotificationSetupState } from "./notification-setup";
-import { isRodgeDev } from "../dev/app-variant";
+import { isFreemailDev } from "../dev/app-variant";
 import { getExpoProjectId } from "./expo-project-id";
 import { NEW_MAIL_CATEGORY } from "./notification-actions";
 import {
@@ -27,10 +27,10 @@ const installationIdKey = "rodge-mail.notification-installation-id";
 const pushTokenKey = "rodge-mail.expo-push-token";
 const registrationRetryDelayMs = 30_000;
 /**
- * Rodge Dev signs in to the same mail as Rodge Mail, so it never registers
+ * Freemail Dev signs in to the same mail as Freemail, so it never registers
  * for pushes: every email would notify twice.
  */
-const canReceivePushes = Device.isDevice && !isRodgeDev;
+const canReceivePushes = Device.isDevice && !isFreemailDev;
 const setupStateListeners = new Set<() => void>();
 let notificationSetupSnapshot: NotificationSetupState | undefined;
 
@@ -137,7 +137,7 @@ export async function registerForNewMailNotifications(
     requestPermission?: boolean;
   } = {},
 ) {
-  if (isRodgeDev) return { kind: "simulator" as const };
+  if (isFreemailDev) return { kind: "simulator" as const };
   const permissionGranted = await prepareNotificationPermissions(
     options.requestPermission ?? true,
   );
@@ -230,7 +230,7 @@ export async function scheduleLocalNotificationPreview(
   }
   return await Notifications.scheduleNotificationAsync({
     content: {
-      title: "Rodge Mail",
+      title: "Freemail",
       body: "Simulator notification preview",
       sound: "default",
       categoryIdentifier: NEW_MAIL_CATEGORY,

@@ -1,6 +1,6 @@
-"""Writes the Rodge Mail app icon, its Icon Composer document, and its renders.
+"""Writes the Freemail app icon, its Icon Composer document, and its renders.
 
-    python3 build-icons.py              # rodge-mail.icon, render-flat.swift, previews/
+    python3 build-icons.py              # freemail.icon, render-flat.swift, previews/
     python3 build-icons.py --check DIR  # also every iOS appearance at 1024px in DIR
 
 The icon is a folded paper plane: one rounded silhouette cut along the fold
@@ -23,7 +23,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parent
-NAME = "rodge-mail"
+NAME = "freemail"
 ICTOOL = "/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool"
 RENDITIONS = ("Default", "Dark", "ClearLight", "ClearDark", "TintedLight", "TintedDark")
 PREVIEW_SIZE = 180

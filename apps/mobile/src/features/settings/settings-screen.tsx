@@ -5,7 +5,7 @@ import { FieldGroup, Picker, Row, Spacer, Text } from "@expo/ui";
 import { frame } from "@expo/ui/swift-ui/modifiers";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { MobileThemeMode } from "~/features/theme/mobile-theme";
 import { useMailStore } from "~/features/mail/store";
@@ -14,14 +14,14 @@ import {
   setMobileThemeMode,
   useMobileAppearance,
 } from "~/features/theme/mobile-theme";
-import { NativeHost } from "./native-host";
 import {
   AddPasskeyRow,
   OwnerRow,
   PasskeyItem,
   SignOutRow,
   usePasskeyGroups,
-} from "./rodge-account-rows";
+} from "./freemail-account-rows";
+import { NativeHost } from "./native-host";
 import { ActionRow, NavigationRow } from "./settings-rows";
 
 const fillRow = Platform.OS === "ios" ? [frame({ maxWidth: Infinity })] : [];
@@ -101,7 +101,7 @@ export function SettingsScreen() {
             onPress={() => router.push("/(tabs)/(settings)/notifications")}
           />
         </FieldGroup.Section>
-        <FieldGroup.Section title="Rodge Mail Account">
+        <FieldGroup.Section title="Freemail Account">
           <OwnerRow />
         </FieldGroup.Section>
         <FieldGroup.Section title="iPhone App Passkeys">

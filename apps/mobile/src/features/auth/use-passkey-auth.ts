@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { completeAuthSession } from "@rodge-mail/std/auth-session";
+import { completeAuthSession } from "@freemail/std/auth-session";
 
 import { authClient } from "./client";
 import {

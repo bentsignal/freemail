@@ -10,7 +10,7 @@ import {
   Trash2,
 } from "lucide-react-native";
 
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
 import type { ThreadRowProps } from "./thread-row-types";

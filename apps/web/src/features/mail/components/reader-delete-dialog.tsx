@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import * as Dialog from "@rodge-mail/ui-web/dialog";
+import * as Dialog from "@freemail/ui-web/dialog";
 
 import type { ThreadMessageDetail } from "../types";
 
@@ -29,7 +29,7 @@ export function ArchiveDeleteDialog({
             Delete permanently?
           </Dialog.Title>
           <Dialog.Description className="text-muted-foreground mt-2 text-xs leading-5">
-            This permanently removes Rodge Mail’s archived copy and cannot be
+            This permanently removes Freemail’s archived copy and cannot be
             undone. Your provider copy is unchanged.
           </Dialog.Description>
         </div>

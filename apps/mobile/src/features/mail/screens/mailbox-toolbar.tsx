@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import { Stack } from "expo-router";
 
-import type { MailAccountFilter } from "@rodge-mail/features/mail";
+import type { MailAccountFilter } from "@freemail/features/mail";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
 import type { MobileMailbox } from "../store";

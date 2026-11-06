@@ -1,7 +1,7 @@
 import { Archive, Inbox, Pin } from "lucide-react";
 
-import { canMoveMailThreadToInbox } from "@rodge-mail/features/mail";
-import * as ContextMenu from "@rodge-mail/ui-web/context-menu";
+import { canMoveMailThreadToInbox } from "@freemail/features/mail";
+import * as ContextMenu from "@freemail/ui-web/context-menu";
 
 import type { MailMode } from "../live-data-types";
 import type { InboxMessage } from "../types";

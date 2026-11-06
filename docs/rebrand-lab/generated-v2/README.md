@@ -1,11 +1,11 @@
-# Rodge Mail generated UI directions — round 2
+# Freemail generated UI directions — round 2
 
 Generated with the built-in image generation tool on 2026-07-11. No runtime UI
 files were changed by this exploration.
 
 ## References
 
-- `../../branding/selected-mail-slot/rodge-mail-mail-slot-source.png` — selected
+- `../../branding/selected-mail-slot/freemail-mail-slot-source.png` — selected
   brand icon and material reference
 - `references/current-desktop-mailbox.png` — live authenticated Electron inbox and
   open-message reference

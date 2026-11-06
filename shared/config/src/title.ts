@@ -1,7 +1,7 @@
 import { worktreeId as overrideWorktreeId } from "./overrides";
 import { normalizeWorktreeId } from "./worktrees";
 
-const APP_TITLE = "Rodge Mail";
+const APP_TITLE = "Freemail";
 
 export function createPageTitle() {
   const worktreeId = normalizeWorktreeId(overrideWorktreeId);

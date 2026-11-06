@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import { useMutation } from "convex/react";
 
-import { api } from "@rodge-mail/convex/api";
+import { api } from "@freemail/convex/api";
 
 import type { MailboxFilter } from "./mailbox-controls";
 import type { MailboxBulkAction } from "./mailbox-thread-list";
@@ -47,7 +47,7 @@ export function useArchiveActions() {
   function confirmDelete(threadIds: string[]) {
     Alert.alert(
       getDeleteTitle(threadIds.length),
-      "This removes Rodge Mail’s archived copy and cannot be undone. Your provider copy is unchanged.",
+      "This removes Freemail’s archived copy and cannot be undone. Your provider copy is unchanged.",
       [
         { style: "cancel", text: "Cancel" },
         {

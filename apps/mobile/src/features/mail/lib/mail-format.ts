@@ -1,6 +1,6 @@
-import type { MailAccountFilter, MailThread } from "@rodge-mail/features/mail";
-import { sortPinnedMailRows } from "@rodge-mail/features/mail";
-import { formatRelativeTime } from "@rodge-mail/std/relative-time";
+import type { MailAccountFilter, MailThread } from "@freemail/features/mail";
+import { sortPinnedMailRows } from "@freemail/features/mail";
+import { formatRelativeTime } from "@freemail/std/relative-time";
 
 export function formatInboxMessageTime(value: string, now = Date.now()) {
   return formatRelativeTime(new Date(value).getTime(), now);

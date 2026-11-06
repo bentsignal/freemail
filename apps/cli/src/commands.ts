@@ -29,7 +29,7 @@ export function parseCommand(arguments_: string[]): Command {
   if (group === "auth") return parseAuthCommand(action, rest);
   if (group === "accounts") return { kind: "accounts" };
   if (group === "mail") return parseMailCommand(action, rest);
-  throw new Error(`Unknown command: ${group}. Run \`rodge help\`.`);
+  throw new Error(`Unknown command: ${group}. Run \`freemail help\`.`);
 }
 
 function parseAuthCommand(action: string | undefined, rest: string[]) {
@@ -40,7 +40,9 @@ function parseAuthCommand(action: string | undefined, rest: string[]) {
   if (action === "login") return { kind: "auth-login" } satisfies Command;
   if (action === "logout") return { kind: "auth-logout" } satisfies Command;
   if (action === "status") return { kind: "auth-status" } satisfies Command;
-  throw new Error(`Unknown auth command: ${action}. Run \`rodge auth help\`.`);
+  throw new Error(
+    `Unknown auth command: ${action}. Run \`freemail auth help\`.`,
+  );
 }
 
 function parseMailCommand(action: string | undefined, rest: string[]): Command {
@@ -68,7 +70,9 @@ function parseMailCommand(action: string | undefined, rest: string[]): Command {
       ...options,
     };
   }
-  throw new Error(`Unknown mail command: ${action}. Run \`rodge mail help\`.`);
+  throw new Error(
+    `Unknown mail command: ${action}. Run \`freemail mail help\`.`,
+  );
 }
 
 function parseMailOptions(values: string[]) {

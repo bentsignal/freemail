@@ -40,7 +40,7 @@ describe("mail notification actions", () => {
     ).toEqual({ isDestructive: true, opensAppToForeground: true });
   });
 
-  it("accepts Rodge Mail action identifiers", () => {
+  it("accepts Freemail action identifiers", () => {
     expect(getMailNotificationAction(PIN_NOTIFICATION_ACTION)).toBe("pin");
     expect(getMailNotificationAction(MARK_READ_NOTIFICATION_ACTION)).toBe(
       "mark-read",

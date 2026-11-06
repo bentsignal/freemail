@@ -5,8 +5,8 @@ import type {
   GetThreadOutput,
   ListAccountsOutput,
   SearchMailOutput,
-} from "@rodge-mail/agent-contract";
-import { MAX_AGENT_SEARCH_RESULTS } from "@rodge-mail/agent-contract";
+} from "@freemail/agent-contract";
+import { MAX_AGENT_SEARCH_RESULTS } from "@freemail/agent-contract";
 
 import type { Id } from "../_generated/dataModel";
 import { authedAction } from "../utils";

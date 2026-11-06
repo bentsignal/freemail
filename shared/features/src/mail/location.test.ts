@@ -39,7 +39,7 @@ describe("mail location", () => {
     expect(getMailThreadPlacement({ inInbox: false })).toBe("elsewhere");
   });
 
-  it("moves only threads Rodge owns into the inbox", () => {
+  it("moves only threads Freemail owns into the inbox", () => {
     expect(
       canMoveMailThreadToInbox({ inInbox: false, provider: "hosted" }),
     ).toBe(true);

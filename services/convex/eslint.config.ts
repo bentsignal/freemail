@@ -1,9 +1,9 @@
 import convexPlugin from "@convex-dev/eslint-plugin";
 import { defineConfig } from "eslint/config";
 
-import { baseConfig, strictConfig } from "@rodge-mail/eslint-config/base";
-import { convexConfig } from "@rodge-mail/eslint-config/convex";
-import { createStrictSyntax } from "@rodge-mail/eslint-config/syntax";
+import { baseConfig, strictConfig } from "@freemail/eslint-config/base";
+import { convexConfig } from "@freemail/eslint-config/convex";
+import { createStrictSyntax } from "@freemail/eslint-config/syntax";
 
 export default defineConfig(
   {

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Uploads an iOS or Android build of Rodge Dev with an install page to
-# bunny.net (Vera's `vera-evidence` zone, under `rodge-mail/dev-client/`, an
+# Uploads an iOS or Android build of Freemail Dev with an install page to
+# bunny.net (Vera's `vera-evidence` zone, under `freemail/dev-client/`, an
 # unlisted path) and prints the page's URL. scripts/phone.sh uses it instead
 # of `eas upload`, because EAS's free plan caps uploads of local builds.
 # iOS installs ad hoc builds from an HTTPS manifest (itms-services), on
 # registered devices only.
 #
 # Each upload is one folder (`<path prefix>-<random>`). Before uploading,
-# it deletes Rodge Dev build folders older than 30 days, so builds don't
-# pile up on the bill; PR evidence (`rodge-mail/pr/`) stays.
+# it deletes Freemail Dev build folders older than 30 days, so builds don't
+# pile up on the bill; PR evidence (`freemail/pr/`) stays.
 # scripts/phone.sh re-uploads a cached dev client whose page was deleted.
 #
 #   scripts/install-page.sh <ipa|apk> <path prefix> "<description>"
@@ -17,10 +17,10 @@ set -euo pipefail
 artifact="${1:?ipa or apk}"
 prefix="${2:?path prefix}-$(openssl rand -hex 6)"
 description="${3:-}"
-app_name="Rodge Dev"
-artifact_name="rodge-dev"
+app_name="Freemail Dev"
+artifact_name="freemail-dev"
 button_color="#ec8a1e"
-replacement="Replaces whichever Rodge Dev is installed. Rodge Mail stays."
+replacement="Replaces whichever Freemail Dev is installed. Freemail stays."
 ZONE="vera-evidence"
 CDN="https://vera-evidence.b-cdn.net"
 work="$(mktemp -d)"
@@ -37,7 +37,8 @@ put() {
 # Deletes upload folders older than 30 days in each build directory.
 prune() {
   local root old
-  for root in rodge-mail/dev-client/ios rodge-mail/dev-client/android; do
+  # rodge-mail/ holds the builds from before the rename to Freemail.
+  for root in freemail/dev-client/ios freemail/dev-client/android rodge-mail/dev-client/ios rodge-mail/dev-client/android; do
     old="$(bunny storage files list "$root/" --zone "$ZONE" -o json 2>/dev/null |
       node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
         let list=[];try{list=JSON.parse(s)}catch{}

@@ -4,7 +4,7 @@
 
 We wanted mobile development to have the same stable URL behavior as web development: start a dev server without caring which random port it chose, then connect from iOS and Android using a predictable Portless hostname.
 
-The desired mobile URL was a stable `mobile.rodge-mail.local` style address rather than manually copying a local IP plus whatever port Expo/Metro picked for that run.
+The desired mobile URL was a stable `mobile.freemail.local` style address rather than manually copying a local IP plus whatever port Expo/Metro picked for that run.
 
 ## What Worked
 

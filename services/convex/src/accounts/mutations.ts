@@ -160,7 +160,7 @@ export const syncAllNow = authedMutation({
 });
 
 /**
- * Removes the account and everything Rodge Mail stored for it. Nothing is
+ * Removes the account and everything Freemail stored for it. Nothing is
  * deleted at the provider.
  */
 export const remove = authedMutation({

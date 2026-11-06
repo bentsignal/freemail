@@ -1,7 +1,4 @@
-import {
-  dedupeThreadRows,
-  sortPinnedMailRows,
-} from "@rodge-mail/features/mail";
+import { dedupeThreadRows, sortPinnedMailRows } from "@freemail/features/mail";
 
 import type { MailAccountDocument } from "./types";
 

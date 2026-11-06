@@ -1,6 +1,6 @@
 import { AlertCircle, RefreshCw } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { MailAccountView } from "../types";
 

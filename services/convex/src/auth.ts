@@ -7,7 +7,7 @@ import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth/minimal";
 import { emailOTP } from "better-auth/plugins";
 
-import { nativeAuthBasePath } from "@rodge-mail/config/auth";
+import { nativeAuthBasePath } from "@freemail/config/auth";
 
 import type { DataModel } from "./_generated/dataModel";
 import { components, internal } from "./_generated/api";
@@ -50,7 +50,7 @@ export function createAuthOptions(
   const { passkeyOrigins, trustedOrigins } = getAuthOrigins(passkeyRpId);
 
   return {
-    appName: "Rodge Mail",
+    appName: "Freemail",
     ...(options.basePath ? { basePath: options.basePath } : {}),
     baseURL: urls.convex.site,
     database: authComponent.adapter(ctx),
@@ -88,7 +88,7 @@ export function createAuthOptions(
       passkey({
         origin: passkeyOrigins,
         rpID: passkeyRpId,
-        rpName: "Rodge Mail",
+        rpName: "Freemail",
         authenticatorSelection: {
           residentKey: "required",
           userVerification: "required",
@@ -147,6 +147,9 @@ function getAuthOrigins(passkeyRpId: string) {
         : [
             urls.web,
             passkeyRpOrigin,
+            "https://*.freemail.local",
+            "https://*.www.freemail.local",
+            // Worktrees from before the rename to Freemail.
             "https://*.rodge-mail.local",
             "https://*.www.rodge-mail.local",
             "rodge-mail://",
@@ -165,6 +168,8 @@ function getAuthCorsAllowedOrigins(passkeyRpId: string) {
     : [
         urls.web,
         passkeyRpOrigin,
+        "*.freemail.local",
+        "*.www.freemail.local",
         "*.rodge-mail.local",
         "*.www.rodge-mail.local",
       ];

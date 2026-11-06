@@ -1,4 +1,4 @@
-import type { MailThread } from "@rodge-mail/features/mail";
+import type { MailThread } from "@freemail/features/mail";
 
 export function filterSpamThreads(threads: MailThread[], searchTerm: string) {
   const query = searchTerm.trim().toLocaleLowerCase();

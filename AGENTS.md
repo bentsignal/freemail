@@ -2,7 +2,7 @@
 
 ## Repository summary
 
-Rodge Mail is a focused, AI-native email client for one owner, Shawn. It
+Freemail is a focused, AI-native email client for one owner, Shawn. It
 has a TanStack Start web app (`apps/web`, hosted on Vercel at
 `https://mail.rodgers.dev`), an Expo React Native app (`apps/mobile`,
 `com.bentsignal.rodgemail`), and a terminal client (`apps/cli`). Everything
@@ -16,7 +16,7 @@ design or infrastructure questions.
 
 There is **one Convex deployment, `dazzling-dog-633`**. It is called a dev
 deployment, but it serves production: the website and both apps on Shawn's
-phone (Rodge Mail and Rodge Dev) use it, and it holds his real mail. Never push functions to it
+phone (Freemail and Freemail Dev) use it, and it holds his real mail. Never push functions to it
 (`convex dev`, `convex deploy`) outside a release Shawn asked for, and never
 write to its data except through the app as he would.
 
@@ -51,7 +51,7 @@ pages in the background; tell Shawn before anything opens on his machine.
 
 Shawn starts each feature or fix in its own T3 Code worktree and thread
 (`t3.json` runs `scripts/worktree-setup.sh` on creation). Follow the
-`rodge-feature` skill. In short:
+`freemail-feature` skill. In short:
 
 - Work only in the worktree and branch you were given. T3 names the branch;
   do not rename it. Never commit directly to `main`.
@@ -59,7 +59,7 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
   branch regularly without waiting to be asked. Do not leave work
   uncommitted between sessions; push it and note its state in the PR.
 - Verify in this worktree's own simulator (`scripts/sim.sh`), never another
-  worktree's or a shared one. Load the `rodge-simulator` skill before any
+  worktree's or a shared one. Load the `freemail-simulator` skill before any
   simulator or emulator use: devices start only through `scripts/sim.sh`,
   which queues them with every other repo on the Mac (Vera, SYNQ): up to
   three run at once, and a boot never overlaps a performance measurement.
@@ -72,9 +72,9 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
   back if one is still up, and the queue deletes devices left idle for 30
   minutes.
 - Web changes are checked in the browser against the worktree's Portless
-  origin (`https://<worktree>.www.rodge-mail.local`): start the proxy
+  origin (`https://<worktree>.www.freemail.local`): start the proxy
   (`pnpm exec portless proxy start --lan`) and only the web app
-  (`pnpm -F @rodge-mail/web dev`). Never `pnpm dev` or `pnpm dev:web`: both
+  (`pnpm -F @freemail/web dev`). Never `pnpm dev` or `pnpm dev:web`: both
   also run `convex dev`, which pushes this worktree's functions to the
   production deployment.
 - UI changes need screenshots (before and after where something changed);
@@ -91,7 +91,7 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
 - Open the PR, review your own diff as a skeptical reviewer, wait for CI to
   pass, start the dev server (`scripts/phone.sh up`), then tell Shawn it is
   ready to test and **stop**. Shawn tests every change on his phone in
-  Rodge Dev before it merges, and you refine it on the branch until he's
+  Freemail Dev before it merges, and you refine it on the branch until he's
   happy; the release doesn't re-test each change. The dev server stays up
   through the rounds of feedback and comes down when the PR merges or
   Shawn drops the work.
@@ -104,14 +104,14 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
 ## Releases
 
 Merging does not release anything. When Shawn asks for a release, follow
-the `rodge-release` skill ([docs/releasing.md](docs/releasing.md)): list
+the `freemail-release` skill ([docs/releasing.md](docs/releasing.md)): list
 what changed since the last release and what to test where those changes
 overlap (each one was already tested on its own before it merged), run
 those tests yourself first in the simulator, put `main` on his phone in
-Rodge Dev for what only he can check, and ship only after he approves the
+Freemail Dev for what only he can check, and ship only after he approves the
 release. Shipping is Convex functions to `dazzling-dog-633`, the website
-with `vercel deploy --prod`, and a new local EAS build of Rodge Mail for
-his phone when the mobile app changed. Rodge Mail is a standalone build
+with `vercel deploy --prod`, and a new local EAS build of Freemail for
+his phone when the mobile app changed. Freemail is a standalone build
 with its JavaScript embedded and no over-the-air updates, so a mobile
 change reaches it only in a new build.
 
@@ -124,21 +124,21 @@ line.
 
 ## Phone builds
 
-Shawn's phone has two Rodge apps side by side: **Rodge Mail**
+Shawn's phone has two Freemail apps side by side: **Freemail**
 (`com.bentsignal.rodgemail`, the standalone build he reads his mail in,
-updated only in a release) and **Rodge Dev**
+updated only in a release) and **Freemail Dev**
 (`com.bentsignal.rodgemail.dev`, amber icon, a dev client). Both talk to
-`dazzling-dog-633`, so Rodge Dev shows his real mail; it never registers
+`dazzling-dog-633`, so Freemail Dev shows his real mail; it never registers
 for push notifications, or every email would notify twice. Every
-development binary is Rodge Dev, the simulators' too. See
+development binary is Freemail Dev, the simulators' too. See
 [docs/phone-testing.md](docs/phone-testing.md).
 
-- **Day to day, Rodge Dev is main's dev client.** When your worktree's work
+- **Day to day, Freemail Dev is main's dev client.** When your worktree's work
   is ready to test, run `scripts/phone.sh up` in it. One Metro serves the
   Mac's Wi-Fi address and, through a Tailscale proxy, his tailnet for when
   he's away from home. It prints a block to send him as it is, first in
   your message, every time: the two **open links** as a Markdown list (one
-  tap on his iPhone opens Rodge Dev on this worktree's server, at home or
+  tap on his iPhone opens Freemail Dev on this worktree's server, at home or
   over Tailscale), then the home and Tailscale server addresses, each in
   its own code block so he can copy it in one tap. **Keep it exactly as
   printed**: the links as list items in `[label](url)` form, never in
@@ -154,11 +154,11 @@ development binary is Rodge Dev, the simulators' too. See
   (`phone.sh main` any time). Tell Shawn when he has to install something,
   with the install link `phone.sh` prints (a list item too); otherwise he
   only taps the open link. `phone.sh list` shows every cached dev client.
-- **Releases are tested in Rodge Dev too**, serving `main` (the
-  `rodge-release` skill), so fixes reach his phone without a build. Rodge
+- **Releases are tested in Freemail Dev too**, serving `main` (the
+  `freemail-release` skill), so fixes reach his phone without a build. Freemail
   Mail gets the release build afterwards.
 - When Shawn asks to test something "on his phone", that means
-  `scripts/phone.sh up`. A Rodge Mail build (the `rodge-expo-build`
+  `scripts/phone.sh up`. A Freemail build (the `freemail-expo-build`
   skill) is only for a release, or when he asks for one by name.
 - Keep it up until the PR merges or Shawn drops the work, then
   `scripts/phone.sh down`. A server the phone hasn't loaded from in 24

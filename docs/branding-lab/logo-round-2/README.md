@@ -1,4 +1,4 @@
-# Rodge Mail logo exploration — round two
+# Freemail logo exploration — round two
 
 These five marks intentionally leave the previous folded-monogram and envelope
 territory. They are early identity studies, not production assets.

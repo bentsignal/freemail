@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions -- Convex upload responses contain runtime-validated branded storage IDs. */
 import { useMutation } from "convex/react";
 
-import type { Id } from "@rodge-mail/convex/model";
-import { api } from "@rodge-mail/convex/api";
+import type { Id } from "@freemail/convex/model";
+import { api } from "@freemail/convex/api";
 import {
   getProviderAttachmentError,
   MAX_ATTACHMENT_COUNT,
   MAX_TOTAL_ATTACHMENT_BYTES,
   validateAttachmentMetadata,
-} from "@rodge-mail/convex/attachments/constants";
-import { toast } from "@rodge-mail/ui-web/toast";
+} from "@freemail/convex/attachments/constants";
+import { toast } from "@freemail/ui-web/toast";
 
 import type { WebComposerAttachment } from "../store";
 import type { MailAccountView } from "../types";

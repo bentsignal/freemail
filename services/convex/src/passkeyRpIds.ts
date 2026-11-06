@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   getPasskeyRemovalBlock,
   getPasskeySignIn,
-} from "@rodge-mail/std/passkey-sign-in";
+} from "@freemail/std/passkey-sign-in";
 
 import { passkeyRpIdSchema } from "./betterAuth/passkeyRpIdPlugin";
 

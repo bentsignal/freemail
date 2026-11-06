@@ -98,7 +98,7 @@ function normalizeReturnPath(value?: string) {
   const baseUrl = new URL(urls.web);
   const destination = new URL(value, baseUrl);
   if (!value.startsWith("/") || destination.origin !== baseUrl.origin) {
-    throw new Error("OAuth return path must be relative to Rodge Mail");
+    throw new Error("OAuth return path must be relative to Freemail");
   }
   return `${destination.pathname}${destination.search}${destination.hash}`;
 }

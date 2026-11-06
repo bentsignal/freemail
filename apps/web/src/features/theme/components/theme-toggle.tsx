@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { Monitor, Moon, Sun } from "lucide-react";
 
-import { cn } from "@rodge-mail/std/cn";
+import { cn } from "@freemail/std/cn";
 
 import type { Theme } from "../types";
 import { useThemeStore } from "../store";
@@ -27,7 +27,7 @@ export function AppearanceSettings() {
           Appearance
         </h2>
         <p className="text-muted-foreground mt-1 text-xs leading-5">
-          Let Rodge follow your preferred light or dark appearance.
+          Let Freemail follow your preferred light or dark appearance.
         </p>
       </div>
       <div className="mt-4">

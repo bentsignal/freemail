@@ -56,7 +56,7 @@ most.
 - Light mode is warm paper with wine ink. Dark mode is a deliberately brown-
   black reading surface with softened rules and off-white type.
 
-This is the strongest option if Rodge should feel intimate, human, and unlike
+This is the strongest option if Freemail should feel intimate, human, and unlike
 enterprise mail.
 
 ## 03 — Frequency

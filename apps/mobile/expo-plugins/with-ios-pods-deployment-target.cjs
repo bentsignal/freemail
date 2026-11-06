@@ -3,7 +3,7 @@ const path = require("node:path");
 const { withDangerousMod } = require("expo/config-plugins");
 
 const DEPLOYMENT_TARGET = "16.4";
-const MARKER = "Rodge Mail force iOS pods deployment target";
+const MARKER = "Freemail force iOS pods deployment target";
 
 function createPostInstallSnippet() {
   return [

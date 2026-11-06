@@ -5,7 +5,7 @@ import type {
   GetThreadOutput,
   ListAccountsOutput,
   SearchMailOutput,
-} from "@rodge-mail/agent-contract";
+} from "@freemail/agent-contract";
 
 import type { CliUrls } from "./config.ts";
 import { authenticatedSession } from "./auth.ts";

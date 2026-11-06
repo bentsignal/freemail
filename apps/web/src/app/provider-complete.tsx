@@ -25,7 +25,7 @@ function ProviderComplete() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 text-center">
       <div>
-        <h1 className="text-2xl font-semibold">Return to Rodge Mail</h1>
+        <h1 className="text-2xl font-semibold">Return to Freemail</h1>
         <p className="text-muted-foreground mt-2 text-sm">
           Your account authorization is complete.
         </p>
@@ -33,7 +33,7 @@ function ProviderComplete() {
           className="mail-primary-button mt-5 inline-flex min-h-11 items-center rounded-lg px-5 text-sm font-bold"
           href={destination}
         >
-          Open Rodge Mail
+          Open Freemail
         </a>
       </div>
     </main>

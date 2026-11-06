@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions -- Select values are validated against the loaded owner-scoped account list before sending. */
 import { ChevronsUpDown } from "lucide-react";
 
-import type { Id } from "@rodge-mail/convex/model";
+import type { Id } from "@freemail/convex/model";
 
 import type { MailAccountView } from "../types";
 import { useLiveMail } from "../live-data";

@@ -1,6 +1,6 @@
 import { House } from "lucide-react";
 
-import { Button } from "@rodge-mail/ui-web/button";
+import { Button } from "@freemail/ui-web/button";
 
 import { QuickLink } from "~/components/quick-link";
 

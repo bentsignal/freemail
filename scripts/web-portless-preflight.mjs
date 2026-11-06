@@ -4,7 +4,7 @@ const routes = spawnSync("pnpm", ["exec", "portless", "list"], {
   encoding: "utf8",
 });
 
-const aliases = ["www.rodge-mail", "rodge-mail"];
+const aliases = ["www.freemail", "freemail"];
 for (const alias of aliases) {
   const hostname = `${alias}.local`;
   const escapedHostname = hostname.replaceAll(".", "\\.");

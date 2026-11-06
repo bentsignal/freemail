@@ -1,6 +1,6 @@
 // Evaluates JavaScript in the app running on this worktree's Metro, over
 // the debugger (Chrome DevTools Protocol) connection. scripts/sim.sh uses it
-// to call the dev-only `globalThis.rodgeDev` hooks
+// to call the dev-only `globalThis.freemailDev` hooks
 // (apps/mobile/src/features/dev/automation.ts).
 //
 //   node scripts/sim-eval.mjs <metro-port> "<expression>"
@@ -14,8 +14,8 @@ const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((r) =>
   r.json(),
 );
 // Metro serves the worktree's iOS simulator and Android emulator at once;
-// RODGE_DEVICE picks one by the start of the device name Metro reports.
-const device = process.env.RODGE_DEVICE;
+// FREEMAIL_DEVICE picks one by the start of the device name Metro reports.
+const device = process.env.FREEMAIL_DEVICE;
 const target = targets.find(
   (t) =>
     t.appId === "com.bentsignal.rodgemail.dev" &&
