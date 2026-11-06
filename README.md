@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/readme-header.jpg" alt="Freemail on iPhone: All Inboxes, switching accounts, a newsletter, Settings, and a reply" width="100%">
+  <img src="docs/images/readme-header.jpg" alt="Freemail on the web and on iPhone: the inbox, mail accounts in Settings, and a sign-in code with one-tap copy" width="100%">
 </p>
 
 <br>
