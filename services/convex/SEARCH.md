@@ -38,8 +38,8 @@ the latest 200 inbox messages rather than polluting search with an unlimited
 archive. Each call is owner-scoped and processes at most 25 messages, so it can
 be driven from authenticated maintenance tooling without an unbounded
 transaction or scheduler fan-out. No client launches this workflow
-automatically. Embedding jobs will finish only when `OPENAI_API_KEY` is
-configured; exact body/header/date search does not depend on OpenAI.
+automatically. Embedding jobs go through the Convex AI Gateway
+([AI.md](AI.md)); exact body/header/date search does not depend on it.
 
 The backfill also rebuilds exact-search text from stored message content. Job
 creation is idempotent: embedding content/model job keys reuse current work,

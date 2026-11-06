@@ -7,7 +7,7 @@ import {
 import { isRetryableRuleFallback } from "./retryPolicy";
 
 const fallback = {
-  error: "OpenAI response did not include structured output text",
+  error: "AI response did not include structured output text",
   outputSchemaVersion: CLASSIFICATION_OUTPUT_SCHEMA_VERSION,
   promptVersion: CLASSIFICATION_PROMPT_VERSION,
   recoveryAttemptedAt: undefined,
@@ -17,6 +17,7 @@ const fallback = {
 
 describe("bounded classification fallback retry", () => {
   it.each([
+    "AI response did not include structured output text",
     "OpenAI response did not include structured output text",
     "Unterminated string in JSON at position 42",
     "Unexpected end of JSON input",

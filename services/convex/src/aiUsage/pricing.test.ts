@@ -18,6 +18,13 @@ describe("AI usage pricing", () => {
     ).toBeCloseTo(0.081);
   });
 
+  it("prices gateway model ids like their OpenAI names", () => {
+    const usage = { inputTokens: 1_000, outputTokens: 1_000 };
+    expect(calculateModelCostUsd("openai/gpt-5.6-luna", usage)).toBe(
+      calculateModelCostUsd("gpt-5.6-luna", usage),
+    );
+  });
+
   it("reserves at least one input token and the full output allowance", () => {
     expect(
       reserveResponseCostUsd({

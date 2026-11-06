@@ -1,6 +1,6 @@
 import type { ActionCtx } from "../_generated/server";
-import type { ClassificationSignal } from "./constants";
-import type { NormalizedMail } from "./normalize";
+import type { ClassificationSignal } from "../classification/constants";
+import type { NormalizedMail } from "../classification/normalize";
 import {
   reserveEmbeddingCostUsd,
   reserveResponseCostUsd,
@@ -10,26 +10,23 @@ import {
   DEFAULT_CLEAN_VIEW_MODEL,
   DEFAULT_EMBEDDING_MODEL,
   EMBEDDING_DIMENSIONS,
-} from "./constants";
+} from "../classification/constants";
 import {
   classificationModelOverride,
   cleanViewModelOverride,
   embeddingModelOverride,
-  openAiApiKey,
 } from "./env";
+import { gatewayModelId, postAiGateway } from "./gateway";
 import {
   classificationRequest as buildClassificationRequest,
   cleanViewRequest as buildCleanViewRequest,
   parseClassification,
   parseCleanView,
-} from "./openaiPayloads";
-import { postOpenAi } from "./openaiTransport";
+} from "./payloads";
 
-export { parseClassification, parseCleanView } from "./openaiPayloads";
-export { AiDailyLimitError } from "./openaiTransport";
+export { parseClassification, parseCleanView } from "./payloads";
+export { AiDailyLimitError } from "./gateway";
 
-const RESPONSES_URL = "https://api.openai.com/v1/responses";
-const EMBEDDINGS_URL = "https://api.openai.com/v1/embeddings";
 const CLASSIFICATION_MAX_OUTPUT_TOKENS = 1_000;
 const CLEAN_VIEW_MAX_OUTPUT_TOKENS = 2_000;
 
@@ -45,10 +42,6 @@ export function configuredEmbeddingModel() {
   return embeddingModelOverride() ?? DEFAULT_EMBEDDING_MODEL;
 }
 
-export function isAiConfigured() {
-  return Boolean(openAiApiKey());
-}
-
 export async function classifyWithModel(args: {
   ctx: ActionCtx;
   ownerId: string;
@@ -57,10 +50,10 @@ export async function classifyWithModel(args: {
   jobKey: string;
 }) {
   const request = classificationRequest(args.mail, args.signals);
-  const data = await postOpenAi({
+  const data = await postAiGateway({
     ctx: args.ctx,
     ownerId: args.ownerId,
-    url: RESPONSES_URL,
+    path: "/v1/responses",
     body: request,
     requestKey: args.jobKey,
     kind: "classification",
@@ -81,10 +74,10 @@ export async function generateCleanView(args: {
   jobKey: string;
 }) {
   const request = cleanViewRequest(args.mail);
-  const data = await postOpenAi({
+  const data = await postAiGateway({
     ctx: args.ctx,
     ownerId: args.ownerId,
-    url: RESPONSES_URL,
+    path: "/v1/responses",
     body: request,
     requestKey: args.jobKey,
     kind: "clean_view",
@@ -106,15 +99,15 @@ export async function createEmbedding(args: {
 }) {
   const model = configuredEmbeddingModel();
   const body = {
-    model,
+    model: gatewayModelId(model),
     input: args.input,
     dimensions: EMBEDDING_DIMENSIONS,
     encoding_format: "float",
   };
-  const data = await postOpenAi({
+  const data = await postAiGateway({
     ctx: args.ctx,
     ownerId: args.ownerId,
-    url: EMBEDDINGS_URL,
+    path: "/v1/embeddings",
     body,
     requestKey: args.jobKey,
     kind: "embedding",
@@ -131,7 +124,7 @@ export function classificationRequest(
   return buildClassificationRequest({
     mail,
     signals,
-    model: configuredClassificationModel(),
+    model: gatewayModelId(configuredClassificationModel()),
     maxOutputTokens: CLASSIFICATION_MAX_OUTPUT_TOKENS,
   });
 }
@@ -139,14 +132,14 @@ export function classificationRequest(
 export function cleanViewRequest(mail: NormalizedMail) {
   return buildCleanViewRequest({
     mail,
-    model: configuredCleanViewModel(),
+    model: gatewayModelId(configuredCleanViewModel()),
     maxOutputTokens: CLEAN_VIEW_MAX_OUTPUT_TOKENS,
   });
 }
 
 function extractOutputText(data: unknown) {
   if (!isRecord(data) || !isUnknownArray(data.output)) {
-    throw new Error("OpenAI response did not include output");
+    throw new Error("AI response did not include output");
   }
   for (const output of data.output) {
     if (!isRecord(output) || !isUnknownArray(output.content)) continue;
@@ -156,16 +149,16 @@ function extractOutputText(data: unknown) {
       }
     }
   }
-  throw new Error("OpenAI response did not include structured output text");
+  throw new Error("AI response did not include structured output text");
 }
 
 function extractEmbedding(data: unknown) {
   if (!isRecord(data) || !isUnknownArray(data.data)) {
-    throw new Error("OpenAI response did not include embedding data");
+    throw new Error("AI response did not include embedding data");
   }
   const first = data.data[0];
   if (!isRecord(first) || !isUnknownArray(first.embedding)) {
-    throw new Error("OpenAI response did not include an embedding vector");
+    throw new Error("AI response did not include an embedding vector");
   }
   const vector = first.embedding.filter(isFiniteNumber);
   if (vector.length !== EMBEDDING_DIMENSIONS) {

@@ -4,13 +4,13 @@ import { ConvexError } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import type { EmbeddingReason } from "../classification/constants";
+import { configuredEmbeddingModel } from "../ai/models";
 import { EMBEDDING_DIMENSIONS } from "../classification/constants";
 import {
   embeddingText,
   normalizeMail,
   stableHash,
 } from "../classification/normalize";
-import { configuredEmbeddingModel } from "../classification/openai";
 import {
   deleteEmbeddingRecords,
   embeddingSelectionPlan,
