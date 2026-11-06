@@ -26,10 +26,8 @@ import { formatInboxMessageTime } from "../lib/mail-format";
 import { isOptimisticOutboxId } from "../outgoing/outbox-optimistic";
 import { useOutgoingMail } from "../outgoing/outgoing-store";
 import { MAIL_SEARCH_DEBOUNCE_MS } from "../screens/inbox-list-state";
-import {
-  MailboxHeaderSlot,
-  SelectedAccountLabel,
-} from "../screens/mailbox-list-header";
+import { SelectedAccountLabel } from "../screens/mailbox-list-header";
+import { MailboxToolbar } from "../screens/mailbox-toolbar";
 import { useMailStore } from "../store";
 import { getSentRowTarget } from "./sent-navigation";
 import { filterSentRows } from "./sent-row";
@@ -53,17 +51,15 @@ export function SentMailbox({
 
   return (
     <>
-      <MailboxHeaderSlot
+      <MailboxToolbar
         accountFilter={accountFilter}
         accounts={accounts}
         bulkActions={[]}
         filter="all"
         filterEnabled={false}
-        headerInList={false}
         mailbox="sent"
         onFilterChange={() => undefined}
         onToggleSelection={() => undefined}
-        refreshError={undefined}
         searchMode={searchMode}
         selectedCount={0}
         selectionEnabled={false}

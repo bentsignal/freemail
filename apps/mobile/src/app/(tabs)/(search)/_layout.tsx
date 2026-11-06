@@ -10,7 +10,6 @@ export default function SearchLayout() {
         contentStyle: { backgroundColor },
         headerShadowVisible: false,
         headerStyle: { backgroundColor: "transparent" },
-        headerTitle: "",
         headerTransparent: true,
       }}
     />

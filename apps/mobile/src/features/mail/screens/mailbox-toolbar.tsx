@@ -13,6 +13,7 @@ import { useMailStore } from "../store";
 import {
   getAccountAddressDetail,
   getMailboxTitle,
+  getSelectedAccountLabel,
   MAILBOX_OPTIONS,
 } from "./mailbox-scope";
 
@@ -25,8 +26,9 @@ export interface MailboxToolbarProps {
   mailbox: MobileMailbox;
   onFilterChange: (value: MailboxFilter) => void;
   onToggleSelection: () => void;
+  searchMode?: boolean;
   selectedCount: number;
-  selectionEnabled: boolean;
+  selectionEnabled?: boolean;
   selectionMode: boolean;
 }
 
@@ -36,7 +38,12 @@ export interface MailboxToolbarProps {
  * Selecting shows the bulk actions in the native bottom toolbar.
  */
 export function MailboxToolbar(props: MailboxToolbarProps) {
-  const { filterEnabled = true, selectionMode } = props;
+  const {
+    filterEnabled = true,
+    searchMode = false,
+    selectionEnabled = true,
+    selectionMode,
+  } = props;
   const setAccountFilter = useMailStore((store) => store.setAccountFilter);
   const setMailbox = useMailStore((store) => store.setMailbox);
   const selectLabel = selectionMode ? "Done" : "Select";
@@ -44,11 +51,11 @@ export function MailboxToolbar(props: MailboxToolbarProps) {
     <>
       <Stack.Screen
         options={{
-          headerLargeTitle: true,
+          headerLargeTitle: !searchMode,
           headerShown: true,
           title: selectionMode
             ? getSelectionTitle(props.selectedCount)
-            : getMailboxTitle(props.mailbox, props.accountFilter),
+            : getScopeTitle(props, searchMode),
         }}
       />
       <Stack.Toolbar placement="left">
@@ -81,7 +88,7 @@ export function MailboxToolbar(props: MailboxToolbarProps) {
           </Stack.Toolbar.MenuAction>
         </Stack.Toolbar.Menu>
         <Stack.Toolbar.Button
-          hidden={!props.selectionEnabled}
+          hidden={!selectionEnabled}
           variant={selectionMode ? "done" : "plain"}
           onPress={props.onToggleSelection}
         >
@@ -191,6 +198,18 @@ export function SelectionToolbar({
       ])}
     </Stack.Toolbar>
   );
+}
+
+// Search has no large title to show the account under, so it joins the title.
+function getScopeTitle(
+  { accountFilter, accounts, mailbox }: MailboxToolbarProps,
+  searchMode: boolean,
+) {
+  const title = getMailboxTitle(mailbox, accountFilter);
+  const account = searchMode
+    ? getSelectedAccountLabel(accountFilter, accounts)
+    : undefined;
+  return account ? `${title} · ${account}` : title;
 }
 
 function getSelectionTitle(count: number) {
