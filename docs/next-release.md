@@ -37,7 +37,7 @@ there's no backfill command.
   only one there. The passkeys still under "Other passkeys" are the phone's
   and any unused ones.
 
-## Rename to Freemail (#PRNUM)
+## Rename to Freemail (#47)
 
 The app, website, email codes, and passkey prompts now say Freemail. Bundle
 IDs and URL schemes didn't change, so the new phone build installs over the
