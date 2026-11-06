@@ -9,7 +9,6 @@ import type { MailAccountFilter, MailThread } from "@rodge-mail/features/mail";
 import type { MobileMailAccount } from "../lib/convex-mail";
 import type { PageStatus } from "../lib/next-page";
 import type { MobileMailbox } from "../store";
-import type { InboxHeader } from "./inbox-header";
 import type { MailboxFilter } from "./mailbox-controls";
 import { ContentReveal } from "~/components/content-reveal";
 import { useColor } from "~/hooks/use-color";
@@ -19,7 +18,8 @@ import { getPageFooter, NEXT_PAGE_THRESHOLD } from "../lib/next-page";
 import { stableRows } from "../lib/stable-rows";
 import { EmptyInbox, InboxFooter } from "./inbox-list-feedback";
 import { getInboxListFeedback } from "./inbox-list-state";
-import { ListHeader, MailboxHeaderSlot } from "./mailbox-list-header";
+import { ListHeader } from "./mailbox-list-header";
+import { MailboxToolbar } from "./mailbox-toolbar";
 import { useInboxFilterTransition } from "./use-inbox-filter-transition";
 
 /** A row's height plus the gap below it. */
@@ -52,8 +52,6 @@ interface MailboxThreadListProps {
   emptyIsLoading: boolean;
   filter: MailboxFilter;
   footerIsLoading: boolean;
-  headerInList?: boolean;
-  includeTopSafeArea?: boolean;
   isRefreshing?: boolean;
   mailbox: MobileMailbox;
   onFilterChange: (value: MailboxFilter) => void;
@@ -81,8 +79,6 @@ export function MailboxThreadList({
   emptyIsLoading,
   filter,
   footerIsLoading,
-  headerInList = false,
-  includeTopSafeArea = true,
   isRefreshing,
   mailbox,
   onFilterChange,
@@ -116,17 +112,14 @@ export function MailboxThreadList({
 
   return (
     <View className="bg-background flex-1">
-      <MailboxHeaderSlot
+      <MailboxToolbar
         accountFilter={accountFilter}
         accounts={accounts}
         bulkActions={bulkActions}
         filter={filter}
-        headerInList={headerInList}
-        includeTopSafeArea={includeTopSafeArea}
         mailbox={mailbox}
         onFilterChange={onFilterChange}
         onToggleSelection={onToggleSelection}
-        refreshError={refreshError}
         searchMode={searchMode}
         selectedCount={selectedCount}
         selectionEnabled={selectionEnabled}
@@ -136,21 +129,9 @@ export function MailboxThreadList({
           reused one keeps its scroll offset and lands misplaced under the bar. */}
       <MailboxRows
         key={accountFilter}
+        accountFilter={accountFilter}
         accounts={accounts}
         feedback={feedback}
-        headerInList={headerInList}
-        headerProps={{
-          accountFilter,
-          accounts,
-          filter,
-          includeTopSafeArea,
-          mailbox,
-          onFilterChange,
-          onToggleSelection,
-          refreshError,
-          selectionMode,
-          selectionEnabled,
-        }}
         mailbox={mailbox}
         listVersion={`${accountFilter}:${filter}:${selectionMode}:${selectedCount}`}
         pageStatus={pageStatus}
@@ -168,10 +149,9 @@ export function MailboxThreadList({
 }
 
 interface MailboxRowsProps {
+  accountFilter: MailAccountFilter;
   accounts: MobileMailAccount[];
   feedback: ReturnType<typeof getInboxListFeedback>;
-  headerInList: boolean;
-  headerProps: React.ComponentProps<typeof InboxHeader>;
   mailbox: MobileMailbox;
   listVersion: string;
   onLoadMore: () => void;
@@ -190,10 +170,9 @@ interface MailboxRowsProps {
 }
 
 function MailboxRows({
+  accountFilter,
   accounts,
   feedback,
-  headerInList,
-  headerProps,
   mailbox,
   listVersion,
   onLoadMore,
@@ -236,7 +215,6 @@ function MailboxRows({
           renderItem={renderThread}
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode="on-drag"
-          stickyHeaderIndices={headerInList ? [0] : undefined}
           style={{ backgroundColor: background, flex: 1 }}
           onEndReached={request}
           onLoad={() => setListIsLoaded(true)}
@@ -259,9 +237,8 @@ function MailboxRows({
           }
           ListHeaderComponent={
             <ListHeader
+              accountFilter={accountFilter}
               accounts={accounts}
-              headerInList={headerInList}
-              headerProps={headerProps}
               refreshError={refreshError}
               searchMode={searchMode}
             />

@@ -47,27 +47,18 @@ function FocusedSearchBar({
   });
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerLargeTitle: false,
-          headerTransparent: true,
-          title: "",
-        }}
-      />
-      <Stack.SearchBar
-        hideNavigationBar
-        hideWhenScrolling={false}
-        obscureBackground={false}
-        onCancelButtonPress={() => {
-          onSearchChange("");
-          onSearchClose();
-        }}
-        onChangeText={(event) => onSearchChange(event.nativeEvent.text)}
-        placeholder={placeholder}
-        placement="automatic"
-        ref={nativeSearchBarRef}
-      />
-    </>
+    <Stack.SearchBar
+      hideNavigationBar={false}
+      hideWhenScrolling={false}
+      obscureBackground={false}
+      onCancelButtonPress={() => {
+        onSearchChange("");
+        onSearchClose();
+      }}
+      onChangeText={(event) => onSearchChange(event.nativeEvent.text)}
+      placeholder={placeholder}
+      placement="automatic"
+      ref={nativeSearchBarRef}
+    />
   );
 }
