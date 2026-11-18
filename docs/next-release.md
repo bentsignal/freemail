@@ -70,7 +70,7 @@ confirmed working.
   `OPENAI_API_KEY`. The OpenAI API key can then be revoked in OpenAI's
   dashboard.
 
-## Transactional mail for other apps (#PR)
+## Transactional mail for other apps (#50)
 
 The new `/transactional-mail/send` endpoint lets Notes (notes.rodgers.dev)
 send its sign-in codes through Freemail's SES
