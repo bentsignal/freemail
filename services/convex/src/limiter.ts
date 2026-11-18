@@ -51,4 +51,10 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     period: MINUTE,
     capacity: 60,
   },
+  transactionalMail: {
+    kind: "token bucket",
+    rate: 10,
+    period: MINUTE,
+    capacity: 10,
+  },
 });

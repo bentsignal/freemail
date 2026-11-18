@@ -7,7 +7,9 @@ component. Configure these variables on each Convex deployment:
 - `AUTH_EMAIL_FROM`: the sender for email codes, on a domain verified in
   Amazon SES, such as `Freemail <mail@rodgers.dev>`. The codes go out
   through SES with the hosted mail credentials (`HOSTED_MAIL_AWS_*`, see
-  [PROVIDERS.md](PROVIDERS.md#hosted-mail-amazon-ses)).
+  [PROVIDERS.md](PROVIDERS.md#hosted-mail-amazon-ses)). Other personal apps
+  send their sign-in codes through the same SES path
+  ([TRANSACTIONAL_MAIL.md](TRANSACTIONAL_MAIL.md)).
 - `PASSKEY_RP_ID`: the browser WebAuthn relying-party domain, without a scheme
   or path. Local web development keeps its `.local` relying party.
 - `ANDROID_PASSKEY_ORIGINS`: optional comma-separated
