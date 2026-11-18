@@ -177,6 +177,8 @@ import type * as registrationEmail from "../registrationEmail.js";
 import type * as sync_gmailOutbox from "../sync/gmailOutbox.js";
 import type * as sync_internal from "../sync/internal.js";
 import type * as sync_stale from "../sync/stale.js";
+import type * as transactionalMail_http from "../transactionalMail/http.js";
+import type * as transactionalMail_send from "../transactionalMail/send.js";
 import type * as urls from "../urls.js";
 import type * as utils from "../utils.js";
 
@@ -356,6 +358,8 @@ declare const fullApi: ApiFromModules<{
   "sync/gmailOutbox": typeof sync_gmailOutbox;
   "sync/internal": typeof sync_internal;
   "sync/stale": typeof sync_stale;
+  "transactionalMail/http": typeof transactionalMail_http;
+  "transactionalMail/send": typeof transactionalMail_send;
   urls: typeof urls;
   utils: typeof utils;
 }>;

@@ -69,29 +69,3 @@ confirmed working.
   shows AI Gateway spend. After removing the key, `convex env list` has no
   `OPENAI_API_KEY`. The OpenAI API key can then be revoked in OpenAI's
   dashboard.
-
-## Transactional mail for other apps (#50)
-
-The new `/transactional-mail/send` endpoint lets Notes (notes.rodgers.dev)
-send its sign-in codes through Freemail's SES
-([TRANSACTIONAL_MAIL.md](../services/convex/TRANSACTIONAL_MAIL.md)). Until
-`TRANSACTIONAL_MAIL_CLIENTS` is set it answers 401 to everyone.
-
-- When: after the Convex deploy
-- Commands: from `services/convex` on main:
-
-  ```sh
-  pnpm exec convex env set TRANSACTIONAL_MAIL_CLIENTS '[{"name":"notes","tokenSha256":"6ca52bc1e3dd34cb3dfdc1902f8292ba80e37eccc414fd89843458e4d603bbaf","from":"notes@rodgers.dev","fromName":"Notes","to":["shawn@rodgers.dev"]}]'
-  curl -s -o /dev/null -w '%{http_code}\n' -X POST \
-    -H 'Content-Type: application/json' -d '{}' \
-    https://dazzling-dog-633.convex.site/transactional-mail/send
-  ```
-
-- Verify: `pnpm exec convex env get TRANSACTIONAL_MAIL_CLIENTS` prints the
-  entry, and the `curl` with no token prints `401` (a `500` means the JSON
-  didn't parse; `404` means the deploy didn't include the route). Then
-  request a sign-in code on notes.rodgers.dev: it arrives at
-  shawn@rodgers.dev from "Notes" <notes@rodgers.dev>, and
-  `pnpm exec convex logs` shows `transactional mail: sent for notes` with no
-  address, subject, or code in it. Tell the Notes thread the endpoint is
-  live.
