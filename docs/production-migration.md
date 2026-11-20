@@ -7,11 +7,11 @@ the end.
 
 ## Where things go
 
-| Deployment             | Type and reference   | After the move                                              |
-| ---------------------- | -------------------- | ----------------------------------------------------------- |
-| `colorful-ostrich-734` | prod, `production`   | Production: Shawn's mail, the website, both phone apps      |
-| `dazzling-dog-633`     | dev, `dev/shawn`     | Paused and untouched, the rollback copy. Shawn deletes it   |
-| a new dev deployment   | dev, `dev/agents`    | Development: a fake owner and seeded mail, for local work   |
+| Deployment             | Type and reference | After the move                                            |
+| ---------------------- | ------------------ | --------------------------------------------------------- |
+| `colorful-ostrich-734` | prod, `production` | Production: Shawn's mail, the website, both phone apps    |
+| `dazzling-dog-633`     | dev, `dev/shawn`   | Paused and untouched, the rollback copy. Shawn deletes it |
+| `tidy-emu-857`         | dev, `dev/agents`  | Development: a fake owner and seeded mail, for local work |
 
 `colorful-ostrich-734` already existed. A `convex deploy` in July created
 it, and it held July's functions, eight environment variables, and no rows
@@ -21,19 +21,19 @@ because it is the project's default production deployment, the one
 
 ## What pointed at `dazzling-dog-633`
 
-| Thing                                 | Where it lives                                                                 | What the move does                                      |
-| ------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| Data, files, Better Auth tables       | the deployment                                                                 | snapshot export, import into production                 |
-| 23 environment variables              | the deployment                                                                 | copied to production, `ENVIRONMENT` becomes `production` |
-| Website                               | `shared/config/src/urls.ts`, built into the Vercel bundle                      | code change, `vercel deploy --prod`                     |
-| Freemail and Freemail Dev             | `urls.ts`, `eas.json`, the `webcredentials:` associated domain                 | code change, new builds of both                         |
-| CLI                                   | `apps/cli/src/config.ts`                                                       | code change                                             |
-| Hosted mail in, and SES delivery events | two SNS subscriptions to `/providers/hosted/sns` on the Convex site URL      | subscribe production, unsubscribe the old endpoint      |
-| Gmail and Microsoft OAuth callbacks   | redirect URIs in Google Cloud and Microsoft Entra                              | Shawn adds the production URIs (needed only to connect or reconnect an account) |
-| Notes' sign-in emails                 | `TRANSACTIONAL_MAIL_URL` on Notes' production deployment                       | Shawn points it at production                           |
-| Push notifications                    | Expo push tokens in the data, no Convex URL                                    | nothing; the quick-action URL comes with the new build  |
-| Crons and scheduled functions         | `crons.ts`; pending scheduled functions aren't in an export                    | crons start on deploy and recover stale work            |
-| Scripts, skills, docs                 | `scripts/backend.sh`, `scripts/hosted-mail.mjs`, `.agents/skills`, `docs/`     | this PR                                                 |
+| Thing                                   | Where it lives                                                             | What the move does                                                              |
+| --------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Data, files, Better Auth tables         | the deployment                                                             | snapshot export, import into production                                         |
+| 23 environment variables                | the deployment                                                             | copied to production, `ENVIRONMENT` becomes `production`                        |
+| Website                                 | `shared/config/src/urls.ts`, built into the Vercel bundle                  | code change, `vercel deploy --prod`                                             |
+| Freemail and Freemail Dev               | `urls.ts`, `eas.json`, the `webcredentials:` associated domain             | code change, new builds of both                                                 |
+| CLI                                     | `apps/cli/src/config.ts`                                                   | code change                                                                     |
+| Hosted mail in, and SES delivery events | two SNS subscriptions to `/providers/hosted/sns` on the Convex site URL    | subscribe production, unsubscribe the old endpoint                              |
+| Gmail and Microsoft OAuth callbacks     | redirect URIs in Google Cloud and Microsoft Entra                          | Shawn adds the production URIs (needed only to connect or reconnect an account) |
+| Notes' sign-in emails                   | `TRANSACTIONAL_MAIL_URL` on Notes' production deployment                   | Shawn points it at production                                                   |
+| Push notifications                      | Expo push tokens in the data, no Convex URL                                | nothing; the quick-action URL comes with the new build                          |
+| Crons and scheduled functions           | `crons.ts`; pending scheduled functions aren't in an export                | crons start on deploy and recover stale work                                    |
+| Scripts, skills, docs                   | `scripts/backend.sh`, `scripts/hosted-mail.mjs`, `.agents/skills`, `docs/` | this PR                                                                         |
 
 Gmail, Microsoft 365, and iCloud sync from cursors stored in the data, with
 no webhook, so they resume in production from where the export left them.
@@ -116,3 +116,32 @@ would have to be replayed from S3 the same way.
   `dazzling-dog-633.convex.site` can't sign in to production. The apps stay
   signed in through their stored session, and a new app passkey is added in
   Settings.
+
+## Outcome
+
+The cutover ran on 2026-11-20 and shipped as `release/20261120-1554`.
+
+- The freeze lasted from 15:51:12 to 15:54:19 UTC: `dazzling-dog-633`
+  paused, final export, import into paused production, unpause, SNS moved,
+  website promoted, new Freemail build installed on Shawn's phone. The
+  website build and the IPA were made before the freeze.
+- Production matched the final export: 101,459 rows in every table and
+  component table, and both stored files, identical by content hash.
+  Production serves both files and their bytes match.
+- Nothing arrived during the freeze. S3 had no inbound objects in it, and
+  the buffer queue on both SNS topics held only a test notification, so
+  nothing was replayed. The queue was deleted afterwards.
+- All 90 inbound objects in S3 are in production as messages, and every
+  hosted message in `dazzling-dog-633` is in production.
+- A message sent from a hosted address to itself went out through SES,
+  came back through S3 and SNS, and production stored it, recorded its
+  delivery event, and sent a push to the phone.
+- The installed Freemail registered its push token with production after
+  launch, signed in through the session it already had.
+- Gmail and iCloud sync runs succeed on production. Production refuses
+  `*.freemail.local` origins and has no dev sign-in route.
+- Production's SNS webhook token is new; the old one appeared in an agent's
+  terminal output during preparation.
+
+The export is in `~/Backups/freemail/convex-migration-2026-11-20/` on
+Shawn's Mac, with both deployments' environment variables next to it.
