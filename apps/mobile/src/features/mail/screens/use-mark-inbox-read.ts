@@ -32,6 +32,10 @@ export function useMarkInboxRead(
   }
 
   function confirmMarkAllRead() {
+    if (unreadCount === 0) {
+      Alert.alert("No Unread Conversations");
+      return;
+    }
     Alert.alert(
       "Mark All as Read?",
       getMarkAllReadMessage(unreadCount, accountFilter, accounts),
@@ -42,5 +46,5 @@ export function useMarkInboxRead(
     );
   }
 
-  return unreadCount > 0 ? confirmMarkAllRead : undefined;
+  return confirmMarkAllRead;
 }

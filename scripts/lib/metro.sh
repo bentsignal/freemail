@@ -13,6 +13,10 @@
 # config, so Metro, fingerprints, and dev client builds all use the dev
 # variant.
 export APP_VARIANT=development
+# Freemail Dev shows the branch it's running (Settings, Developer), so Shawn
+# can tell which worktree's server the phone opened.
+EXPO_PUBLIC_FREEMAIL_BRANCH="$(git -C "$ROOT" branch --show-current 2>/dev/null || true)"
+export EXPO_PUBLIC_FREEMAIL_BRANCH
 
 hash_of() { printf '%s' "$1" | cksum | cut -d' ' -f1; }
 

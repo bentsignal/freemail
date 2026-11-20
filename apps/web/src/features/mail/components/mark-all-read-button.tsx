@@ -28,7 +28,6 @@ function MarkAllReadDialog() {
     api.mail.inboxRead.markInboxRead,
   ).withOptimisticUpdate(optimisticallyMarkInboxRead);
   const unreadCount = unreadCounts[accountFilter] ?? 0;
-  if (unreadCount === 0 && !isOpen) return null;
 
   function markAllRead() {
     setIsOpen(false);
@@ -44,7 +43,8 @@ function MarkAllReadDialog() {
       <Dialog.Trigger asChild>
         <button
           aria-label="Mark all as read"
-          className="focus-visible:outline-ring bg-background hover:text-foreground border-border text-muted-foreground flex h-9 items-center gap-2 rounded-[9px] border px-3 text-[11px] font-semibold tracking-wide transition-[background-color,border-color,color,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="focus-visible:outline-ring bg-background hover:text-foreground border-border text-muted-foreground flex h-9 items-center gap-2 rounded-[9px] border px-3 text-[11px] font-semibold tracking-wide transition-[background-color,border-color,color,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={unreadCount === 0}
           title="Mark all as read"
           type="button"
         >

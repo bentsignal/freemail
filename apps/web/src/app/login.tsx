@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { AuthPage } from "~/features/auth/components/auth-page";
+import { DevSignInButton } from "~/features/auth/components/dev-sign-in-button";
 import { SignInButton } from "~/features/auth/components/sign-in-button";
 
 export const Route = createFileRoute("/login")({
@@ -18,6 +19,7 @@ function Login() {
   return (
     <AuthPage>
       <SignInButton />
+      <DevSignInButton />
     </AuthPage>
   );
 }
