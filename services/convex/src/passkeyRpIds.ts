@@ -9,11 +9,6 @@ import {
 
 import { passkeyRpIdSchema } from "./betterAuth/passkeyRpIdPlugin";
 
-export interface PasskeyRpIds {
-  app: string;
-  website: string;
-}
-
 interface StoredPasskey {
   credentialID: string;
   id: string;
@@ -44,11 +39,11 @@ const deleteBodySchema = z.object({ id: z.string().min(1) });
 
 /**
  * Records which relying party each passkey belongs to, and refuses to delete
- * a platform's last passkey. A passkey's rpId is set when it's registered,
+ * the last one that works. A passkey's rpId is set when it's registered,
  * and on every sign-in it verifies, since the signature proves the relying
  * party. Passkeys stored before this have none until they next sign in.
  */
-export function passkeyRpIds(options: { rpId: string; rpIds: PasskeyRpIds }) {
+export function passkeyRpIds(options: { rpId: string }) {
   return {
     id: "passkey-rp-ids",
     schema: passkeyRpIdSchema,
@@ -63,7 +58,7 @@ export function passkeyRpIds(options: { rpId: string; rpIds: PasskeyRpIds }) {
             const block = await findPasskeyRemovalBlock(
               ctx.context.adapter,
               body.data.id,
-              options.rpIds,
+              options.rpId,
             );
             if (block) throw new APIError("BAD_REQUEST", { message: block });
           }),
@@ -99,7 +94,7 @@ export function passkeyRpIds(options: { rpId: string; rpIds: PasskeyRpIds }) {
 export async function findPasskeyRemovalBlock(
   adapter: PasskeyAdapter,
   id: string,
-  rpIds: PasskeyRpIds,
+  rpId: string,
 ) {
   const target = await adapter.findOne<StoredPasskey>({
     model: "passkey",
@@ -113,7 +108,7 @@ export async function findPasskeyRemovalBlock(
   return getPasskeyRemovalBlock(
     passkeys.map((passkey) => ({
       id: passkey.id,
-      signsInTo: getPasskeySignIn(passkey.rpId, rpIds),
+      signsInTo: getPasskeySignIn(passkey.rpId, rpId),
     })),
     id,
   );

@@ -49,35 +49,35 @@ function OwnerIdentity() {
   );
 }
 
-const appRpId = new URL(urls.convex.site).hostname;
+const host = new URL(urls.web).hostname;
 
 function Passkeys() {
   const query = authClient.useListPasskeys();
   const { groups, remove } = useOptimisticPasskeys({
-    appRpId,
     deletePasskey: async (id) => await authClient.passkey.deletePasskey({ id }),
+    host,
     onRemoveError: (message) => toast.error(message),
     passkeys: query.data,
   });
 
   return (
     <>
-      <PasskeyGroupLabel>Website passkeys</PasskeyGroupLabel>
+      <PasskeyGroupLabel>Passkeys</PasskeyGroupLabel>
       <PasskeyList
         isLoading={query.isPending && !query.data}
         onRemove={remove}
-        rows={groups.website}
+        rows={groups.works}
       />
       <AddPasskeyButton />
-      <PasskeyGroup
-        label="iPhone app passkeys"
-        onRemove={remove}
-        rows={groups.app}
-      />
       <PasskeyGroup
         label="Other passkeys"
         onRemove={remove}
         rows={groups.unknown}
+      />
+      <PasskeyGroup
+        label="Old passkeys"
+        onRemove={remove}
+        rows={groups.nowhere}
       />
     </>
   );

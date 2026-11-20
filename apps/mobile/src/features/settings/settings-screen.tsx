@@ -56,10 +56,10 @@ export function SettingsScreen() {
       <NotificationPreviewRow />
     </FieldGroup.Section>
   ) : null;
-  const websitePasskeySection =
-    passkeys.groups.website.length > 0 ? (
-      <FieldGroup.Section title="Website Passkeys">
-        {passkeyItems("website")}
+  const oldPasskeySection =
+    passkeys.groups.nowhere.length > 0 ? (
+      <FieldGroup.Section title="Old Passkeys">
+        {passkeyItems("nowhere")}
       </FieldGroup.Section>
     ) : null;
   const otherPasskeySection =
@@ -104,12 +104,12 @@ export function SettingsScreen() {
         <FieldGroup.Section title="Freemail Account">
           <OwnerRow />
         </FieldGroup.Section>
-        <FieldGroup.Section title="iPhone App Passkeys">
-          {passkeyItems("app")}
+        <FieldGroup.Section title="Passkeys">
+          {passkeyItems("works")}
           <AddPasskeyRow />
         </FieldGroup.Section>
-        {websitePasskeySection}
         {otherPasskeySection}
+        {oldPasskeySection}
         <FieldGroup.Section>
           <SignOutRow />
         </FieldGroup.Section>

@@ -12,6 +12,7 @@ import { createUrls } from "@freemail/config/urls";
 // scripts/backend.sh isolate points this worktree elsewhere.
 const urls = createUrls({ nodeEnv: "production" });
 export const convexUrls = urls.convex;
+export const webUrl = urls.web;
 
 export const authClient = createAuthClient({
   baseURL: urls.convex.site,

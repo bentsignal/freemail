@@ -42,7 +42,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
     },
     ios: {
-      associatedDomains: ["webcredentials:colorful-ostrich-734.convex.site"],
+      // The website's relying party, so website passkeys sign in here too.
+      associatedDomains: ["webcredentials:mail.rodgers.dev"],
       bundleIdentifier: BUNDLE_ID,
       supportsTablet: true,
       // Liquid Glass icon from Icon Composer; see assets/icons/README.md.

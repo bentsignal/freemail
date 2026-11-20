@@ -30,14 +30,10 @@ because one Metro per worktree serves both and Metro serves the variant's
 config (`scripts/lib/metro.sh` exports `APP_VARIANT`). Only Freemail's
 standalone `development` build is Freemail.
 
-Native passkeys need `com.bentsignal.rodgemail.dev` in the Apple
-app-site association production serves (`services/convex/src/http.ts`) and
-`webcredentials:colorful-ostrich-734.convex.site` in the build
-(`app.config.ts`). App passkeys belong to the Convex site host, so one
-registered for `dazzling-dog-633.convex.site`, where production used to
-run, doesn't work against production: the app stays signed in through its
-stored session, and a new app passkey is added in Settings → Freemail
-account. Freemail Dev also offers an emailed sign-in code
+Native passkeys need `com.bentsignal.rodgemail.dev` in the website's Apple
+app-site association (`apps/web/public/.well-known/apple-app-site-association`)
+and `webcredentials:mail.rodgers.dev` in the build (`app.config.ts`). The
+website's passkeys sign in to both apps. Freemail Dev also offers an emailed sign-in code
 (`email-code-sign-in.tsx`, shown only in Freemail Dev), which uses the
 passkey recovery endpoints, for when it has no passkey for production. The
 auth client still sends the `rodge-mail://` origin the backend trusts. Android passkeys in

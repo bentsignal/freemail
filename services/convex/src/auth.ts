@@ -27,13 +27,12 @@ import { urls } from "./urls";
 // eslint-disable-next-line no-restricted-syntax -- This preserves Better Auth's generated Convex API typing.
 const authFunctions: AuthFunctions = internal.auth;
 const androidPasskeyOrigins = getAndroidPasskeyOrigins();
-const nativePasskeyRpId = new URL(urls.convex.site).hostname;
 
+// The website and the apps share one relying party, PASSKEY_RP_ID, so one
+// passkey signs in to both. The apps' auth only has its own base path.
 export const authCorsAllowedOrigins = getAuthCorsAllowedOrigins(
   env.PASSKEY_RP_ID,
 );
-export const nativeAuthCorsAllowedOrigins =
-  getAuthCorsAllowedOrigins(nativePasskeyRpId);
 
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
@@ -46,9 +45,9 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
 
 export function createAuthOptions(
   ctx: GenericCtx<DataModel>,
-  options: { basePath?: string; passkeyRpId?: string } = {},
+  options: { basePath?: string } = {},
 ) {
-  const passkeyRpId = options.passkeyRpId ?? env.PASSKEY_RP_ID;
+  const passkeyRpId = env.PASSKEY_RP_ID;
   const { passkeyOrigins, trustedOrigins } = getAuthOrigins(passkeyRpId);
   const emailCodeLimit = createEmailCodeLimit(ctx);
 
@@ -87,10 +86,7 @@ export function createAuthOptions(
           userVerification: "required",
         },
       }),
-      passkeyRpIds({
-        rpId: passkeyRpId,
-        rpIds: { app: nativePasskeyRpId, website: env.PASSKEY_RP_ID },
-      }),
+      passkeyRpIds({ rpId: passkeyRpId }),
       expo(),
       ...(devToolsEnabled() ? [devSignIn()] : []),
       crossDomain({ siteUrl: urls.web }),
@@ -109,12 +105,7 @@ export function createAuth(ctx: GenericCtx<DataModel>) {
 }
 
 export function createNativeAuth(ctx: GenericCtx<DataModel>) {
-  return betterAuth(
-    createAuthOptions(ctx, {
-      basePath: nativeAuthBasePath,
-      passkeyRpId: nativePasskeyRpId,
-    }),
-  );
+  return betterAuth(createAuthOptions(ctx, { basePath: nativeAuthBasePath }));
 }
 
 export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();

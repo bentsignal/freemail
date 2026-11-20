@@ -6,7 +6,6 @@ import {
   authCorsAllowedOrigins,
   createAuth,
   createNativeAuth,
-  nativeAuthCorsAllowedOrigins,
 } from "./auth";
 import { performQuickAction } from "./notifications/http";
 import { oauthCallback as gmailOAuthCallback } from "./providers/gmail/http";
@@ -53,7 +52,7 @@ authComponent.registerRoutes(http, createAuth, {
 
 authComponent.registerRoutes(http, createNativeAuth, {
   cors: {
-    allowedOrigins: [...new Set(nativeAuthCorsAllowedOrigins)],
+    allowedOrigins: [...new Set(authCorsAllowedOrigins)],
   },
 });
 

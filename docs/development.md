@@ -100,14 +100,14 @@ configuration.
 ## Native passkeys
 
 The native client uses the iOS AuthenticationServices and Android Credential
-Manager APIs through `expo-better-auth-passkey`. App passkeys belong to the
-Convex site host ([AUTH.md](../services/convex/AUTH.md)), and both phone
-apps send authentication requests to production, so their associated domain
-is `webcredentials:colorful-ostrich-734.convex.site` (`app.config.ts`).
+Manager APIs through `expo-better-auth-passkey`. The apps share the
+website's relying party, `mail.rodgers.dev`
+([AUTH.md](../services/convex/AUTH.md)), so their associated domain is
+`webcredentials:mail.rodgers.dev` (`app.config.ts`).
 
-- iOS fetches the Apple app-site-association file from that host, which
-  Convex serves (`services/convex/src/http.ts`), so a build needs no Metro
-  or Portless to use passkeys.
+- iOS fetches the Apple app-site-association file from the website
+  (`apps/web/public/.well-known/apple-app-site-association`), through
+  Apple's CDN, so a build needs no Metro or Portless to use passkeys.
 - Android requires an `assetlinks.json` file
   ([AUTH.md](../services/convex/AUTH.md#android)). Add the SHA-256
   fingerprints for each development signing certificate used for testing.
@@ -117,11 +117,8 @@ is `webcredentials:colorful-ostrich-734.convex.site` (`app.config.ts`).
 Passkeys require a development build or signed app; the native credential
 module is not available in Expo Go.
 
-A passkey registered for another Convex site host doesn't work against
-production, including the ones made for `dazzling-dog-633.convex.site`
-before the move. The app stays signed in through its stored session; add a
-new app passkey in Settings → Freemail account. Website passkeys
-(`PASSKEY_RP_ID`) are unaffected.
+App passkeys made before the apps moved to the website's relying party (for
+a Convex site host) sign in nowhere; Settings lists them under Old Passkeys.
 
 ## Mail intelligence
 

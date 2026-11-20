@@ -12,7 +12,7 @@ import {
   useOptimisticPasskeys,
 } from "@freemail/std/passkeys";
 
-import { authClient, convexUrls } from "~/features/auth/client";
+import { authClient, webUrl } from "~/features/auth/client";
 import { retryTransientPasskeyAssociation } from "~/features/auth/native-passkey-operation";
 import {
   registerForNewMailNotifications,
@@ -46,7 +46,7 @@ export function OwnerRow() {
   );
 }
 
-const appRpId = new URL(convexUrls.site).hostname;
+const host = new URL(webUrl).hostname;
 
 export function usePasskeyGroups() {
   const query = authClient.useListPasskeys();
@@ -54,8 +54,8 @@ export function usePasskeyGroups() {
     authClient.$store.notify("$listPasskeys");
   });
   return useOptimisticPasskeys({
-    appRpId,
     deletePasskey: async (id) => await authClient.passkey.deletePasskey({ id }),
+    host,
     onRemoveError: (message) => Alert.alert("Couldn't Remove Passkey", message),
     passkeys: query.data,
   });

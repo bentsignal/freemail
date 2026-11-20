@@ -28,13 +28,13 @@ afterEach(() => {
 });
 
 describe("mobile development configuration", () => {
-  it("associates passkeys with the public Convex relying party", () => {
+  it("associates passkeys with the website's relying party", () => {
     process.env.EAS_BUILD_PROFILE = "development";
 
     const config = createExpoConfig({ config: {} } as ConfigContext);
 
     expect(config.ios?.associatedDomains).toEqual([
-      "webcredentials:colorful-ostrich-734.convex.site",
+      "webcredentials:mail.rodgers.dev",
     ]);
     expect(config.extra?.deploymentEnvironment).toBe("development");
     expect(JSON.stringify(config).toLowerCase()).not.toContain("vercel");
@@ -106,7 +106,7 @@ describe("Freemail Dev variant", () => {
     expect(config.ios?.icon).toBe("./assets/icons/freemail-dev.icon");
     expect(config.extra?.appVariant).toBe("development");
     expect(config.ios?.associatedDomains).toEqual([
-      "webcredentials:colorful-ostrich-734.convex.site",
+      "webcredentials:mail.rodgers.dev",
     ]);
   });
 });
