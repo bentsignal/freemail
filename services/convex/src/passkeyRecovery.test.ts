@@ -15,6 +15,7 @@ describe("passkey recovery sign-in", () => {
     await expect(
       completePasskeyRecovery({
         adapter,
+        allowAttempt,
         code: "123456",
         email,
         now,
@@ -39,6 +40,7 @@ describe("passkey recovery sign-in", () => {
     const results = await Promise.all([
       completePasskeyRecovery({
         adapter,
+        allowAttempt,
         code: "123456",
         email,
         now,
@@ -46,6 +48,7 @@ describe("passkey recovery sign-in", () => {
       }),
       completePasskeyRecovery({
         adapter,
+        allowAttempt,
         code: "123456",
         email,
         now,
@@ -57,6 +60,7 @@ describe("passkey recovery sign-in", () => {
     await expect(
       completePasskeyRecovery({
         adapter,
+        allowAttempt,
         code: "123456",
         email,
         now,
@@ -78,6 +82,7 @@ describe("passkey recovery safeguards", () => {
       await expect(
         completePasskeyRecovery({
           adapter,
+          allowAttempt,
           code: "000000",
           email,
           now,
@@ -92,6 +97,7 @@ describe("passkey recovery safeguards", () => {
     await expect(
       completePasskeyRecovery({
         adapter,
+        allowAttempt,
         code: "000000",
         email,
         now,
@@ -116,6 +122,7 @@ describe("passkey recovery safeguards", () => {
       await expect(
         completePasskeyRecovery({
           adapter,
+          allowAttempt,
           code: "123456",
           email,
           now,
@@ -127,6 +134,47 @@ describe("passkey recovery safeguards", () => {
       expect(adapter.values.has(identifier)).toBe(false);
     },
   );
+});
+
+describe("passkey recovery attempt budget", () => {
+  it("leaves the code unused when the budget is spent", async () => {
+    const adapter = await createRecoveryAdapter();
+    const setSession = vi.fn(() => Promise.resolve());
+
+    await expect(
+      completePasskeyRecovery({
+        adapter,
+        allowAttempt: () => Promise.resolve(false),
+        code: "123456",
+        email,
+        now,
+        setSession,
+      }),
+    ).resolves.toBe(false);
+    expect(adapter.sessions).toHaveLength(0);
+    expect(setSession).not.toHaveBeenCalled();
+    expect(
+      JSON.parse(adapter.values.get(identifier)?.value ?? "{}"),
+    ).toMatchObject({ attempts: 0 });
+  });
+
+  it("does not spend the attempt budget when no code is pending", async () => {
+    const adapter = await createRecoveryAdapter();
+    adapter.values.clear();
+    const spend = vi.fn(() => Promise.resolve(true));
+
+    await expect(
+      completePasskeyRecovery({
+        adapter,
+        allowAttempt: spend,
+        code: "123456",
+        email,
+        now,
+        setSession: () => Promise.resolve(),
+      }),
+    ).resolves.toBe(false);
+    expect(spend).not.toHaveBeenCalled();
+  });
 
   it("removes an orphan session when cookie persistence fails", async () => {
     const adapter = await createRecoveryAdapter();
@@ -135,6 +183,7 @@ describe("passkey recovery safeguards", () => {
     await expect(
       completePasskeyRecovery({
         adapter,
+        allowAttempt,
         code: "123456",
         email,
         now,
@@ -146,6 +195,10 @@ describe("passkey recovery safeguards", () => {
     expect(adapter.values.has(identifier)).toBe(false);
   });
 });
+
+function allowAttempt() {
+  return Promise.resolve(true);
+}
 
 async function createRecoveryAdapter({
   emailVerified = true,

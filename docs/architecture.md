@@ -33,9 +33,11 @@ They are never returned by Convex queries or written to logs.
 
 Registration verifies email ownership with a single-use code before issuing
 WebAuthn options. Passkey creation then requires the verified Better Auth
-session, and email codes are not delivered for accounts that already have a
-passkey. Every mailbox query and mutation remains scoped to the authenticated
-user.
+session. An account that already has a passkey is never issued a
+registration code and never accepts one. Every emailed code, registration or
+recovery, draws on one request budget and one attempt budget stored in
+Convex (`services/convex/AUTH.md`). Every mailbox query and mutation remains
+scoped to the authenticated user.
 
 ## Mail model
 

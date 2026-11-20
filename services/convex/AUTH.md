@@ -34,16 +34,46 @@ Registration verifies the email address with a single-use, five-minute Better
 Auth email OTP before issuing passkey registration options. OTP verification
 creates an email-verified user and authenticated session; the client then adds a
 passkey through the same authenticated flow used by existing users. Email OTPs
-are stored hashed and allow three attempts. To keep registration OTP from
-becoming an alternate sign-in method, the server silently skips delivery for
-users who already have a passkey. Users with no passkeys can request another
-registration code to resume interrupted onboarding. Passkey sign-in remains
-usernameless and selects the account from the credential.
+are stored hashed and allow three attempts. Users with no passkeys can request
+another registration code to resume interrupted onboarding. Passkey sign-in
+remains usernameless and selects the account from the credential.
 
 Both sign-in screens, web and mobile, offer only **Sign in with passkey**.
 Passkeys are listed, added, and removed in Settings under **Freemail
 account**, through Better Auth's passkey client
 (`/passkey/list-user-passkeys`, `/passkey/delete-passkey`).
+
+`emailOtpAccess` (`src/emailOtpAccess.ts`) limits Better Auth's email OTP
+plugin to registration codes, on both `/api/auth` and `/api/mobile-auth`:
+
+- `/email-otp/send-verification-otp` issues only `sign-in` codes, and only to
+  an existing account with no passkey. Any other address, including one with a
+  passkey, gets the same `{ success: true }` and no code is stored.
+- `/sign-in/email-otp` refuses an account with a passkey (or no account) with
+  the plugin's usual invalid-code error, and deletes any code stored for it.
+- Every other email OTP route (password reset, email verification and change,
+  code checks) answers 404.
+
+## Email code limits
+
+Registration and recovery codes share two token buckets in the
+`@convex-dev/rate-limiter` component (`emailCodeRequest` and `emailCodeVerify`
+in `src/limiter.ts`). They are global, not keyed on the client or its
+headers, and live in the database, so every request and both auth instances
+see the same counts:
+
+- **Codes issued**: 5 at once, refilling at 10 a day. A request over the
+  limit gets the usual `{ success: true }`, and no code is stored or sent.
+- **Codes checked**: 10 at once, refilling at 20 a day. Every check against
+  a pending code counts, right or wrong; over the limit, the endpoint returns
+  its usual invalid-code error without checking.
+
+A budget is spent only when a code would be issued to, or checked against, an
+account that can use one, so requests for other addresses, or checks while no
+code is pending, cost nothing. `createEmailCodeLimit` (`src/emailCodeLimit.ts`)
+spends tokens only from an action ctx, where the spend commits even when the
+request then fails; anywhere else it refuses. The Better Auth HTTP routes run
+in actions.
 
 ## Website and app passkeys
 
@@ -80,8 +110,8 @@ revealing whether an address exists (`/passkey-recovery/request`). A valid code
 (`/passkey-recovery/verify`) verifies ownership of that address, atomically
 consumes the hashed code, and creates a normal authenticated session. It
 neither replaces nor adds a passkey: after it signs you in, open Settings →
-Freemail account → **Add passkey**. Both recovery endpoints are rate limited
-to three requests per minute.
+Freemail account → **Add passkey**. Both recovery endpoints draw on the
+[email code limits](#email-code-limits).
 
 The mobile app has no recovery screen, and `/recover` can't sign the app in.
 Only the signed-in app can add an app passkey, which is why the app's last

@@ -7,6 +7,7 @@ import {
 } from "better-auth/crypto";
 import { z } from "zod";
 
+import type { EmailCodeLimit } from "./emailCodeLimit";
 import { sendRecoveryEmail } from "./registrationEmail";
 
 const recoveryCodeTtlMs = 5 * 60 * 1000;
@@ -29,6 +30,7 @@ const verifyRecoverySchema = z.object({
 
 interface RecoveryOptions {
   from: string;
+  limit: EmailCodeLimit;
 }
 
 interface VerificationValue {
@@ -76,18 +78,6 @@ interface RecoveryAdapter<
 export function passkeyRecovery(options: RecoveryOptions) {
   return {
     id: "passkey-recovery",
-    rateLimit: [
-      {
-        max: 3,
-        pathMatcher: (path: string) => path === "/passkey-recovery/request",
-        window: 60,
-      },
-      {
-        max: 3,
-        pathMatcher: (path: string) => path === "/passkey-recovery/verify",
-        window: 60,
-      },
-    ],
     endpoints: {
       requestPasskeyRecovery: createAuthEndpoint(
         "/passkey-recovery/request",
@@ -103,6 +93,9 @@ export function passkeyRecovery(options: RecoveryOptions) {
             where: [{ field: "userId", value: existing.user.id }],
           });
           if (!passkey) return ctx.json({ success: true });
+          if (!(await options.limit("request"))) {
+            return ctx.json({ success: true });
+          }
 
           const code = generateRandomString(6, "0-9");
           const codeHash = await hashPassword(code);
@@ -131,6 +124,7 @@ export function passkeyRecovery(options: RecoveryOptions) {
           const adapter = ctx.context.internalAdapter;
           const success = await completePasskeyRecovery({
             adapter,
+            allowAttempt: () => options.limit("verify"),
             code: ctx.body.code,
             email: ctx.body.email,
             now: Date.now(),
@@ -153,19 +147,21 @@ export async function completePasskeyRecovery<
   TSession extends RecoverySession,
 >({
   adapter,
+  allowAttempt,
   code,
   email,
   now,
   setSession,
 }: {
   adapter: RecoveryAdapter<TUser, TSession>;
+  allowAttempt: () => Promise<boolean>;
   code: string;
   email: string;
   now: number;
   setSession: (auth: { session: TSession; user: TUser }) => Promise<void>;
 }) {
   const identifier = getRecoveryCodeIdentifier(email);
-  const consumed = await adapter.consumeVerificationValue(identifier);
+  const consumed = await claimRecoveryCode(adapter, identifier, allowAttempt);
   const recovery = parseRecoveryCodeValue(consumed, now);
   if (!recovery || recovery.attempts >= maximumCodeAttempts) return false;
 
@@ -198,6 +194,16 @@ export async function completePasskeyRecovery<
     throw error;
   }
   return true;
+}
+
+async function claimRecoveryCode(
+  adapter: RecoveryVerificationAdapter,
+  identifier: string,
+  allowAttempt: () => Promise<boolean>,
+) {
+  if (!(await adapter.findVerificationValue(identifier))) return null;
+  if (!(await allowAttempt())) return null;
+  return await adapter.consumeVerificationValue(identifier);
 }
 
 async function replaceVerificationValue(
