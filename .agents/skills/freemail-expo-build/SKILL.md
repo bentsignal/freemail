@@ -87,9 +87,9 @@ codesign -d --entitlements :- Payload/Freemail.app
 
 Do not install an IPA unless both the profile and signed app contain an
 `aps-environment` entitlement and the signed app contains
-`webcredentials:colorful-ostrich-734.convex.site`. Confirm that EAS reports push
-notifications as configured during the build. That public domain serves its
-Apple app-site association from Convex, so the installed standalone app does
+`webcredentials:mail.rodgers.dev`. Confirm that EAS reports push
+notifications as configured during the build. The website serves that
+domain's Apple app-site association, so the installed standalone app does
 not require Metro, Portless, or access to the development machine.
 
 Install the verified IPA:

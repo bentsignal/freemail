@@ -54,19 +54,19 @@ export function formatPasskeyAdded(createdAt: Date | string) {
 }
 
 /**
- * Groups passkeys by where they sign in, hides one as soon as its removal
- * starts, and shows it again if the server refuses. Each platform keeps its
- * last passkey: without one, only the email recovery route can sign the
- * owner in there.
+ * Groups passkeys by whether they sign in, hides one as soon as its removal
+ * starts, and shows it again if the server refuses. The last working passkey
+ * stays: without one, only the email recovery route can sign the owner in.
+ * `host` is the website's hostname, which the relying party covers.
  */
 export function useOptimisticPasskeys<Passkey extends PasskeyListItem>({
-  appRpId,
   deletePasskey,
+  host,
   onRemoveError,
   passkeys,
 }: {
-  appRpId: string;
   deletePasskey: (id: string) => Promise<DeleteResult>;
+  host: string;
   onRemoveError: (message: string) => void;
   passkeys: readonly Passkey[] | null | undefined;
 }) {
@@ -77,7 +77,7 @@ export function useOptimisticPasskeys<Passkey extends PasskeyListItem>({
     .filter((passkey) => !removedIds.has(passkey.id))
     .map((passkey) => ({
       passkey,
-      signsInTo: getPasskeySignIn(passkey.rpId, { app: appRpId }),
+      signsInTo: getPasskeySignIn(passkey.rpId, host),
     }));
   const rules = visible.map(({ passkey, signsInTo }) => ({
     id: passkey.id,
@@ -89,9 +89,9 @@ export function useOptimisticPasskeys<Passkey extends PasskeyListItem>({
     signsInTo,
   }));
   const groups = {
-    app: rows.filter((row) => row.signsInTo === "app"),
+    nowhere: rows.filter((row) => row.signsInTo === "nowhere"),
     unknown: rows.filter((row) => row.signsInTo === "unknown"),
-    website: rows.filter((row) => row.signsInTo === "website"),
+    works: rows.filter((row) => row.signsInTo === "works"),
   };
 
   async function remove(id: string) {

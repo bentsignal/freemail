@@ -5,10 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { passkeyRpIds, recordPasskeyRpId } from "./passkeyRpIds";
 
-const rpIds = {
-  app: "fake-deployment.convex.site",
-  website: "mail.example.com",
-};
+const rpId = "mail.example.com";
+const oldAppRpId = "fake-deployment.convex.site";
 
 async function createAuth(rpIdsByPasskey: Record<string, string | undefined>) {
   const db = Object.fromEntries(
@@ -21,10 +19,7 @@ async function createAuth(rpIdsByPasskey: Record<string, string | undefined>) {
     baseURL: "http://localhost:3000",
     database: memoryAdapter(db),
     logger: { disabled: true },
-    plugins: [
-      passkey({ rpID: rpIds.website }),
-      passkeyRpIds({ rpId: rpIds.website, rpIds }),
-    ],
+    plugins: [passkey({ rpID: rpId }), passkeyRpIds({ rpId })],
     secret: "test-secret-that-is-long-enough-to-use",
   });
   const context = await auth.$context;
@@ -65,34 +60,30 @@ async function deletePasskeyError(
 }
 
 describe("passkeyRpIds", () => {
-  it("refuses to delete a platform's last passkey before the session check", async () => {
+  it("refuses to delete the last working passkey before the session check", async () => {
     const { auth } = await createAuth({
-      phone: rpIds.app,
-      laptop: rpIds.website,
+      laptop: rpId,
+      oldPhone: oldAppRpId,
       older: undefined,
     });
 
-    await expect(deletePasskeyError(auth, "phone")).resolves.toBe(
-      "This is your only passkey for the iPhone app.",
-    );
     await expect(deletePasskeyError(auth, "laptop")).resolves.toBe(
-      "This is your only passkey for the website.",
+      "This is your only passkey.",
     );
   });
 
   it("leaves allowed deletes to the passkey endpoint", async () => {
     const { auth } = await createAuth({
-      desktop: rpIds.website,
-      laptop: rpIds.website,
-      phone: rpIds.app,
-      stale: "old.example.com",
+      desktop: rpId,
+      laptop: rpId,
+      oldPhone: oldAppRpId,
     });
 
     // Without a session the endpoint itself refuses, after the guard passed.
     await expect(deletePasskeyError(auth, "laptop")).resolves.toBe(
       "Unauthorized",
     );
-    await expect(deletePasskeyError(auth, "stale")).resolves.toBe(
+    await expect(deletePasskeyError(auth, "oldPhone")).resolves.toBe(
       "Unauthorized",
     );
   });
@@ -100,11 +91,11 @@ describe("passkeyRpIds", () => {
   it("records the relying party on a passkey that has none", async () => {
     const { context, db } = await createAuth({ older: undefined });
 
-    await recordPasskeyRpId(context.adapter, "credential-older", rpIds.app);
-    await recordPasskeyRpId(context.adapter, "credential-missing", rpIds.app);
+    await recordPasskeyRpId(context.adapter, "credential-older", rpId);
+    await recordPasskeyRpId(context.adapter, "credential-missing", rpId);
 
     expect(db.passkey).toEqual([
-      expect.objectContaining({ id: "older", rpId: rpIds.app }),
+      expect.objectContaining({ id: "older", rpId }),
     ]);
   });
 });

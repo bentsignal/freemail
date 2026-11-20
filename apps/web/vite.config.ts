@@ -9,7 +9,10 @@ import tsconfigPaths from "vite-tsconfig-paths";
 const appleAppSiteAssociation = JSON.stringify({
   applinks: { apps: [], details: [] },
   webcredentials: {
-    apps: ["39K6A9FP99.com.bentsignal.rodgemail"],
+    apps: [
+      "39K6A9FP99.com.bentsignal.rodgemail",
+      "39K6A9FP99.com.bentsignal.rodgemail.dev",
+    ],
   },
 });
 

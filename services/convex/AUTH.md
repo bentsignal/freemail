@@ -20,12 +20,12 @@ env set --prod` for production):
 
 `CONVEX_CLOUD_URL` and `CONVEX_SITE_URL` are supplied by Convex. The auth
 server uses `CONVEX_SITE_URL` as its base URL rather than the placeholder URLs
-in shared app configuration. Native clients use a separate `/api/mobile-auth`
-base path whose relying party is the public Convex site hostname. The Convex
-HTTP router serves its Apple app-site association at
-`https://<CONVEX_SITE_URL>/.well-known/apple-app-site-association`, so a
-standalone mobile build never depends on a workstation-hosted server. Browser
-clients continue using `/api/auth` and `PASSKEY_RP_ID`.
+in shared app configuration. Browser clients use `/api/auth` and native
+clients a separate `/api/mobile-auth` base path, and both use `PASSKEY_RP_ID`
+as their relying party, so one passkey signs in to the website and the apps.
+The website lists both iOS apps in its Apple app-site association
+(`apps/web/public/.well-known/apple-app-site-association`), and the apps
+claim `webcredentials:mail.rodgers.dev` (`apps/mobile/app.config.ts`).
 
 Passkeys are cryptographically scoped to their relying-party ID. Changing
 `PASSKEY_RP_ID` requires users to authenticate through account recovery and
@@ -76,12 +76,12 @@ spends tokens only from an action ctx, where the spend commits even when the
 request then fails; anywhere else it refuses. The Better Auth HTTP routes run
 in actions.
 
-## Website and app passkeys
+## Which passkeys work
 
-Website passkeys and app passkeys belong to different relying parties:
-`PASSKEY_RP_ID` for the website, the Convex site host for the app. A website
-passkey can't sign the app in, and the reverse. Better Auth doesn't store a
-passkey's relying party, so `passkeyRpIds` (`src/passkeyRpIds.ts`) adds an
+Until 2026-11-20 the apps used the Convex site host as their relying party,
+so app passkeys from then (for `dazzling-dog-633.convex.site` and
+`colorful-ostrich-734.convex.site`) sign in nowhere now. Better Auth doesn't
+store a passkey's relying party, so `passkeyRpIds` (`src/passkeyRpIds.ts`) adds an
 `rpId` field to the passkey row and fills it in:
 
 - when a passkey is registered, with the relying party of the auth instance
@@ -90,14 +90,13 @@ passkey's relying party, so `passkeyRpIds` (`src/passkeyRpIds.ts`) adds an
   relying party the passkey belongs to. Passkeys registered before `rpId`
   existed get theirs the next time they sign in.
 
-Settings groups passkeys by where they sign in: Website, iPhone app, and
-Other for those with no `rpId` yet. Each platform keeps its last passkey: the
-apps disable Remove on it, and the delete endpoint refuses it with a message
-the apps show (a `before` hook, so a stale client can't remove it either).
-Passkeys without an `rpId` never count as a platform's spare, and one can only
-be removed once both platforms have a passkey with a known `rpId`. A passkey
-whose `rpId` matches neither current relying party (after `PASSKEY_RP_ID`
-changed) signs in nowhere and can be removed.
+Settings lists the passkeys that work, then Other for those with no `rpId`
+yet, then Old for those whose `rpId` isn't `PASSKEY_RP_ID`. The last working
+passkey stays: the apps disable Remove on it, and the delete endpoint
+refuses it with a message the apps show (a `before` hook, so a stale client
+can't remove it either). A passkey without an `rpId` never counts as a
+spare, and stays until a working one exists. Old passkeys can always be
+removed.
 
 The rules live in `@freemail/std/passkey-sign-in`, shared by the server and
 both apps.
@@ -114,9 +113,8 @@ neither replaces nor adds a passkey: after it signs you in, open Settings →
 Freemail account → **Add passkey**. Both recovery endpoints draw on the
 [email code limits](#email-code-limits).
 
-The mobile app has no recovery screen, and `/recover` can't sign the app in.
-Only the signed-in app can add an app passkey, which is why the app's last
-passkey can't be removed from either platform.
+The mobile app has no recovery screen, and `/recover` can't sign the app in,
+which is one reason the last passkey can't be removed.
 
 ## CLI sign-in
 
