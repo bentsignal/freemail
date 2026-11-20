@@ -92,9 +92,9 @@ serial `up` prints (`emulator-55xx`), with `platform: "android"`.
   `globalThis.freemailDev` hook (`apps/mobile/src/features/dev/automation.ts`)
   over Metro's debugger connection, because iOS asks "Open in Freemail Dev?"
   before every `simctl openurl`.
-- **Signing in needs an isolated backend.** The default backend is the
-  production deployment with Shawn's real mail, so there the simulator
-  stays signed out. `scripts/backend.sh isolate` gives the worktree its
+- **Signing in needs an isolated backend.** The app's default backend is
+  the production deployment (`colorful-ostrich-734`) with Shawn's real
+  mail, so there the simulator stays signed out. `scripts/backend.sh isolate` gives the worktree its
   own dev deployment with a fake owner and seeded mail, and points Metro
   at it; then `scripts/sim.sh up` (or `relaunch`) and `scripts/sim.sh
 signin` signs in as that owner, and evidence of it is safe to publish

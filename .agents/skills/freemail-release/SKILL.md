@@ -1,6 +1,6 @@
 ---
 name: freemail-release
-description: Run a Freemail release end to end, covering what changed since the last release, what to test where those changes meet, a first pass of those tests in the simulator, testing main in Freemail Dev on Shawn's phone, then (after his go-ahead) Convex functions to the one deployment, the website to mail.rodgers.dev, and a new local EAS build of Freemail on his iPhone. Use when Shawn asks to release, ship, deploy, push the backend or website, or put a new build on his phone, or asks what changed since the last release.
+description: Run a Freemail release end to end, covering what changed since the last release, what to test where those changes meet, a first pass of those tests in the simulator, testing main in Freemail Dev on Shawn's phone, then (after his go-ahead) Convex functions to the production deployment, the website to mail.rodgers.dev, and a new local EAS build of Freemail on his iPhone. Use when Shawn asks to release, ship, deploy, push the backend or website, or put a new build on his phone, or asks what changed since the last release.
 ---
 
 # Releasing Freemail
@@ -57,9 +57,9 @@ Before sending Shawn anything, run every step of that list yourself: the
 website against the worktree's Portless origin (`pnpm exec portless proxy
 start --lan`, then `pnpm -F @freemail/web dev`; never `pnpm dev`, which
 runs `convex dev`), and the mobile app in the simulator (the
-`freemail-simulator` skill; signed in on an isolated backend,
-`scripts/backend.sh isolate`, with seeded mail, which also has the
-release's Convex functions). Take a screenshot of each result and upload
+`freemail-simulator` skill). Both run signed in on an isolated backend
+(`scripts/backend.sh isolate`) with seeded mail, which also has the
+release's Convex functions; the local website can't sign in to production. Take a screenshot of each result and upload
 them with `scripts/evidence.sh`. Fix what fails the usual way (a PR, the
 `freemail-feature` skill, which Shawn approves like any other) before he sees
 it, then `scripts/backend.sh teardown` and `sim.sh down`.
@@ -85,7 +85,7 @@ It builds a dev client only when `main`'s native fingerprint has none yet
 (about 15 minutes); otherwise Shawn just taps the open link. Send him the
 block it prints, first and exactly as printed (the `freemail-feature` skill,
 step 4b). Freemail Dev runs `main`'s JavaScript against the functions already
-on `dazzling-dog-633`. If the release has Convex changes, the parts of the
+on production. If the release has Convex changes, the parts of the
 list that need them can't be tried there yet: say which, and ask whether to
 deploy Convex first (step 5's Convex part, safe for the installed apps
 because every Convex change stays compatible with them) so he can test
@@ -108,16 +108,25 @@ earlier release, or of a PR, is not approval of this one.
 In this order, skipping parts the plan doesn't need, doing each
 `docs/next-release.md` step where it says:
 
-**Convex** (from `services/convex`, whose `.env.local` points at
-`dazzling-dog-633`):
+**Convex** (from `services/convex`). `convex deploy` targets production,
+`colorful-ostrich-734`, whatever `.env.local` selects:
 
 ```sh
 cd services/convex
-pnpm exec convex dev --once --tail-logs disable
+pnpm exec convex deploy -y
 ```
 
-Then call what changed (`npx convex run` on an internal query, or `curl` an
-HTTP route) to check it's live, and `npx convex logs` for errors.
+Then call what changed (`npx convex run --prod` on an internal query, or
+`curl` an HTTP route) to check it's live, and `npx convex logs --prod` for
+errors. Every Convex command needs `--prod` to reach production; without it
+the command runs against development.
+
+Then push `main` to the development deployment (`tidy-emu-857`, which
+`.env.local` selects) so the local website doesn't fall behind:
+
+```sh
+pnpm exec convex dev --once --tail-logs disable
+```
 
 **Website** (from the repository root):
 
@@ -146,7 +155,8 @@ Report what shipped, the tag, and anything that didn't work.
 ## Rolling back
 
 - Convex: check out the last release tag (`git checkout --detach <tag>`),
-  `pnpm install --frozen-lockfile`, and push it the same way. Schema changes
+  `pnpm install --frozen-lockfile`, and push it the same way
+  (`pnpm exec convex deploy -y`). Schema changes
   that deleted data can't be undone this way; tell Shawn.
 - Website: `vercel rollback` to the previous production deployment
   (`vercel ls` lists them).

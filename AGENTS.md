@@ -14,19 +14,32 @@ and classification. Read [README.md](README.md),
 `services/convex` (`AUTH.md`, `PROVIDERS.md`, `AI.md`, ...) before asking
 design or infrastructure questions.
 
-There is **one Convex deployment, `dazzling-dog-633`**. It is called a dev
-deployment, but it serves production: the website and both apps on Shawn's
-phone (Freemail and Freemail Dev) use it, and it holds his real mail. Never push functions to it
-(`convex dev`, `convex deploy`) outside a release Shawn asked for, and never
-write to its data except through the app as he would.
+Convex project `rodge-mail` (team `bentsignal`) has two deployments:
+
+- **`colorful-ostrich-734` (production)** holds Shawn's real mail. The
+  website, both apps on his phone (Freemail and Freemail Dev), the CLI, and
+  inbound hosted mail use it. Push to it only with
+  `pnpm exec convex deploy -y` as part of a release Shawn asked for
+  ([docs/releasing.md](docs/releasing.md)), and never write to its data
+  except through the app as he would.
+- **`tidy-emu-857` (development)** is for agents: a fake owner
+  (`alex.rivera@example.com`) and seeded fake mail, `DEV_TOOLS=true`, no
+  provider or AWS secrets. The local website uses it. Every worktree shares
+  it, so don't push a branch's functions to it.
+
+`dazzling-dog-633` served production until the move to
+`colorful-ostrich-734` ([docs/production-migration.md](docs/production-migration.md)).
+It is paused and kept as the rollback copy until Shawn deletes it. Never
+push to it, unpause it, or change its data.
 
 Auth is owner-only (Better Auth, email codes and passkeys,
 `AUTH_ALLOWED_USER_ID`). Registration is closed.
 
 Backend changes and signed-in checks get an **isolated backend**:
-`scripts/backend.sh isolate` creates a dev deployment for the branch with
-a fake owner and seeded fake mail (no production secrets), points this
-worktree's apps at it, and `scripts/sim.sh signin` signs the simulator in.
+`scripts/backend.sh isolate` creates a dev deployment for the branch
+(`dev/<branch>`) with a fake owner and seeded fake mail (no production
+secrets), points this worktree's apps at it, and `scripts/sim.sh signin`
+signs the simulator in.
 `push` after Convex changes, `teardown` when done
 ([docs/simulator-sign-in.md](docs/simulator-sign-in.md)).
 
@@ -74,9 +87,11 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
 - Web changes are checked in the browser against the worktree's Portless
   origin (`https://<worktree>.www.freemail.local`): start the proxy
   (`pnpm exec portless proxy start --lan`) and only the web app
-  (`pnpm -F @freemail/web dev`). Never `pnpm dev` or `pnpm dev:web`: both
-  also run `convex dev`, which pushes this worktree's functions to the
-  production deployment.
+  (`pnpm -F @freemail/web dev`). It talks to the development deployment,
+  or to this worktree's isolated backend; production doesn't trust local
+  origins, so the local website can't sign in there. Never `pnpm dev` or
+  `pnpm dev:web`: both also run `convex dev`, which pushes this worktree's
+  functions to the development deployment every worktree shares.
 - UI changes need screenshots (before and after where something changed);
   motion and gestures need a video. Upload with `scripts/evidence.sh` and put
   them in the PR description. Never commit PR assets. Evidence URLs are
@@ -109,8 +124,10 @@ what changed since the last release and what to test where those changes
 overlap (each one was already tested on its own before it merged), run
 those tests yourself first in the simulator, put `main` on his phone in
 Freemail Dev for what only he can check, and ship only after he approves the
-release. Shipping is Convex functions to `dazzling-dog-633`, the website
-with `vercel deploy --prod`, and a new local EAS build of Freemail for
+release. Shipping is Convex functions to production with
+`pnpm exec convex deploy -y` (then `main` to the development deployment so
+it doesn't fall behind), the website with `vercel deploy --prod`, and a new
+local EAS build of Freemail for
 his phone when the mobile app changed. Freemail is a standalone build
 with its JavaScript embedded and no over-the-air updates, so a mobile
 change reaches it only in a new build.
@@ -128,7 +145,8 @@ Shawn's phone has two Freemail apps side by side: **Freemail**
 (`com.bentsignal.rodgemail`, the standalone build he reads his mail in,
 updated only in a release) and **Freemail Dev**
 (`com.bentsignal.rodgemail.dev`, amber icon, a dev client). Both talk to
-`dazzling-dog-633`, so Freemail Dev shows his real mail; it never registers
+production (`colorful-ostrich-734`), so Freemail Dev shows his real mail; it
+never registers
 for push notifications, or every email would notify twice. Every
 development binary is Freemail Dev, the simulators' too. See
 [docs/phone-testing.md](docs/phone-testing.md).

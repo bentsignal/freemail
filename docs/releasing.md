@@ -9,7 +9,7 @@ A release has up to three parts, always from `origin/main`, in this order:
 
 | Part          | What it updates                                         | Command                                                       | Needed when                                  |
 | ------------- | ------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------- |
-| Convex        | functions and schema on `dazzling-dog-633`              | `pnpm exec convex dev --once` from `services/convex`          | a merged PR said "Convex deploy needed: yes" |
+| Convex        | functions and schema on `colorful-ostrich-734`          | `pnpm exec convex deploy -y` from `services/convex`           | a merged PR said "Convex deploy needed: yes" |
 | Website       | `https://mail.rodgers.dev` (Vercel `bsx-sh/rodge-mail`) | `vercel deploy --prod` from the repository root               | `apps/web` or a package it uses changed      |
 | Shawn's phone | Freemail, the standalone build on his iPhone            | local EAS `development` IPA (the `freemail-expo-build` skill) | `apps/mobile` or a package it uses changed   |
 
@@ -19,12 +19,43 @@ with the clients before it (the `freemail-feature` skill, step 2): the
 website keeps its old bundle until its deploy, and the phone keeps its
 embedded JavaScript until Shawn installs a new build.
 
-## One deployment
+## Deployments
 
-`dazzling-dog-633` is the only Convex deployment. It is named a dev
-deployment, but the website and the phone use it and it holds Shawn's real
-mail, so a Convex push is a production deploy. `convex dev --once` pushes
-once and exits; never leave `convex dev` running against it.
+Convex project `rodge-mail` (team `bentsignal`):
+
+| Deployment             | Reference    | What it is                                                         |
+| ---------------------- | ------------ | ------------------------------------------------------------------ |
+| `colorful-ostrich-734` | `production` | Shawn's real mail: the website, both phone apps, the CLI, SES mail |
+| `tidy-emu-857`         | `dev/agents` | Development: a fake owner and seeded mail, for the local website   |
+| `dazzling-dog-633`     | `dev/shawn`  | Retired and paused, the rollback copy of the move to production    |
+
+`convex deploy` targets the project's production deployment whatever
+`services/convex/.env.local` selects. `.env.local` selects development, so
+after the production deploy the release also pushes `main` there, or it
+falls behind:
+
+```sh
+cd services/convex
+pnpm exec convex deploy -y
+pnpm exec convex dev --once --tail-logs disable
+```
+
+`convex dev --once` pushes once and exits; never leave `convex dev` running.
+Other commands reach production with `--prod` (`npx convex logs --prod`,
+`npx convex env list --prod`).
+
+Nothing uses `dazzling-dog-633`, which served production before the move
+([production-migration.md](production-migration.md)). Never push to it,
+unpause it, or change its data; Shawn deletes it when he no longer needs
+the rollback.
+
+## Production environment
+
+Production runs with `ENVIRONMENT=production`, so it trusts only
+`https://mail.rodgers.dev`, the passkey relying-party origin, and the
+`rodge-mail://` app origin. Local origins (`*.freemail.local`) can't sign in
+to it. Set its environment variables with `npx convex env set --prod <name>
+<value>`; without `--prod` the command changes development.
 
 ## The phone
 

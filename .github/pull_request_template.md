@@ -19,6 +19,6 @@
 
 ## Release notes
 
-- Convex deploy needed: <!-- no / yes: this changes Convex functions or schema (services/convex/src), which the release pushes to dazzling-dog-633 with `pnpm exec convex dev --once`. Say whether the phone's installed build keeps working against it. CI checks this line. -->
+- Convex deploy needed: <!-- no / yes: this changes Convex functions or schema (services/convex/src), which the release deploys to production (colorful-ostrich-734) with `pnpm exec convex deploy -y`. Say whether the phone's installed build keeps working against it. CI checks this line. -->
 - Native change: <!-- no / yes: the native fingerprint changed (native dependencies, config plugins, app.config.ts), so the phone needs a new local EAS build. CI labels these "📱 Native Change" and checks this line. -->
 - Extra release steps: <!-- none, or what this PR adds to docs/next-release.md: Convex environment variables, DNS or AWS setup, an order to deploy in, checks after shipping. CI checks this line. -->

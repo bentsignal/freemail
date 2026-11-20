@@ -3,8 +3,10 @@
 Agents test signed-in screens on an **isolated backend**: a throwaway
 Convex dev deployment for one branch, with a fake owner and seeded fake
 mail. Nothing on it is Shawn's, so screenshots of it are safe to publish as
-PR evidence. The production deployment, `dazzling-dog-633`, is never
-touched.
+PR evidence. Production (`colorful-ostrich-734`) is never touched, and
+neither is the development deployment every worktree's local website shares
+(`tidy-emu-857`); each branch gets its own so its functions can be pushed
+without colliding with another's.
 
 ```sh
 scripts/backend.sh isolate    # create dev/<branch>, configure, push, make the test owner, seed
@@ -14,7 +16,7 @@ scripts/backend.sh push       # after changing services/convex/src
 scripts/backend.sh seed       # a fresh mailbox, dated now
 scripts/backend.sh seed 150   # the same, plus 150 older threads to page through
 scripts/backend.sh status     # which deployment this worktree talks to
-scripts/backend.sh teardown   # delete it; the worktree goes back to the default
+scripts/backend.sh teardown   # delete it; the app goes back to production, the local website to development
 ```
 
 ## What `isolate` does
@@ -23,8 +25,9 @@ scripts/backend.sh teardown   # delete it; the worktree goes back to the default
    `<team>:<project>:dev/<branch>` with `npx convex deployment create
 --type dev --select --expiration "in 14 days"`. The CLI writes the new
    deployment into `.env.local`. Every later write checks that
-   `.env.local` selects that deployment, not `dazzling-dog-633`, and that
-   no `CONVEX_DEPLOY_KEY` is in play.
+   `.env.local` selects that deployment, not production, development, or
+   the retired `dazzling-dog-633`, and that no `CONVEX_DEPLOY_KEY` is in
+   play.
 2. Sets only what `convex.env.ts` declares, plus `DEV_TOOLS=true`:
    `ENVIRONMENT=development`, a fresh random `BETTER_AUTH_SECRET`,
    `PASSKEY_RP_ID` (the deployment's `.convex.site` host), `WEB_URL` and
@@ -48,7 +51,9 @@ scripts/backend.sh teardown   # delete it; the worktree goes back to the default
    talk to it. Relaunch the app after `isolate` or `teardown`.
 
 The state lives in `.cache/backend/`. `teardown` deletes the deployment
-through the Convex API, restores `.env.local`, and resets the overrides.
+through the Convex API, restores `.env.local`, and resets the overrides, so
+the mobile app talks to production again and the local website to
+development.
 Deployments expire on their own after 14 days.
 
 ## How sign-in works, and why it can't reach production
@@ -60,21 +65,27 @@ own Better Auth client, so `@better-auth/expo` stores the session cookie in
 SecureStore exactly as after a passkey sign-in.
 
 That route is a Better Auth plugin (`services/convex/src/devSignIn.ts`)
-that signs in the deployment's allowed owner without a passkey or code.
+that signs in the deployment's allowed owner without a passkey or code. The
+local website reaches the same plugin at `/api/auth/dev/sign-in`, on an
+isolated backend or the development deployment
+([development.md](development.md#local-apps)).
 Several independent checks keep it off production:
 
 - **It isn't installed on production.** `auth.ts` adds the plugin only when
   `devToolsEnabled()`: `DEV_TOOLS` is `"true"`, `ENVIRONMENT` is
-  `development`, and neither `CONVEX_CLOUD_URL` nor `CONVEX_SITE_URL` is
-  `dazzling-dog-633` (`devToolsPolicy.ts`, with tests). Production sets
-  none of the first and is the last, so the route 404s there.
+  `development`, and neither `CONVEX_CLOUD_URL` nor `CONVEX_SITE_URL` names
+  a deployment with real mail: `colorful-ostrich-734` or `dazzling-dog-633`,
+  the retired one production moved from (`REAL_MAIL_DEPLOYMENTS` in
+  `devToolsPolicy.ts`, with tests). Production sets
+  `ENVIRONMENT=production` and no `DEV_TOOLS`, and is on that list, so the
+  route 404s there.
 - **The handler checks again** and refuses unless the user it signs in is
   `AUTH_ALLOWED_USER_ID`, and `privateAccountHooks` still vets the session.
 - **`ensureOwner` and `seed` are internal** (only callable with the
   deployment's admin credentials) and call `requireDevTools()` first.
 - **The app refuses** to call the route when its Convex URLs point at
-  `dazzling-dog-633`, and the hook exists only in `__DEV__` builds, never
-  the phone's standalone build.
+  either of those deployments, and the hook exists only in `__DEV__`
+  builds, never the phone's standalone build.
 - **`sim.sh signin` refuses** unless `scripts/backend.sh isolate` has run.
 
 ## What doesn't work on an isolated backend

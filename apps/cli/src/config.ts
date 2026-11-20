@@ -4,9 +4,9 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
 const defaultUrls = {
-  convexCloud: "https://dazzling-dog-633.convex.cloud",
-  convexSite: "https://dazzling-dog-633.convex.site",
-  web: "https://www.freemail.local",
+  convexCloud: "https://colorful-ostrich-734.convex.cloud",
+  convexSite: "https://colorful-ostrich-734.convex.site",
+  web: "https://mail.rodgers.dev",
 };
 
 export interface CliSession {

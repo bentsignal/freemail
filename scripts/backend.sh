@@ -9,9 +9,10 @@
 #                                 plus n older filler threads for paging
 #   scripts/backend.sh teardown   delete it and go back to the default
 #
-# Without `isolate`, a worktree's apps talk to dazzling-dog-633, the one
-# production deployment with Shawn's real mail, and nothing here touches
-# it. An isolated backend is a named Convex dev deployment (`dev/<branch>`)
+# Without `isolate`, a worktree's mobile app talks to production
+# (colorful-ostrich-734, Shawn's real mail) and its local website to the
+# shared development deployment (tidy-emu-857, a fake owner). Nothing here
+# touches either. An isolated backend is a named Convex dev deployment (`dev/<branch>`)
 # with only the settings the app needs to boot and sign in: a fresh
 # BETTER_AUTH_SECRET, DEV_TOOLS=true, and harmless placeholders. No provider,
 # AI, email, or AWS secret is copied, so syncing, sending, AI features, and
@@ -30,7 +31,10 @@ OVERRIDES="$ROOT/shared/config/src/overrides.ts"
 STATE_DIR="$ROOT/.cache/backend"
 STATE="$STATE_DIR/isolated"
 SAVED_ENV="$STATE_DIR/convex-env-local.default"
-PRODUCTION="dazzling-dog-633"
+# Never written to here: production, the deployment production moved from
+# (still Shawn's real mail), and the development deployment every worktree
+# shares.
+PROTECTED="colorful-ostrich-734 dazzling-dog-633 tidy-emu-857"
 EXPIRATION="in 14 days"
 mkdir -p "$STATE_DIR"
 
@@ -62,11 +66,19 @@ require_isolated() {
   . "$STATE"
   local selected
   selected="$(env_value CONVEX_DEPLOYMENT "$CONVEX_ENV")"
-  if [ "${selected#*:}" != "$DEPLOYMENT" ] || [[ "$selected" == *"$PRODUCTION"* ]] ||
+  if [ "${selected#*:}" != "$DEPLOYMENT" ] || is_protected "$selected" ||
     grep -q '^CONVEX_DEPLOY_KEY=' "$CONVEX_ENV"; then
     echo "services/convex/.env.local doesn't select $DEPLOYMENT; refusing" >&2
     exit 1
   fi
+}
+
+is_protected() {
+  local name
+  for name in $PROTECTED; do
+    [[ "$1" == *"$name"* ]] && return 0
+  done
+  return 1
 }
 
 write_overrides() {
@@ -90,7 +102,7 @@ status() {
     echo "site: $SITE_URL"
     echo "sign in the simulator: scripts/sim.sh signin"
   else
-    echo "default: $PRODUCTION (production, Shawn's real mail); scripts/backend.sh isolate to test signed in"
+    echo "default: the mobile app uses production (colorful-ostrich-734, Shawn's real mail), the local website uses development (tidy-emu-857); scripts/backend.sh isolate to test signed in"
   fi
 }
 
@@ -130,7 +142,7 @@ create_deployment() {
   cloud="${cloud:-$(env_value VITE_CONVEX_URL "$CONVEX_ENV")}"
   site="$(env_value CONVEX_SITE_URL "$CONVEX_ENV")"
   site="${site:-$(env_value VITE_CONVEX_SITE_URL "$CONVEX_ENV")}"
-  if [ -z "$deployment" ] || [ "$deployment" = "$PRODUCTION" ] || [ -z "$cloud" ] || [ -z "$site" ]; then
+  if [ -z "$deployment" ] || is_protected "$deployment" || [ -z "$cloud" ] || [ -z "$site" ]; then
     echo "the new deployment wasn't selected; restoring services/convex/.env.local" >&2
     exit 1
   fi

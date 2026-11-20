@@ -1,7 +1,8 @@
 # Passkey authentication
 
 Freemail uses Better Auth passkeys backed by a locally installed Convex
-component. Configure these variables on each Convex deployment:
+component. Configure these variables on each Convex deployment (`npx convex
+env set --prod` for production):
 
 - `BETTER_AUTH_SECRET`: a random Better Auth signing secret.
 - `AUTH_EMAIL_FROM`: the sender for email codes, on a domain verified in

@@ -87,7 +87,7 @@ codesign -d --entitlements :- Payload/Freemail.app
 
 Do not install an IPA unless both the profile and signed app contain an
 `aps-environment` entitlement and the signed app contains
-`webcredentials:dazzling-dog-633.convex.site`. Confirm that EAS reports push
+`webcredentials:colorful-ostrich-734.convex.site`. Confirm that EAS reports push
 notifications as configured during the build. That public domain serves its
 Apple app-site association from Convex, so the installed standalone app does
 not require Metro, Portless, or access to the development machine.
@@ -104,8 +104,9 @@ the notification acceptance gate for every physical-iPhone build:
 1. Confirm iOS notification permission is authorized and Freemail's `New
    mail` setting reports the device as ready. A denied permission is a device
    blocker, not a successful build result.
-2. Inspect the active Convex deployment's `mobilePushTokens` table and confirm
-   the current installation registered an enabled token after launch. Do not
+2. Inspect the production deployment's `mobilePushTokens` table (`--prod` on
+   the Convex command) and confirm the current installation registered an
+   enabled token after launch. Do not
    print or report the token value.
 3. Trigger one remote notification through the real Convex → Expo → APNs path.
    A local notification preview does not satisfy this gate.

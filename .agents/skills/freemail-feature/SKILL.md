@@ -30,12 +30,17 @@ build), the browser for web.
 
 ## 2. The backend
 
-There is one Convex deployment, `dazzling-dog-633`, and it holds Shawn's
-real mail. **Never push to it from a feature branch**: no `convex dev`, no
-`convex deploy`, no `pnpm dev` or `pnpm dev:web` (both run `convex dev`).
-Functions reach it only in a release (the `freemail-release` skill).
+Production is `colorful-ostrich-734`, which holds Shawn's real mail, and
+every worktree's local website shares the development deployment,
+`tidy-emu-857` (a fake owner and seeded mail). **Never push to either from
+a feature branch**: no `convex deploy`, no `convex dev`, no `pnpm dev` or
+`pnpm dev:web` (both run `convex dev`, which pushes to development).
+Functions reach them only in a release (the `freemail-release` skill).
+`dazzling-dog-633`, where production used to run, is paused as the
+rollback copy: never push to it, unpause it, or change its data.
 
-- App-only changes run against it as it is.
+- App-only changes run against them as they are: the mobile app against
+  production, the local website against development.
 - Convex changes (`services/convex/src`) are proven with Vitest unit tests
   next to the code (`*.test.ts`) and typecheck. Keep every
   change compatible with the app version before it: the phone's installed
@@ -52,8 +57,9 @@ Functions reach it only in a release (the `freemail-release` skill).
   also lists what doesn't work there: syncing, sending, AI, email). Check
   `scripts/backend.sh status` before any Convex CLI command.
 - Read data only through tests or, when Shawn asks, read-only
-  `npx convex data` / `npx convex run` on internal queries from
-  `services/convex`. Never mutate it.
+  `npx convex data --prod` / `npx convex run --prod` on internal queries
+  from `services/convex` (without `--prod` they read development). Never
+  mutate it.
 
 ## 3. Build it
 
@@ -78,6 +84,10 @@ navigation, platform files (`.ios.tsx`/`.android.tsx`), or native config.
 **Web:** run only the web app on the worktree's Portless origin
 (`pnpm exec portless proxy start --lan`, then `pnpm -F @freemail/web dev`,
 at `https://<worktree-id>.www.freemail.local`), and check it in a browser.
+It talks to the development deployment, or to the isolated backend when
+the worktree has one, never to production, which doesn't trust local
+origins. Sign in as the fake owner from the browser console
+([docs/development.md](../../../docs/development.md#local-apps)).
 
 Exercise the actual change: the happy path, the empty and loading states,
 errors you can trigger, and dark mode if colors changed.
@@ -95,7 +105,7 @@ The simulator is your check. Every change also gets Shawn's own test on his
 phone, in its worktree, before it merges: the release no longer re-tests
 each change, so this is where a change gets right. He tests in Freemail Dev
 (`com.bentsignal.rodgemail.dev`, amber icon; Freemail stays beside it),
-which shows his real mail from `dazzling-dog-633`
+which shows his real mail from production
 ([docs/phone-testing.md](../../../docs/phone-testing.md)).
 
 **Serve it as soon as the work is ready to test** (step 7), and keep it up
@@ -172,7 +182,7 @@ scripts/phone.sh list           # every cached dev client, marking main's
 - JavaScript edits hot-reload on his phone. Re-run `up` after native
   changes or `app.config.ts`.
 - Freemail Dev signs in to his real account, so it runs this worktree's app
-  against the functions already on `dazzling-dog-633`. `up` refuses in a
+  against the functions already on production. `up` refuses in a
   worktree with an isolated backend: Freemail Dev would load that backend,
   which has no account he can sign in to from the phone. A PR that changes
   Convex functions is tested in the simulator on its isolated backend;

@@ -5,8 +5,8 @@ import { completeAuthSession } from "@freemail/std/auth-session";
 import { authClient } from "./client";
 
 /**
- * Freemail Dev signs in with the passkey recovery code until its app ID is in
- * the Apple app-site association on dazzling-dog-633 (docs/phone-testing.md).
+ * Freemail Dev signs in with the passkey recovery code, for when it has no
+ * passkey for the production Convex site host (docs/phone-testing.md).
  * The code and the session come from the server, so each step waits on it.
  */
 export function useEmailCodeAuth() {

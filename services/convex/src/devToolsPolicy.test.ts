@@ -27,18 +27,21 @@ describe("dev tools", () => {
     ).toBe(false);
   });
 
-  it("never run on the production deployment", () => {
-    expect(
-      isDevToolsDeployment({
-        ...isolated,
-        cloudUrl: "https://dazzling-dog-633.convex.cloud",
-      }),
-    ).toBe(false);
-    expect(
-      isDevToolsDeployment({
-        ...isolated,
-        siteUrl: "https://dazzling-dog-633.convex.site",
-      }),
-    ).toBe(false);
-  });
+  it.each(["colorful-ostrich-734", "dazzling-dog-633"])(
+    "never run on %s, which holds real mail",
+    (name) => {
+      expect(
+        isDevToolsDeployment({
+          ...isolated,
+          cloudUrl: `https://${name}.convex.cloud`,
+        }),
+      ).toBe(false);
+      expect(
+        isDevToolsDeployment({
+          ...isolated,
+          siteUrl: `https://${name}.convex.site`,
+        }),
+      ).toBe(false);
+    },
+  );
 });

@@ -8,9 +8,9 @@ import { ConvexReactClient } from "convex/react";
 import { nativeAuthBasePath } from "@freemail/config/auth";
 import { createUrls } from "@freemail/config/urls";
 
-const urls = createUrls({
-  nodeEnv: "development",
-});
+// Both phone apps and the simulators use production unless
+// scripts/backend.sh isolate points this worktree elsewhere.
+const urls = createUrls({ nodeEnv: "production" });
 export const convexUrls = urls.convex;
 
 export const authClient = createAuthClient({
