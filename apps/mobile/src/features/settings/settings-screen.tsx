@@ -8,7 +8,6 @@ import { useMutation } from "convex/react";
 import { api } from "@freemail/convex/api";
 
 import type { MobileThemeMode } from "~/features/theme/mobile-theme";
-import { useColor } from "~/hooks/use-color";
 import { devBranch } from "~/features/dev/dev-branch";
 import { useMailStore } from "~/features/mail/store";
 import { scheduleLocalNotificationPreview } from "~/features/notifications/mobile-notifications";
@@ -16,6 +15,7 @@ import {
   setMobileThemeMode,
   useMobileAppearance,
 } from "~/features/theme/mobile-theme";
+import { useColor } from "~/hooks/use-color";
 import {
   AddPasskeyRow,
   OwnerRow,

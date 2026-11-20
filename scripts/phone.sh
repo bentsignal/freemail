@@ -212,6 +212,17 @@ serve_tailnet() {
 
 # Stops serving Metro on the tailnet once neither phone uses it. Runs
 # before release_metro, which forgets the port.
+# Freemail Dev never uses production (apps/mobile/src/features/auth/client.ts).
+backend_label() {
+  local state
+  state="$("$ROOT/scripts/backend.sh" status 2>/dev/null || true)"
+  if [[ "$state" == isolated* ]]; then
+    echo "this branch's test backend (fake mail, this branch's Convex functions)"
+  else
+    echo "the shared development backend (fake mail, the last release's Convex functions)"
+  fi
+}
+
 unserve_tailnet() {
   if [ -f "$STATE_DIR/phone-ios" ] || [ -f "$STATE_DIR/phone-android" ]; then
     return 0
@@ -241,6 +252,7 @@ links() {
   [ -z "$tailnet" ] || echo "- [Open in Freemail Dev on iPhone over Tailscale]($(open_url "$tailnet"))"
   printf '\nHome Wi-Fi:\n\n```text\n%s\n```\n' "$wifi"
   [ -z "$tailnet" ] || printf '\nTailscale:\n\n```text\n%s\n```\n' "$tailnet"
+  printf '\nFreemail Dev opens on %s and shows branch `%s` (Settings, Developer). Sign in with **Sign in as test owner**.\n' "$(backend_label)" "$(git -C "$ROOT" branch --show-current)"
   echo "---- end ----"
   echo "add when he has to install first:"
   echo "- [Install Freemail Dev on $PHONE_NAME]($install)"
@@ -298,10 +310,6 @@ up() {
   reclaimed
   sweep
   address >/dev/null
-  if "$ROOT/scripts/backend.sh" status 2>/dev/null | grep -q '^isolated'; then
-    echo "this worktree has an isolated backend, which Freemail Dev would load and Shawn can't sign in to; serve the phone from a worktree on the default backend (docs/phone-testing.md)" >&2
-    exit 1
-  fi
   # Offline or mid-conflict, serve anyway and say main's is unknown.
   main="$(main_fingerprint)" || main=""
   ensure_client

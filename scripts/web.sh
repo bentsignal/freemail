@@ -39,7 +39,7 @@ backend() {
   if [[ "$state" == isolated* ]]; then
     echo "this worktree's isolated backend: fake mail, with this branch's Convex functions"
   else
-    echo "the shared development backend: fake mail, with main's Convex functions"
+    echo "the shared development backend: fake mail, with the last release's Convex functions"
   fi
 }
 

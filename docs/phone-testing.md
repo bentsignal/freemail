@@ -8,11 +8,23 @@ it. His phone has two Freemail apps side by side:
 | Freemail     | `com.bentsignal.rodgemail`     | The standalone `development` build he reads his mail in, JavaScript embedded | a release (`freemail-release`) |
 | Freemail Dev | `com.bentsignal.rodgemail.dev` | A dev client, amber icon, loading a worktree's JavaScript from its Metro     | `scripts/phone.sh up`          |
 
-Both talk to production (`colorful-ostrich-734`), so Freemail Dev shows his
-real mail. Freemail Dev never registers for push notifications (`isFreemailDev` in
-`apps/mobile/src/features/dev/app-variant.ts`), or every email would
-notify twice; notification changes are checked in the simulator and in
-the release build.
+Freemail talks to production (`colorful-ostrich-734`, his real mail).
+Freemail Dev never does (`apps/mobile/src/features/auth/client.ts`): it
+uses the backend of the worktree whose Metro it loaded, which is that
+worktree's isolated backend (`scripts/backend.sh isolate`) or else the
+shared development deployment (`tidy-emu-857`). Both hold fake mail and a
+test owner, and Freemail Dev's sign-in screen has a **Sign in as test
+owner** button for it (`features/auth/test-owner-button.tsx`, which posts to
+the backend's dev-only `/dev/sign-in` route). So a change, its backend
+functions included, works on his phone before it merges, and his real mail
+stays in production. Freemail Dev never registers for push notifications
+(`isFreemailDev` in `apps/mobile/src/features/dev/app-variant.ts`);
+notification changes are checked in the simulator and in the release build.
+
+**Which branch is it running?** Settings → Developer → Branch shows the
+branch whose Metro served the JavaScript (`EXPO_PUBLIC_FREEMAIL_BRANCH`,
+set by `scripts/lib/metro.sh`). If it isn't the branch being tested, the
+phone opened another worktree's server: tap the open link again.
 
 ## The variant
 
@@ -33,10 +45,8 @@ standalone `development` build is Freemail.
 Native passkeys need `com.bentsignal.rodgemail.dev` in the website's Apple
 app-site association (`apps/web/public/.well-known/apple-app-site-association`)
 and `webcredentials:mail.rodgers.dev` in the build (`app.config.ts`). The
-website's passkeys sign in to both apps. Freemail Dev also offers an emailed sign-in code
-(`email-code-sign-in.tsx`, shown only in Freemail Dev), which uses the
-passkey recovery endpoints, for when it has no passkey for production. The
-auth client still sends the `rodge-mail://` origin the backend trusts. Android passkeys in
+website's passkeys sign in to Freemail. The auth client sends the
+`rodge-mail://` origin the backend trusts. Android passkeys in
 Freemail Dev would also need its signing certificate in
 `ANDROID_PASSKEY_ORIGINS` and `assetlinks.json` (services/convex/AUTH.md);
 not done.
@@ -74,11 +84,10 @@ or on Tailscale for the `over Tailscale` link. iOS's App Transport
 Security allows plain HTTP to local network addresses but not to tailnet
 (100.x) ones, so the tailnet link goes through `tailscale serve`.
 
-`up` refuses in a worktree with an isolated backend: Freemail Dev would load
-that backend, whose only account is the fake test owner the simulator
-signs in as. Backend changes are tested in the simulator on their isolated
-backend until a release deploys them to production. A dev-only sign-in page for the
-phone, like Vera's `/dev/sign-in`, would lift that; not built yet.
+The block `up` prints names the backend and branch Freemail Dev will open
+on. Switching a worktree's backend (`backend.sh isolate` or `teardown`)
+hot-reloads the phone onto the other backend, signed out; Shawn signs in
+with **Sign in as test owner** again.
 
 Android works the same way (`--android`), but the open links crash Freemail
 Dev there (an expo-dev-launcher 57 bug, Vera's apps/mobile/README.md), so

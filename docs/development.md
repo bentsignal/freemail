@@ -12,31 +12,32 @@ scripts coordinate package tasks.
 
 ## Deployments
 
-| What               | Where                                                                |
-| ------------------ | -------------------------------------------------------------------- |
-| Website            | `https://mail.rodgers.dev`, Vercel project `bsx-sh/rodge-mail`       |
-| Convex production  | `colorful-ostrich-734` (Shawn's mail)                                |
-| Convex development | `tidy-emu-857` (fake owner, seeded mail, `DEV_TOOLS=true`)           |
-| Isolated backends  | `dev/<branch>`, one per branch that needs it (`scripts/backend.sh`)  |
+| What               | Where                                                                            |
+| ------------------ | -------------------------------------------------------------------------------- |
+| Website            | `https://mail.rodgers.dev`, Vercel project `bsx-sh/rodge-mail`                   |
+| Convex production  | `colorful-ostrich-734` (Shawn's mail)                                            |
+| Convex development | `tidy-emu-857` (fake owner, seeded mail, `DEV_TOOLS=true`)                       |
+| Isolated backends  | `dev/<branch>`, one per branch that needs it (`scripts/backend.sh`)              |
 | iPhone apps        | Freemail `com.bentsignal.rodgemail`, Freemail Dev `com.bentsignal.rodgemail.dev` |
 
 `shared/config/src/urls.ts` holds the URLs. `createUrls({ nodeEnv:
 "production" })` returns production and anything else returns development.
-The website built for production, the mobile app (which always asks for
-production, in the simulator too), the CLI, and inbound hosted mail use
-production; the local website uses development.
+The website built for production, Freemail (the standalone phone app), the
+CLI, and inbound hosted mail use production. Freemail Dev (the phone's dev
+client and the simulators) and the local website use development
+(`apps/mobile/src/features/auth/client.ts` picks by app variant).
 `shared/config/src/overrides.ts` (skip-worktree) wins over both and points a
 worktree's apps elsewhere; `scripts/backend.sh isolate` writes it.
 
 `services/convex/.env.local` selects the development deployment, so
-`pnpm exec convex dev --once` pushes there. Every worktree's local website
-uses development, so only a release pushes to it, with `main`, after
-production ([releasing.md](releasing.md)). A branch that changes Convex
+`pnpm exec convex dev --once` pushes there. Every worktree's Freemail Dev
+and local website use development, so only a release pushes to it, with
+`main` ([releasing.md](releasing.md)). A branch that changes Convex
 functions gets its own deployment instead: `scripts/backend.sh isolate`
 creates `dev/<branch>` with a fake owner and seeded mail, and `push`,
 `seed`, and `teardown` work on it ([simulator-sign-in.md](simulator-sign-in.md)).
-After `teardown` the mobile app is back on production and the local website
-on development. `backend.sh` refuses to write to production, development,
+After `teardown` Freemail Dev and the local website are back on
+development. `backend.sh` refuses to write to production, development,
 or `dazzling-dog-633`, the retired deployment production moved from
 ([production-migration.md](production-migration.md)).
 
@@ -45,15 +46,15 @@ or `dazzling-dog-633`, the retired deployment production moved from
 Portless HTTPS is the primary development environment.
 
 ```sh
-pnpm exec portless proxy start --lan
-pnpm -F @freemail/web dev         # https://<worktree>.www.freemail.local, against development
+scripts/web.sh up    # https://<worktree>.www.freemail.local, against the worktree's backend
+scripts/web.sh down
 ```
 
-Production doesn't trust local origins, so the local website can't sign in
-to it. On development or an isolated backend, sign in as the
-fake owner from the browser console:
-`fetch('/api/auth/dev/sign-in', { method: 'POST', body: '{}', headers: { 'content-type': 'application/json' } })`,
-then reload.
+`web.sh` runs `portless proxy start --lan` and `pnpm -F @freemail/web dev`
+([web-testing.md](web-testing.md)). Production doesn't trust local
+origins, so the local website can't sign in to it. On development or an
+isolated backend, the login page's **Sign in as test owner** button signs
+in as the fake owner.
 
 `pnpm dev:web` also runs `convex dev`, which pushes the checkout's functions
 to the development deployment, and `pnpm dev` adds the Expo development

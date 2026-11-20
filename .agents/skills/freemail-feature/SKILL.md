@@ -30,27 +30,30 @@ build), the browser for web.
 
 ## 2. The backend
 
-Production is `colorful-ostrich-734`, which holds Shawn's real mail, and
-every worktree's local website shares the development deployment,
-`tidy-emu-857` (a fake owner and seeded mail). **Never push to either from
+Production is `colorful-ostrich-734`, which holds Shawn's real mail; only
+Freemail, mail.rodgers.dev, and the CLI use it. Every worktree's Freemail
+Dev (phone and simulators) and local website share the development
+deployment, `tidy-emu-857` (a fake owner and seeded mail), unless the
+worktree has an isolated backend. **Never push to either from
 a feature branch**: no `convex deploy`, no `convex dev`, no `pnpm dev` or
 `pnpm dev:web` (both run `convex dev`, which pushes to development).
 Functions reach them only in a release (the `freemail-release` skill).
 `dazzling-dog-633`, where production used to run, is paused as the
 rollback copy: never push to it, unpause it, or change its data.
 
-- App-only changes run against them as they are: the mobile app against
-  production, the local website against development.
+- App-only changes run against development as it is.
 - Convex changes (`services/convex/src`) are proven with Vitest unit tests
   next to the code (`*.test.ts`) and typecheck. Keep every
   change compatible with the app version before it: the phone's installed
   build keeps calling the old functions until Shawn installs a new one, and
   the website until the next `vercel deploy`. Add, don't rename or remove;
   make new arguments optional.
-- **Backend changes, and any signed-in check, get an isolated backend:**
+- **Backend changes get an isolated backend:**
   `scripts/backend.sh isolate` makes a dev deployment for the branch
   (`dev/<branch>`) with a fake owner and seeded fake mail, copies no
-  production secret, and points this worktree's apps at it;
+  production secret, and points this worktree's apps at it (the
+  simulators, Freemail Dev on Shawn's phone, and the local website), so
+  he tries the whole change, backend included, before it merges;
   `scripts/backend.sh push` after each Convex change, `seed` for a fresh
   mailbox, `teardown` when the work is done
   ([docs/simulator-sign-in.md](../../../docs/simulator-sign-in.md), which
@@ -81,13 +84,11 @@ seeded mail. Without an isolated backend the simulator stays signed out;
 say plainly in the PR which signed-in screens you couldn't see. Check Android too whenever a change touches layout,
 navigation, platform files (`.ios.tsx`/`.android.tsx`), or native config.
 
-**Web:** run only the web app on the worktree's Portless origin
-(`pnpm exec portless proxy start --lan`, then `pnpm -F @freemail/web dev`,
-at `https://<worktree-id>.www.freemail.local`), and check it in a browser.
-It talks to the development deployment, or to the isolated backend when
-the worktree has one, never to production, which doesn't trust local
-origins. Sign in as the fake owner from the browser console
-([docs/development.md](../../../docs/development.md#local-apps)).
+**Web:** `scripts/web.sh up` runs only the web app on the worktree's
+Portless origin (`https://<worktree-id>.www.freemail.local`) against the
+worktree's backend, never production
+([docs/web-testing.md](../../../docs/web-testing.md)). Check it in a
+browser and sign in with **Sign in as test owner** on the login page.
 
 Exercise the actual change: the happy path, the empty and loading states,
 errors you can trigger, and dark mode if colors changed.
@@ -99,14 +100,16 @@ interaction (`scripts/sim.sh frames start` / `stop`, the `freemail-simulator`
 skill) before and after the change, and put both reports in the PR. `slow`
 must be 0 while things move.
 
-## 4b. Shawn tests it on his phone
+## 4b. Shawn tests it on his phone and the web
 
-The simulator is your check. Every change also gets Shawn's own test on his
-phone, in its worktree, before it merges: the release no longer re-tests
-each change, so this is where a change gets right. He tests in Freemail Dev
-(`com.bentsignal.rodgemail.dev`, amber icon; Freemail stays beside it),
-which shows his real mail from production
-([docs/phone-testing.md](../../../docs/phone-testing.md)).
+The simulator is your check. Every change also gets Shawn's own test, in
+its worktree, before it merges: the release no longer re-tests each
+change, so this is where a change gets right. He tests in Freemail Dev on
+his phone (`com.bentsignal.rodgemail.dev`, amber icon; Freemail stays
+beside it) and, when the website changed, on the worktree's website on his
+Mac (`scripts/web.sh up`, [docs/web-testing.md](../../../docs/web-testing.md)).
+Both use the worktree's backend, with fake mail; he signs in with **Sign in
+as test owner** ([docs/phone-testing.md](../../../docs/phone-testing.md)).
 
 **Serve it as soon as the work is ready to test** (step 7), and keep it up
 through every round of feedback. It comes down when the PR merges (the
@@ -175,20 +178,21 @@ scripts/phone.sh list           # every cached dev client, marking main's
   - **Each server address is in its own fenced code block** (` ```text `),
     which T3 gives a copy button. Inline code has none.
 
-  If Tailscale isn't running on the Mac, `up` prints no Tailscale link or
-  address; say so. Add the install link only when he has to install, and
+  The block ends with the backend and branch Freemail Dev opens on; keep
+  that line too. If Tailscale isn't running on the Mac, `up` prints no
+  Tailscale link or address; say so. Add the install link only when he has to install, and
   say plainly whether he does. Don't send QR codes unless he asks.
 
 - JavaScript edits hot-reload on his phone. Re-run `up` after native
   changes or `app.config.ts`.
-- Freemail Dev signs in to his real account, so it runs this worktree's app
-  against the functions already on production. `up` refuses in a
-  worktree with an isolated backend: Freemail Dev would load that backend,
-  which has no account he can sign in to from the phone. A PR that changes
-  Convex functions is tested in the simulator on its isolated backend;
-  tell Shawn what he can only try on the phone after the release that
-  deploys it, and keep the app compatible with the functions already
-  deployed so the rest of the change can be served.
+- Freemail Dev runs this worktree's app against this worktree's backend:
+  the isolated one with the branch's functions, or development with the
+  last release's. A Convex change therefore needs an isolated backend for
+  Shawn to try it. It opens signed out the first time on a backend; he taps **Sign
+  in as test owner**. Settings → Developer → Branch shows which branch it
+  loaded; tell him the branch so he can check. Keep Convex changes
+  compatible with the functions already on production anyway: Freemail
+  keeps calling them until the release.
 - Leave it up while you work on his feedback. If this worktree has its own
   dev client, `down` at close-out prints main's install link: send it so
   he can put main's dev client back.
@@ -278,13 +282,17 @@ for CI (`gh pr checks --watch`) and fix failures; make sure the CI workflow
 actually ran (lint, typecheck, test, format, build, react-doctor, bundle),
 not just the fingerprint and release-steps checks.
 
-Then start the dev server (step 4b) and tell Shawn it's ready to test:
-the block `phone.sh up` prints first (the open links as a list of
-clickable links, then each address in its own code block), then the PR
-link, a two-line summary, what to try on his phone (concrete steps for
-this change), whether he has to install its own dev client, anything he
-can't try on the phone yet (a Convex change waiting for a release), and
-anything he should look at closely. **Stop there.** Don't merge.
+Then start the dev servers (step 4b: `phone.sh up`, and `web.sh up` when
+the website changed) and tell Shawn it's ready to test, following AGENTS.md,
+"Telling Shawn a change is ready to test": the phone block as printed, the
+web block, then for each of iPhone and web the screen, the exact control
+and where it sits, numbered steps, and what he should see; the branch to
+check under Settings → Developer → Branch; **Sign in as test owner**; what
+doesn't work on a test backend; whether he has to install a dev client;
+the PR link and a two-line summary. **Stop there.** Don't merge.
+
+Before sending it, re-read it as Shawn, who has only this message and his
+phone: could he find the change without asking you? If not, say more.
 
 ## 8. Feedback and merge
 
