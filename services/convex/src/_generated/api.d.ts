@@ -71,6 +71,8 @@ import type * as devSeedWrites from "../devSeedWrites.js";
 import type * as devSignIn from "../devSignIn.js";
 import type * as devTools from "../devTools.js";
 import type * as devToolsPolicy from "../devToolsPolicy.js";
+import type * as emailCodeLimit from "../emailCodeLimit.js";
+import type * as emailOtpAccess from "../emailOtpAccess.js";
 import type * as embedding_actions from "../embedding/actions.js";
 import type * as embedding_cleanup from "../embedding/cleanup.js";
 import type * as embedding_internal from "../embedding/internal.js";
@@ -252,6 +254,8 @@ declare const fullApi: ApiFromModules<{
   devSignIn: typeof devSignIn;
   devTools: typeof devTools;
   devToolsPolicy: typeof devToolsPolicy;
+  emailCodeLimit: typeof emailCodeLimit;
+  emailOtpAccess: typeof emailOtpAccess;
   "embedding/actions": typeof embedding_actions;
   "embedding/cleanup": typeof embedding_cleanup;
   "embedding/internal": typeof embedding_internal;

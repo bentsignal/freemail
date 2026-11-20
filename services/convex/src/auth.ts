@@ -17,6 +17,8 @@ import authSchema from "./betterAuth/schema";
 import { env } from "./convex.env";
 import { desktopAuth } from "./desktopAuth";
 import { devSignIn, devToolsEnabled } from "./devSignIn";
+import { createEmailCodeLimit } from "./emailCodeLimit";
+import { emailOtpAccess } from "./emailOtpAccess";
 import { passkeyRecovery } from "./passkeyRecovery";
 import { passkeyRpIds } from "./passkeyRpIds";
 import { sendRegistrationEmail } from "./registrationEmail";
@@ -48,6 +50,7 @@ export function createAuthOptions(
 ) {
   const passkeyRpId = options.passkeyRpId ?? env.PASSKEY_RP_ID;
   const { passkeyOrigins, trustedOrigins } = getAuthOrigins(passkeyRpId);
+  const emailCodeLimit = createEmailCodeLimit(ctx);
 
   return {
     appName: "Freemail",
@@ -59,25 +62,15 @@ export function createAuthOptions(
     trustedOrigins,
     plugins: [
       desktopAuth(),
-      passkeyRecovery({ from: env.AUTH_EMAIL_FROM }),
+      passkeyRecovery({ from: env.AUTH_EMAIL_FROM, limit: emailCodeLimit }),
+      emailOtpAccess({ limit: emailCodeLimit }),
       emailOTP({
         disableSignUp: true,
         allowedAttempts: 3,
         expiresIn: 300,
         storeOTP: "hashed",
-        sendVerificationOTP: async ({ email, otp, type }, authCtx) => {
-          if (type !== "sign-in" || !authCtx) return;
-
-          const existing =
-            await authCtx.context.internalAdapter.findUserByEmail(email);
-          if (existing) {
-            const existingPasskey = await authCtx.context.adapter.findOne({
-              model: "passkey",
-              where: [{ field: "userId", value: existing.user.id }],
-            });
-            if (existingPasskey) return;
-          }
-
+        sendVerificationOTP: async ({ email, otp, type }) => {
+          if (type !== "sign-in") return;
           await sendRegistrationEmail({
             from: env.AUTH_EMAIL_FROM,
             otp,
