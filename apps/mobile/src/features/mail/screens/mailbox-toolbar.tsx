@@ -25,6 +25,7 @@ export interface MailboxToolbarProps {
   filterEnabled?: boolean;
   mailbox: MobileMailbox;
   onFilterChange: (value: MailboxFilter) => void;
+  onMarkAllRead?: () => void;
   onToggleSelection: () => void;
   searchMode?: boolean;
   selectedCount: number;
@@ -62,6 +63,7 @@ export function MailboxToolbar(props: MailboxToolbarProps) {
         {scopeMenu(props, setAccountFilter, setMailbox)}
       </Stack.Toolbar>
       <Stack.Toolbar placement="right">
+        {markAllReadButton(props)}
         <Stack.Toolbar.Menu
           accessibilityLabel="Filter"
           hidden={selectionMode || !filterEnabled}
@@ -137,6 +139,21 @@ function scopeMenu(
         ))}
       </Stack.Toolbar.Menu>
     </Stack.Toolbar.Menu>
+  );
+}
+
+function markAllReadButton({
+  onMarkAllRead,
+  searchMode = false,
+  selectionMode,
+}: MailboxToolbarProps) {
+  return (
+    <Stack.Toolbar.Button
+      accessibilityLabel="Mark All as Read"
+      hidden={selectionMode || searchMode || !onMarkAllRead}
+      icon="envelope.open"
+      onPress={onMarkAllRead}
+    />
   );
 }
 

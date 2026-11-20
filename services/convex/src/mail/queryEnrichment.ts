@@ -1,4 +1,5 @@
-import type { Doc } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
+import type { QueryCtx } from "../_generated/server";
 import type { AuthedQueryCtx } from "../utils";
 import {
   isActiveAccount,
@@ -12,10 +13,21 @@ import { getUnreadCountSummary } from "./unreadCounts";
 export type MailSearchScope = "all" | "inbox";
 
 export async function getVisibleUnreadCountSummary(ctx: AuthedQueryCtx) {
+  return getUnreadCountSummary(
+    await getVisibleUnreadInboxThreads(ctx, ctx.ownerId),
+  );
+}
+
+/** The unread threads the inbox shows: active accounts, spam left out. */
+export async function getVisibleUnreadInboxThreads(
+  ctx: Pick<QueryCtx, "db">,
+  ownerId: string,
+  accountId?: Id<"mailAccounts">,
+) {
   const threads = await ctx.db
     .query("threads")
     .withIndex("by_owner_unread", (q) =>
-      q.eq("ownerId", ctx.ownerId).gt("unreadCount", 0),
+      q.eq("ownerId", ownerId).gt("unreadCount", 0),
     )
     .filter((q) => q.neq(q.field("inInbox"), false))
     .collect();
@@ -23,7 +35,7 @@ export async function getVisibleUnreadCountSummary(ctx: AuthedQueryCtx) {
     (
       await ctx.db
         .query("mailAccounts")
-        .withIndex("by_owner", (q) => q.eq("ownerId", ctx.ownerId))
+        .withIndex("by_owner", (q) => q.eq("ownerId", ownerId))
         .collect()
     )
       .filter(isActiveAccount)
@@ -31,17 +43,19 @@ export async function getVisibleUnreadCountSummary(ctx: AuthedQueryCtx) {
   );
   const visibleThreads = await Promise.all(
     threads
-      .filter((thread) => activeAccountIds.has(thread.accountId))
+      .filter(
+        (thread) =>
+          activeAccountIds.has(thread.accountId) &&
+          (accountId === undefined || thread.accountId === accountId),
+      )
       .map(async (thread) => ({
         item: await toThreadListItem(ctx, thread),
         thread,
       })),
   );
-  return getUnreadCountSummary(
-    visibleThreads
-      .filter(({ item }) => item?.classification?.isSpam !== true)
-      .map(({ thread }) => thread),
-  );
+  return visibleThreads
+    .filter(({ item }) => item?.classification?.isSpam !== true)
+    .map(({ thread }) => thread);
 }
 
 export async function enrichMessagePage<T extends { page: Doc<"messages">[] }>(

@@ -94,6 +94,7 @@ import type * as mail_cleanupRecords from "../mail/cleanupRecords.js";
 import type * as mail_helpers from "../mail/helpers.js";
 import type * as mail_html from "../mail/html.js";
 import type * as mail_icloudCleanup from "../mail/icloudCleanup.js";
+import type * as mail_inboxRead from "../mail/inboxRead.js";
 import type * as mail_location from "../mail/location.js";
 import type * as mail_maintenance from "../mail/maintenance.js";
 import type * as mail_messageSearch from "../mail/messageSearch.js";
@@ -277,6 +278,7 @@ declare const fullApi: ApiFromModules<{
   "mail/helpers": typeof mail_helpers;
   "mail/html": typeof mail_html;
   "mail/icloudCleanup": typeof mail_icloudCleanup;
+  "mail/inboxRead": typeof mail_inboxRead;
   "mail/location": typeof mail_location;
   "mail/maintenance": typeof mail_maintenance;
   "mail/messageSearch": typeof mail_messageSearch;

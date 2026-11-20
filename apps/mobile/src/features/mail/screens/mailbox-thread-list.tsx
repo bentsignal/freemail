@@ -56,6 +56,7 @@ interface MailboxThreadListProps {
   mailbox: MobileMailbox;
   onFilterChange: (value: MailboxFilter) => void;
   onLoadMore: () => void;
+  onMarkAllRead?: () => void;
   onRefresh?: () => void;
   onToggleSelection: () => void;
   pageStatus: PageStatus;
@@ -83,6 +84,7 @@ export function MailboxThreadList({
   mailbox,
   onFilterChange,
   onLoadMore,
+  onMarkAllRead,
   onRefresh,
   onToggleSelection,
   pageStatus,
@@ -119,6 +121,7 @@ export function MailboxThreadList({
         filter={filter}
         mailbox={mailbox}
         onFilterChange={onFilterChange}
+        onMarkAllRead={onMarkAllRead}
         onToggleSelection={onToggleSelection}
         searchMode={searchMode}
         selectedCount={selectedCount}
