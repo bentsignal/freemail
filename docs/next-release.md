@@ -22,14 +22,15 @@ section here in that PR (see AGENTS.md → Releases), in this form:
 
 ## Move to the production deployment (#54)
 
-The release of this PR is the cutover in
-[production-migration.md](production-migration.md), run in the PR's own
-thread. These are the steps that outlive it.
+The cutover is done ([production-migration.md](production-migration.md)).
+These steps are left, each one Shawn's to do: the main checkout's
+`.env.local` is off-limits to agents, and agents have no access to the
+Google, Microsoft, or Notes settings.
 
 - When: after the cutover
 - Commands:
   - In the main checkout, `cd services/convex && npx convex deployment
-    select bentsignal:rodge-mail:dev/agents`, so `.env.local` selects
+select bentsignal:rodge-mail:dev/agents`, so `.env.local` selects
     development (`tidy-emu-857`) and new worktrees copy that. Until then it
     still selects `dazzling-dog-633`.
   - Google Cloud console, the OAuth client: add the redirect URI
@@ -38,7 +39,7 @@ thread. These are the steps that outlive it.
     `https://colorful-ostrich-734.convex.site/providers/microsoft/oauth/callback`.
   - Notes' production deployment, from `~/dev/notes/services/convex`:
     `pnpm exec convex env set --prod TRANSACTIONAL_MAIL_URL
-    https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
+https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
     the same URL in Notes' docs.
 - Verify: `scripts/backend.sh status` in a new worktree names
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
