@@ -8,8 +8,8 @@ it. His phone has two Freemail apps side by side:
 | Freemail     | `com.bentsignal.rodgemail`     | The standalone `development` build he reads his mail in, JavaScript embedded | a release (`freemail-release`) |
 | Freemail Dev | `com.bentsignal.rodgemail.dev` | A dev client, amber icon, loading a worktree's JavaScript from its Metro     | `scripts/phone.sh up`          |
 
-Both talk to `dazzling-dog-633`, so Freemail Dev shows his real mail. Freemail
-Dev never registers for push notifications (`isFreemailDev` in
+Both talk to production (`colorful-ostrich-734`), so Freemail Dev shows his
+real mail. Freemail Dev never registers for push notifications (`isFreemailDev` in
 `apps/mobile/src/features/dev/app-variant.ts`), or every email would
 notify twice; notification changes are checked in the simulator and in
 the release build.
@@ -31,13 +31,16 @@ config (`scripts/lib/metro.sh` exports `APP_VARIANT`). Only Freemail's
 standalone `development` build is Freemail.
 
 Native passkeys need `com.bentsignal.rodgemail.dev` in the Apple
-app-site association (`services/convex/src/http.ts`), which reaches
-`dazzling-dog-633` in the release after it merged; until then iOS refuses
-them ("not associated with domain"). Freemail Dev also offers an emailed
-sign-in code (`email-code-sign-in.tsx`, shown only in Freemail Dev), which
-uses the existing passkey recovery endpoints, so it works without a
-deploy. The auth client still sends the `rodge-mail://` origin the backend
-trusts. Android passkeys in
+app-site association production serves (`services/convex/src/http.ts`) and
+`webcredentials:colorful-ostrich-734.convex.site` in the build
+(`app.config.ts`). App passkeys belong to the Convex site host, so one
+registered for `dazzling-dog-633.convex.site`, where production used to
+run, doesn't work against production: the app stays signed in through its
+stored session, and a new app passkey is added in Settings → Freemail
+account. Freemail Dev also offers an emailed sign-in code
+(`email-code-sign-in.tsx`, shown only in Freemail Dev), which uses the
+passkey recovery endpoints, for when it has no passkey for production. The
+auth client still sends the `rodge-mail://` origin the backend trusts. Android passkeys in
 Freemail Dev would also need its signing certificate in
 `ANDROID_PASSKEY_ORIGINS` and `assetlinks.json` (services/convex/AUTH.md);
 not done.
@@ -78,7 +81,7 @@ Security allows plain HTTP to local network addresses but not to tailnet
 `up` refuses in a worktree with an isolated backend: Freemail Dev would load
 that backend, whose only account is the fake test owner the simulator
 signs in as. Backend changes are tested in the simulator on their isolated
-backend until a release deploys them. A dev-only sign-in page for the
+backend until a release deploys them to production. A dev-only sign-in page for the
 phone, like Vera's `/dev/sign-in`, would lift that; not built yet.
 
 Android works the same way (`--android`), but the open links crash Freemail

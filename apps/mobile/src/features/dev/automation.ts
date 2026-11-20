@@ -6,7 +6,8 @@ import { authClient, convexUrls } from "~/features/auth/client";
 import { devMailActions } from "./dev-mail-actions";
 import { frameReport, startFrames, stopFrames } from "./frames";
 
-const PRODUCTION_DEPLOYMENT = "dazzling-dog-633";
+// Production, and the deployment it moved from: both hold real mail.
+const REAL_MAIL_DEPLOYMENTS = ["colorful-ostrich-734", "dazzling-dog-633"];
 
 function isAppPath(path: string): path is Href & string {
   return path.startsWith("/");
@@ -20,8 +21,10 @@ function isAppPath(path: string): path is Href & string {
  */
 async function requestSignIn() {
   if (
-    convexUrls.cloud.includes(PRODUCTION_DEPLOYMENT) ||
-    convexUrls.site.includes(PRODUCTION_DEPLOYMENT)
+    REAL_MAIL_DEPLOYMENTS.some(
+      (name) =>
+        convexUrls.cloud.includes(name) || convexUrls.site.includes(name),
+    )
   ) {
     throw new Error(
       "This app talks to the production deployment; run scripts/backend.sh isolate first",

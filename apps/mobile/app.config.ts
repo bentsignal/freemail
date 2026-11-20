@@ -42,7 +42,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
     },
     ios: {
-      associatedDomains: ["webcredentials:dazzling-dog-633.convex.site"],
+      associatedDomains: ["webcredentials:colorful-ostrich-734.convex.site"],
       bundleIdentifier: BUNDLE_ID,
       supportsTablet: true,
       // Liquid Glass icon from Icon Composer; see assets/icons/README.md.

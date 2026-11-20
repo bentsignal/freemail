@@ -34,7 +34,7 @@ describe("mobile development configuration", () => {
     const config = createExpoConfig({ config: {} } as ConfigContext);
 
     expect(config.ios?.associatedDomains).toEqual([
-      "webcredentials:dazzling-dog-633.convex.site",
+      "webcredentials:colorful-ostrich-734.convex.site",
     ]);
     expect(config.extra?.deploymentEnvironment).toBe("development");
     expect(JSON.stringify(config).toLowerCase()).not.toContain("vercel");
@@ -63,10 +63,10 @@ describe("mobile development configuration", () => {
     );
   });
 
-  it("uses the Convex development deployment", () => {
-    expect(createUrls({ nodeEnv: "development" }).convex).toEqual({
-      cloud: "https://dazzling-dog-633.convex.cloud",
-      site: "https://dazzling-dog-633.convex.site",
+  it("uses the Convex production deployment", () => {
+    expect(createUrls({ nodeEnv: "production" }).convex).toEqual({
+      cloud: "https://colorful-ostrich-734.convex.cloud",
+      site: "https://colorful-ostrich-734.convex.site",
     });
   });
 });
@@ -106,7 +106,7 @@ describe("Freemail Dev variant", () => {
     expect(config.ios?.icon).toBe("./assets/icons/freemail-dev.icon");
     expect(config.extra?.appVariant).toBe("development");
     expect(config.ios?.associatedDomains).toEqual([
-      "webcredentials:dazzling-dog-633.convex.site",
+      "webcredentials:colorful-ostrich-734.convex.site",
     ]);
   });
 });

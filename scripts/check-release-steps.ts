@@ -7,7 +7,7 @@
 //   nothing depends on someone remembering to pass it on.
 // - "Convex deploy needed:" yes exactly when the PR changes Convex
 //   functions or schema (services/convex/src, tests aside), since releases
-//   push them to the one deployment by hand.
+//   deploy them to production by hand.
 // - "Native change:" no or yes. Whether native code changed takes the
 //   fingerprint, which the Mobile fingerprint workflow checks.
 //

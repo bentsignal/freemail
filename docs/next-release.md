@@ -19,3 +19,27 @@ section here in that PR (see AGENTS.md → Releases), in this form:
 - Commands: ...
 - Verify: ...
 ```
+
+## Move to the production deployment (#54)
+
+The release of this PR is the cutover in
+[production-migration.md](production-migration.md), run in the PR's own
+thread. These are the steps that outlive it.
+
+- When: after the cutover
+- Commands:
+  - In the main checkout, `cd services/convex && npx convex deployment
+    select bentsignal:rodge-mail:dev/agents`, so `.env.local` selects
+    development (`tidy-emu-857`) and new worktrees copy that. Until then it
+    still selects `dazzling-dog-633`.
+  - Google Cloud console, the OAuth client: add the redirect URI
+    `https://colorful-ostrich-734.convex.site/providers/gmail/oauth/callback`.
+  - Microsoft Entra, the app registration: add the Web redirect URI
+    `https://colorful-ostrich-734.convex.site/providers/microsoft/oauth/callback`.
+  - Notes' production deployment, from `~/dev/notes/services/convex`:
+    `pnpm exec convex env set --prod TRANSACTIONAL_MAIL_URL
+    https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
+    the same URL in Notes' docs.
+- Verify: `scripts/backend.sh status` in a new worktree names
+  `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
+  the consent screen and returns to Freemail; Notes emails a sign-in code.

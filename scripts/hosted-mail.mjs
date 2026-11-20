@@ -11,8 +11,10 @@ const CONVEX_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
   "../services/convex",
 );
+// Hosted mail is production's: every Convex command here runs with --prod,
+// whatever services/convex/.env.local selects.
 const CONVEX_SITE_URL =
-  process.env.CONVEX_SITE_URL ?? "https://dazzling-dog-633.convex.site";
+  process.env.CONVEX_SITE_URL ?? "https://colorful-ostrich-734.convex.site";
 const WEBHOOK_PATH = "/providers/hosted/sns";
 const MAIL_FROM_SUBDOMAIN = "bounce";
 const SPF = "v=spf1 include:amazonses.com ~all";
@@ -547,14 +549,14 @@ function awsAllowing(args, allowedErrors) {
 }
 
 function convexEnvSet(name, value) {
-  run("pnpm", ["exec", "convex", "env", "set", name, value], {
+  run("pnpm", ["exec", "convex", "env", "set", "--prod", name, value], {
     cwd: CONVEX_DIR,
   });
 }
 
 function convexEnvGet(name) {
   try {
-    return run("pnpm", ["exec", "convex", "env", "get", name], {
+    return run("pnpm", ["exec", "convex", "env", "get", "--prod", name], {
       cwd: CONVEX_DIR,
     }).trim();
   } catch {
@@ -563,7 +565,10 @@ function convexEnvGet(name) {
 }
 
 function convexRun(name, args) {
-  return run("pnpm", ["exec", "convex", "run", name, JSON.stringify(args)], {
+  return run(
+    "pnpm",
+    ["exec", "convex", "run", "--prod", name, JSON.stringify(args)],
+    {
     cwd: CONVEX_DIR,
   }).trim();
 }

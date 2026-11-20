@@ -16,7 +16,8 @@ Convex invoice. Every request asks for zero-data-retention endpoints
 (`provider: { zdr: true }`).
 
 The models are OpenAI's, addressed as `openai/<model>`. Override them per
-deployment with bare OpenAI names (the `openai/` prefix is added for you):
+deployment with bare OpenAI names (the `openai/` prefix is added for you;
+add `--prod` after `env set` for production):
 
 ```sh
 pnpm --filter @freemail/convex exec convex env set AI_CLASSIFICATION_MODEL gpt-5-mini

@@ -12,7 +12,9 @@ mail-domain tables.
 2. Create a **Web application** OAuth client.
 3. Add this exact authorized redirect URI:
    `https://<deployment>.convex.site/providers/gmail/oauth/callback`.
-4. Configure these Convex deployment variables:
+4. Configure these Convex deployment variables. Add `--prod` after
+   `env set` for production; without it the command sets them on the
+   deployment `.env.local` selects, which is development:
 
    ```sh
    pnpm --filter @freemail/convex exec convex env set GOOGLE_OAUTH_CLIENT_ID '<client-id>'
@@ -46,9 +48,10 @@ Google OAuth verification and may require a security assessment.
    `Mail.Send`. Freemail also requests `openid`, `profile`, and
    `offline_access` during authorization. Tenant policy may require an
    administrator to grant consent.
-3. Create a client secret and configure the Convex deployment. The tenant is
-   optional and defaults to `common`; set it to a tenant ID or verified tenant
-   domain to restrict authorization to one organization.
+3. Create a client secret and configure the Convex deployment (`--prod`
+   after `env set` for production). The tenant is optional and defaults to
+   `common`; set it to a tenant ID or verified tenant domain to restrict
+   authorization to one organization.
 
    ```sh
    pnpm --filter @freemail/convex exec convex env set MICROSOFT_OAUTH_CLIENT_ID '<application-client-id>'
@@ -247,7 +250,10 @@ SES configuration-set events ─> SNS ─> hostedDeliveryEvents
   sending from verified identities. The same credentials send Freemail's
   own sign-in and verification codes from `AUTH_EMAIL_FROM` ([AUTH.md](AUTH.md)).
 
-Provisioning is idempotent and lives in `scripts/hosted-mail.mjs`:
+Provisioning is idempotent and lives in `scripts/hosted-mail.mjs`. It always
+targets production: every Convex command it runs has `--prod`, and it
+subscribes SNS to production's site URL unless `CONVEX_SITE_URL` says
+otherwise.
 
 ```sh
 node scripts/hosted-mail.mjs bootstrap                 # AWS resources + Convex env

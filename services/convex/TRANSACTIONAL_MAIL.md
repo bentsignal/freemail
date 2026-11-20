@@ -58,6 +58,6 @@ recipient, subject, or text.
 Unset, nobody is allowed (every request gets 401). To add an app, generate a
 token on its side (`openssl rand -base64 32`), hash it
 (`printf %s "$TOKEN" | shasum -a 256`), add an entry, and set the variable
-again with `pnpm exec convex env set TRANSACTIONAL_MAIL_CLIENTS '<json>'`.
+again with `pnpm exec convex env set --prod TRANSACTIONAL_MAIL_CLIENTS '<json>'`.
 Rotating a token is the same: replace the hash. The code is in
 `src/transactionalMail/`.
