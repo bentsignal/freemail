@@ -165,17 +165,13 @@ function InboxBulkActions({
         disabled={disabled}
         icon={CheckCheck}
         label="Read"
-        onClick={() =>
-          void run(async () => await liveMail.setThreadsRead(messages, true))
-        }
+        onClick={() => liveMail.setThreadsRead(messages, true)}
       />
       <BulkActionButton
         disabled={disabled}
         icon={MailOpen}
         label="Unread"
-        onClick={() =>
-          void run(async () => await liveMail.setThreadsRead(messages, false))
-        }
+        onClick={() => liveMail.setThreadsRead(messages, false)}
       />
     </>
   );

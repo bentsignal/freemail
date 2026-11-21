@@ -1,18 +1,19 @@
 import type { MailThread } from "@freemail/features/mail";
 
-import type { useInboxMailboxControls } from "./use-inbox-mailbox-controls";
 import { ThreadRow } from "../components/thread-row";
 import { getThreadTag } from "../components/thread-row-presentation";
 import { useMailStore } from "../store";
 
+/**
+ * Reads its own selection from the store, so selecting a row or switching
+ * Select mode re-renders the rows that change without re-rendering the list.
+ */
 export function InboxThreadRow({
-  controls,
   isSearch,
   onMoveToInbox,
   onOpen,
   thread,
 }: {
-  controls: ReturnType<typeof useInboxMailboxControls>;
   isSearch: boolean;
   onMoveToInbox: (threadId: string) => void;
   onOpen: (thread: MailThread) => void;
@@ -20,6 +21,13 @@ export function InboxThreadRow({
 }) {
   const accounts = useMailStore((store) => store.accounts);
   const accountFilter = useMailStore((store) => store.accountFilter);
+  const selectionMode = useMailStore((store) => store.selectionMode);
+  const selected = useMailStore((store) =>
+    store.selectedThreadIds.has(thread.id),
+  );
+  const toggleThreadSelected = useMailStore(
+    (store) => store.toggleThreadSelected,
+  );
   return (
     <ThreadRow
       locationTag={
@@ -28,11 +36,11 @@ export function InboxThreadRow({
           : undefined
       }
       onMoveToInbox={() => onMoveToInbox(thread.id)}
-      selected={controls.selectedIds.has(thread.id)}
-      selectionMode={controls.selectionMode}
+      selected={selected}
+      selectionMode={selectionMode}
       thread={thread}
       onOpen={() => onOpen(thread)}
-      onSelect={() => controls.toggleThreadSelection(thread.id)}
+      onSelect={() => toggleThreadSelected(thread.id)}
     />
   );
 }

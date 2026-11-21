@@ -14,6 +14,7 @@ import type { SentRow } from "./sent/sent-row";
 import { useAccountPageCache } from "./hooks/use-account-page-cache";
 import { toConvexId } from "./lib/convex-id";
 import { toMailAccount, toMailThreads } from "./lib/convex-mail";
+import { toggleSelectedThread } from "./screens/mailbox-controls";
 
 interface ThreadOverride {
   isPinned?: boolean;
@@ -27,8 +28,12 @@ function useInternalStore() {
   const [mailbox, setMailboxState] = useState<MobileMailbox>("inbox");
   const mailboxPages = useAccountPageCache<InboxItem>();
   const sentPages = useAccountPageCache<SentRow>();
-  // Shared so the tab bar can make way for the selection toolbar.
+  // Shared so the tab bar can make way for the selection toolbar, and so
+  // each inbox row reads its own selection without re-rendering the list.
   const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedThreadIds, setSelectedThreadIds] = useState(
+    () => new Set<string>(),
+  );
   const inbox = usePaginatedQuery(
     api.mail.queries.listInbox,
     {
@@ -108,6 +113,17 @@ function useInternalStore() {
   function setMailbox(next: MobileMailbox) {
     setMailboxState(next);
     setSelectionMode(false);
+    clearThreadSelection();
+  }
+
+  function toggleThreadSelected(threadId: string) {
+    setSelectedThreadIds((current) => toggleSelectedThread(current, threadId));
+  }
+
+  function clearThreadSelection() {
+    setSelectedThreadIds((current) =>
+      current.size === 0 ? current : new Set(),
+    );
   }
 
   return {
@@ -123,13 +139,16 @@ function useInternalStore() {
     mailboxPages,
     markRead,
     sentPages,
+    selectedThreadIds,
     selectionMode,
+    clearThreadSelection,
     setAccountFilter,
     setMailbox,
     setSelectionMode,
     threads,
     togglePin,
     toggleRead,
+    toggleThreadSelected,
   };
 }
 

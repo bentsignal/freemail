@@ -136,7 +136,6 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
   function renderThread({ item }: LegendListRenderItemProps<MailThread>) {
     return (
       <InboxThreadRow
-        controls={controls}
         isSearch={isSearching}
         thread={item}
         onMoveToInbox={moveToInbox}
@@ -171,6 +170,7 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
       onMarkAllRead={isSearching ? undefined : confirmMarkAllRead}
       onRefresh={() => void refresh()}
       onToggleSelection={controls.toggleSelectionMode}
+      rowsReadSelection
       pageStatus={isSearching ? search.status : inboxPageStatus}
     />
   );

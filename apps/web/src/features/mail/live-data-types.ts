@@ -53,6 +53,6 @@ export interface LiveMailContextValue {
   selectedThread: MailThreadDetail | undefined;
   togglePinned: (message: InboxMessage) => Promise<void>;
   toggleRead: (message: InboxMessage) => Promise<void>;
-  setThreadsRead: (messages: InboxMessage[], isRead: boolean) => Promise<void>;
+  setThreadsRead: (messages: InboxMessage[], isRead: boolean) => void;
   unreadCounts: Record<string, number>;
 }

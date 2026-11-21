@@ -65,6 +65,8 @@ interface MailboxThreadListProps {
   renderThread: (
     info: LegendListRenderItemProps<MailThread>,
   ) => React.ReactElement;
+  /** Rows read their selection from the mail store (the inbox). */
+  rowsReadSelection?: boolean;
   searchMode?: boolean;
   searchTerm?: string;
   selectedCount: number;
@@ -91,6 +93,7 @@ export function MailboxThreadList({
   primary,
   refreshError,
   renderThread,
+  rowsReadSelection = false,
   searchMode = false,
   searchTerm,
   selectedCount,
@@ -136,7 +139,13 @@ export function MailboxThreadList({
         accounts={accounts}
         feedback={feedback}
         mailbox={mailbox}
-        listVersion={`${accountFilter}:${filter}:${selectionMode}:${selectedCount}`}
+        listVersion={getListVersion({
+          accountFilter,
+          filter,
+          rowsReadSelection,
+          selectedCount,
+          selectionMode,
+        })}
         pageStatus={pageStatus}
         onLoadMore={onLoadMore}
         background={background}
@@ -262,4 +271,23 @@ function MailboxRows({
 
 function threadKey(thread: MailThread) {
   return thread.id;
+}
+
+// LegendList re-renders every row when this changes. Rows that read their
+// selection from the store leave it out, so Select mode doesn't wait on it.
+function getListVersion({
+  accountFilter,
+  filter,
+  rowsReadSelection,
+  selectedCount,
+  selectionMode,
+}: {
+  accountFilter: MailAccountFilter;
+  filter: MailboxFilter;
+  rowsReadSelection: boolean;
+  selectedCount: number;
+  selectionMode: boolean;
+}) {
+  if (rowsReadSelection) return `${accountFilter}:${filter}`;
+  return `${accountFilter}:${filter}:${selectionMode}:${selectedCount}`;
 }

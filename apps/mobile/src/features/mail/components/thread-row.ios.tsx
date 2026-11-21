@@ -89,9 +89,6 @@ function NativeRowContent({
 }) {
   const mailbox = getRowMailbox(props.mailbox ?? "inbox", props.thread);
   const rowProps = { ...props, mailbox } satisfies ThreadRowProps;
-  if (props.selectionMode) {
-    return <NativeSelectableThread colors={colors} props={rowProps} />;
-  }
   if (mailbox === "archive") {
     return <ArchiveSwipeRow colors={colors} props={rowProps} />;
   }
@@ -104,31 +101,6 @@ function NativeRowContent({
   return <InboxSwipeRow colors={colors} props={rowProps} />;
 }
 
-function NativeSelectableThread({
-  colors,
-  props,
-}: {
-  colors: NativeThreadRowColors;
-  props: ThreadRowProps;
-}) {
-  const { locationTag, mailbox = "inbox", thread } = props;
-  return (
-    <NativeThreadSummary
-      colors={colors}
-      mailbox={mailbox}
-      locationTag={locationTag}
-      modifiers={[
-        tag(thread.id),
-        accessibilityElement("ignore"),
-        accessibilityLabel(getNativeAccessibilityLabel(props)),
-        accessibilityHint("Toggles selection"),
-        ...rowModifiers(colors.background),
-      ]}
-      thread={thread}
-    />
-  );
-}
-
 function NativeThreadButton({
   colors,
   props,
@@ -136,18 +108,23 @@ function NativeThreadButton({
   colors: NativeThreadRowColors;
   props: ThreadRowProps;
 }) {
-  const { locationTag, mailbox = "inbox", onOpen, thread } = props;
+  const { locationTag, mailbox = "inbox", onOpen, onSelect, thread } = props;
+  // The same native row in and out of Select mode, so switching modes only
+  // updates it: the List's edit mode adds the checkmark and hides swipes.
   return (
     <Button
       modifiers={[
         buttonStyle("plain"),
         frame({ height: rowHeight, maxWidth: Infinity }),
+        tag(thread.id),
         accessibilityElement("ignore"),
         accessibilityLabel(getNativeAccessibilityLabel(props)),
-        accessibilityHint("Opens this email thread"),
+        accessibilityHint(
+          props.selectionMode ? "Toggles selection" : "Opens this email thread",
+        ),
         ...rowModifiers(colors.background),
       ]}
-      onPress={onOpen}
+      onPress={props.selectionMode ? onSelect : onOpen}
     >
       <NativeThreadSummary
         colors={colors}
