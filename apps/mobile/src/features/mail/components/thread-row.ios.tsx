@@ -56,7 +56,7 @@ export function ThreadRow(props: ThreadRowProps) {
       }}
     >
       <List
-        selection={selectionMode ? (selected ? [thread.id] : []) : undefined}
+        selection={selected ? [thread.id] : []}
         modifiers={[
           listStyle("plain"),
           scrollDisabled(true),
