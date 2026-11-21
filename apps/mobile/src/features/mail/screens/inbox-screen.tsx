@@ -30,6 +30,7 @@ import { SpamMailbox } from "./spam-screen";
 import { getThreadRoute } from "./thread-route";
 import { useInboxMailboxControls } from "./use-inbox-mailbox-controls";
 import { useInboxRefresh } from "./use-inbox-refresh";
+import { useMarkInboxRead } from "./use-mark-inbox-read";
 import { useMoveToInbox } from "./use-move-to-inbox";
 
 const skippedSearch = "skip";
@@ -98,6 +99,7 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
   const primary = useColor("primary");
   const { isRefreshing, refresh, refreshError } = useInboxRefresh(accounts);
   const moveToInbox = useMoveToInbox();
+  const confirmMarkAllRead = useMarkInboxRead(accountFilter, accounts);
   const search = usePaginatedQuery(
     api.mail.queries.searchHeaders,
     getSearchArgs(debouncedSearchTerm, getSelectedAccountId(accountFilter)),
@@ -134,7 +136,6 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
   function renderThread({ item }: LegendListRenderItemProps<MailThread>) {
     return (
       <InboxThreadRow
-        controls={controls}
         isSearch={isSearching}
         thread={item}
         onMoveToInbox={moveToInbox}
@@ -166,8 +167,10 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
       selectionMode={controls.selectionMode}
       onFilterChange={controls.changeFilter}
       onLoadMore={loadNextPage}
+      onMarkAllRead={isSearching ? undefined : confirmMarkAllRead}
       onRefresh={() => void refresh()}
       onToggleSelection={controls.toggleSelectionMode}
+      rowsReadSelection
       pageStatus={isSearching ? search.status : inboxPageStatus}
     />
   );

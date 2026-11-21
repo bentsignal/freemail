@@ -39,3 +39,13 @@ pnpm --filter @freemail/convex exec convex run mail/maintenance:backfillThreadIn
 The backfill is idempotent and recomputes projection state from messages.
 Zero-message orphan threads are explicitly marked outside the inbox so they do
 not consume pagination cursor slots before row enrichment.
+
+## Mark all as read
+
+`mail.inboxRead.markInboxRead` marks every unread conversation the inbox
+shows as read: the same threads `getUnreadCounts` counts (active accounts,
+spam left out), optionally for one account. It collects the thread IDs once,
+marks up to 50 threads (or 400 messages) per transaction, and schedules
+`markThreadsReadBatch` for the rest, so mail that arrives meanwhile stays
+unread. Provider read updates are spaced 250 ms apart across the whole run,
+because iCloud opens an IMAP connection for each one.

@@ -8,8 +8,8 @@ import {
 } from "react-native";
 
 import roundedIcon from "../../../assets/icon.png";
-import { EmailCodeSignIn } from "./email-code-sign-in";
 import { NativeAuthButton } from "./native-auth-button";
+import { TestOwnerSignIn } from "./test-owner-button";
 import { usePasskeyAuth } from "./use-passkey-auth";
 
 export function PasskeySignInScreen() {
@@ -36,7 +36,7 @@ export function PasskeySignInScreen() {
             />
             <AuthMessage message={auth.message} />
           </View>
-          <EmailCodeSignIn />
+          <TestOwnerSignIn />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

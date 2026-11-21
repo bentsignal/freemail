@@ -33,9 +33,17 @@ export async function setOwnedThreadPinned(
 
 export async function setOwnedThreadRead(
   ctx: MutationCtx,
-  ownerId: string,
-  threadId: Id<"threads">,
-  isRead: boolean,
+  {
+    isRead,
+    ownerId,
+    providerDelay = { start: 0, step: 100 },
+    threadId,
+  }: {
+    isRead: boolean;
+    ownerId: string;
+    providerDelay?: { start: number; step: number };
+    threadId: Id<"threads">;
+  },
 ) {
   const thread = await ensureOwnedThread(ctx, ownerId, threadId);
   const messages = await ctx.db
@@ -65,11 +73,12 @@ export async function setOwnedThreadRead(
         account,
         message,
         isRead,
-        delay: index * 100,
+        delay: providerDelay.start + index * providerDelay.step,
       });
       return update ? [update] : [];
     }),
   ]);
+  return { changedMessages: changedMessages.length };
 }
 
 export async function archiveOwnedThread(

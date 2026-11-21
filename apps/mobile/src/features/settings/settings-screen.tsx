@@ -8,12 +8,14 @@ import { useMutation } from "convex/react";
 import { api } from "@freemail/convex/api";
 
 import type { MobileThemeMode } from "~/features/theme/mobile-theme";
+import { devBranch } from "~/features/dev/dev-branch";
 import { useMailStore } from "~/features/mail/store";
 import { scheduleLocalNotificationPreview } from "~/features/notifications/mobile-notifications";
 import {
   setMobileThemeMode,
   useMobileAppearance,
 } from "~/features/theme/mobile-theme";
+import { useColor } from "~/hooks/use-color";
 import {
   AddPasskeyRow,
   OwnerRow,
@@ -52,6 +54,7 @@ export function SettingsScreen() {
   // returned from a component in a second card.
   const developerSection = __DEV__ ? (
     <FieldGroup.Section title="Developer">
+      <BranchRow />
       <SeedMailRow />
       <NotificationPreviewRow />
     </FieldGroup.Section>
@@ -135,6 +138,19 @@ function AppearanceRow() {
           <Picker.Item key={mode.value} label={mode.label} value={mode.value} />
         ))}
       </Picker>
+    </Row>
+  );
+}
+
+function BranchRow() {
+  const muted = useColor("muted-foreground");
+  return (
+    <Row alignment="center" modifiers={fillRow}>
+      <Text>Branch</Text>
+      <Spacer />
+      <Text numberOfLines={1} textStyle={{ color: muted }}>
+        {devBranch || "unknown"}
+      </Text>
     </Row>
   );
 }

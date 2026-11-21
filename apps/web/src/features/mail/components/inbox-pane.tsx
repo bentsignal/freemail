@@ -11,6 +11,7 @@ import {
   BulkSelectButton,
   BulkSelectionToolbar,
 } from "./bulk-selection-toolbar";
+import { MarkAllReadButton } from "./mark-all-read-button";
 import { MobileScopeFilters } from "./mobile-scope-filters";
 import { ThreadList } from "./thread-list";
 
@@ -37,7 +38,7 @@ function InboxHeader() {
 
   return (
     <header className="bg-background border-border shrink-0 border-b px-4 pt-5 pb-4 sm:px-5">
-      <div className="mb-5 flex items-end justify-between gap-4">
+      <div className="mb-5 flex items-end justify-between gap-3 sm:gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
             <MobileBrand />
@@ -46,7 +47,7 @@ function InboxHeader() {
             </h1>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <MailboxFilterControl mailMode={mailMode} />
           <BulkSelectSlot mailMode={mailMode} />
           <button
@@ -87,7 +88,12 @@ function getMailboxTitle(mailMode: MailMode) {
 
 function MailboxFilterControl({ mailMode }: { mailMode: MailMode }) {
   if (mailMode !== "inbox") return null;
-  return <UnreadFilterButton />;
+  return (
+    <>
+      <MarkAllReadButton />
+      <UnreadFilterButton />
+    </>
+  );
 }
 
 function UnreadFilterButton() {
@@ -112,6 +118,7 @@ function UnreadFilterButton() {
 
   return (
     <button
+      aria-label="Unread"
       aria-pressed={unreadOnly}
       className={cn(
         "focus-visible:outline-ring flex h-9 items-center gap-2 rounded-[9px] border px-3 text-[11px] font-semibold tracking-wide transition-[background-color,border-color,color,box-shadow] focus-visible:outline-2 focus-visible:outline-offset-2",
@@ -123,7 +130,7 @@ function UnreadFilterButton() {
       type="button"
     >
       <MailOpen aria-hidden="true" className="size-3.5" strokeWidth={1.8} />
-      Unread
+      <span className="hidden sm:inline">Unread</span>
     </button>
   );
 }

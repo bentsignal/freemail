@@ -2,40 +2,12 @@ import type { Href } from "expo-router";
 import { DevSettings } from "react-native";
 import { router } from "expo-router";
 
-import { authClient, convexUrls } from "~/features/auth/client";
+import { signInAsTestOwner } from "~/features/auth/test-owner-sign-in";
 import { devMailActions } from "./dev-mail-actions";
 import { frameReport, startFrames, stopFrames } from "./frames";
 
-// Production, and the deployment it moved from: both hold real mail.
-const REAL_MAIL_DEPLOYMENTS = ["colorful-ostrich-734", "dazzling-dog-633"];
-
 function isAppPath(path: string): path is Href & string {
   return path.startsWith("/");
-}
-
-/**
- * Isolated backends only (`scripts/backend.sh isolate`): signs in as the
- * deployment's test owner through its dev-only `/dev/sign-in` route, which
- * production doesn't have. The Expo auth client stores the session cookie
- * as it does after any sign-in.
- */
-async function requestSignIn() {
-  if (
-    REAL_MAIL_DEPLOYMENTS.some(
-      (name) =>
-        convexUrls.cloud.includes(name) || convexUrls.site.includes(name),
-    )
-  ) {
-    throw new Error(
-      "This app talks to the production deployment; run scripts/backend.sh isolate first",
-    );
-  }
-  const { data, error } = await authClient.$fetch<{ email: string }>(
-    "/dev/sign-in",
-    { method: "POST", body: {} },
-  );
-  if (error) throw new Error(error.message ?? error.statusText);
-  return data.email;
 }
 
 let signInStatus = "idle";
@@ -47,7 +19,7 @@ let signInStatus = "idle";
 function signIn() {
   if (signInStatus === "pending") return signInStatus;
   signInStatus = "pending";
-  requestSignIn().then(
+  signInAsTestOwner().then(
     (email) => (signInStatus = `signed in as ${email}`),
     (error: unknown) =>
       (signInStatus = `failed: ${error instanceof Error ? error.message : String(error)}`),

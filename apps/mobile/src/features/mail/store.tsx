@@ -14,6 +14,7 @@ import type { SentRow } from "./sent/sent-row";
 import { useAccountPageCache } from "./hooks/use-account-page-cache";
 import { toConvexId } from "./lib/convex-id";
 import { toMailAccount, toMailThreads } from "./lib/convex-mail";
+import { toggleSelectedThread } from "./screens/mailbox-controls";
 
 interface ThreadOverride {
   isPinned?: boolean;
@@ -27,8 +28,7 @@ function useInternalStore() {
   const [mailbox, setMailboxState] = useState<MobileMailbox>("inbox");
   const mailboxPages = useAccountPageCache<InboxItem>();
   const sentPages = useAccountPageCache<SentRow>();
-  // Shared so the tab bar can make way for the selection toolbar.
-  const [selectionMode, setSelectionMode] = useState(false);
+  const selection = useThreadSelection();
   const inbox = usePaginatedQuery(
     api.mail.queries.listInbox,
     {
@@ -107,7 +107,8 @@ function useInternalStore() {
 
   function setMailbox(next: MobileMailbox) {
     setMailboxState(next);
-    setSelectionMode(false);
+    selection.setSelectionMode(false);
+    selection.clearThreadSelection();
   }
 
   return {
@@ -123,10 +124,9 @@ function useInternalStore() {
     mailboxPages,
     markRead,
     sentPages,
-    selectionMode,
+    ...selection,
     setAccountFilter,
     setMailbox,
-    setSelectionMode,
     threads,
     togglePin,
     toggleRead,
@@ -137,6 +137,33 @@ export type MailStoreValue = ReturnType<typeof useInternalStore>;
 
 export const { Store: MailStore, useStore: useMailStore } =
   createStore(useInternalStore);
+
+// Shared so the tab bar can make way for the selection toolbar, and so each
+// inbox row reads its own selection without re-rendering the list.
+function useThreadSelection() {
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedThreadIds, setSelectedThreadIds] = useState(
+    () => new Set<string>(),
+  );
+
+  function toggleThreadSelected(threadId: string) {
+    setSelectedThreadIds((current) => toggleSelectedThread(current, threadId));
+  }
+
+  function clearThreadSelection() {
+    setSelectedThreadIds((current) =>
+      current.size === 0 ? current : new Set(),
+    );
+  }
+
+  return {
+    clearThreadSelection,
+    selectedThreadIds,
+    selectionMode,
+    setSelectionMode,
+    toggleThreadSelected,
+  };
+}
 
 function useArchiveThread() {
   const archiveThreadMutation = useMutation(api.mail.mutations.archiveThread);

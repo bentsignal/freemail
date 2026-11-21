@@ -8,9 +8,14 @@ import { ConvexReactClient } from "convex/react";
 import { nativeAuthBasePath } from "@freemail/config/auth";
 import { createUrls } from "@freemail/config/urls";
 
-// Both phone apps and the simulators use production unless
-// scripts/backend.sh isolate points this worktree elsewhere.
-const urls = createUrls({ nodeEnv: "production" });
+import { isFreemailDev } from "../dev/app-variant";
+
+// Freemail uses production. Freemail Dev (the phone's dev client and the
+// simulators) never does: it uses this worktree's isolated backend when
+// scripts/backend.sh isolate made one, otherwise the development deployment.
+const urls = createUrls({
+  nodeEnv: isFreemailDev ? "development" : "production",
+});
 export const convexUrls = urls.convex;
 export const webUrl = urls.web;
 

@@ -17,15 +17,18 @@ design or infrastructure questions.
 Convex project `rodge-mail` (team `bentsignal`) has two deployments:
 
 - **`colorful-ostrich-734` (production)** holds Shawn's real mail. The
-  website, both apps on his phone (Freemail and Freemail Dev), the CLI, and
-  inbound hosted mail use it. Push to it only with
+  website (mail.rodgers.dev), Freemail on his phone, the CLI, and inbound
+  hosted mail use it, and nothing else: no development build or local
+  website ever talks to it. Push to it only with
   `pnpm exec convex deploy -y` as part of a release Shawn asked for
   ([docs/releasing.md](docs/releasing.md)), and never write to its data
   except through the app as he would.
-- **`tidy-emu-857` (development)** is for agents: a fake owner
+- **`tidy-emu-857` (development)** has a fake owner
   (`alex.rivera@example.com`) and seeded fake mail, `DEV_TOOLS=true`, no
-  provider or AWS secrets. The local website uses it. Every worktree shares
-  it, so don't push a branch's functions to it.
+  provider or AWS secrets. Freemail Dev (his phone's dev client and the
+  simulators) and the local website use it unless the worktree has an
+  isolated backend. Every worktree shares it, so don't push a branch's
+  functions to it.
 
 `dazzling-dog-633` served production until the move to
 `colorful-ostrich-734` ([docs/production-migration.md](docs/production-migration.md)).
@@ -35,13 +38,15 @@ push to it, unpause it, or change its data.
 Auth is owner-only (Better Auth, email codes and passkeys,
 `AUTH_ALLOWED_USER_ID`). Registration is closed.
 
-Backend changes and signed-in checks get an **isolated backend**:
-`scripts/backend.sh isolate` creates a dev deployment for the branch
-(`dev/<branch>`) with a fake owner and seeded fake mail (no production
-secrets), points this worktree's apps at it, and `scripts/sim.sh signin`
-signs the simulator in.
-`push` after Convex changes, `teardown` when done
-([docs/simulator-sign-in.md](docs/simulator-sign-in.md)).
+Backend changes get an **isolated backend**: `scripts/backend.sh isolate`
+creates a dev deployment for the branch (`dev/<branch>`) with a fake owner
+and seeded fake mail (no production secrets) and points this worktree's
+apps at it: the simulators, Freemail Dev on Shawn's phone, and the local
+website. `push` after Convex changes, `seed` to reset the mail, `teardown`
+when the PR merges ([docs/simulator-sign-in.md](docs/simulator-sign-in.md)).
+Everything that isn't production signs in with **Sign in as test owner**
+(on the sign-in screen in Freemail Dev, on the login page of the local
+website; `scripts/sim.sh signin` taps it for the simulator).
 
 ## Project knowledge
 
@@ -84,14 +89,13 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
   evidence, and always before you end your turn. A Stop hook sends you
   back if one is still up, and the queue deletes devices left idle for 30
   minutes.
-- Web changes are checked in the browser against the worktree's Portless
-  origin (`https://<worktree>.www.freemail.local`): start the proxy
-  (`pnpm exec portless proxy start --lan`) and only the web app
-  (`pnpm -F @freemail/web dev`). It talks to the development deployment,
-  or to this worktree's isolated backend; production doesn't trust local
-  origins, so the local website can't sign in there. Never `pnpm dev` or
-  `pnpm dev:web`: both also run `convex dev`, which pushes this worktree's
-  functions to the development deployment every worktree shares.
+- Web changes are checked in the browser on the worktree's website:
+  `scripts/web.sh up` starts the Portless proxy and only the web app, on
+  `https://<worktree>.www.freemail.local`, against the worktree's backend
+  ([docs/web-testing.md](docs/web-testing.md)); `web.sh down` stops it.
+  Never `pnpm dev` or `pnpm dev:web`: both also run `convex dev`, which
+  pushes this worktree's functions to the development deployment every
+  worktree shares.
 - UI changes need screenshots (before and after where something changed);
   motion and gestures need a video. Upload with `scripts/evidence.sh` and put
   them in the PR description. Never commit PR assets. Evidence URLs are
@@ -104,17 +108,47 @@ Shawn starts each feature or fix in its own T3 Code worktree and thread
 - A fix for a GitHub issue says `Fixes #<issue>` in its PR description (one
   line per issue) and targets `main`.
 - Open the PR, review your own diff as a skeptical reviewer, wait for CI to
-  pass, start the dev server (`scripts/phone.sh up`), then tell Shawn it is
-  ready to test and **stop**. Shawn tests every change on his phone in
-  Freemail Dev before it merges, and you refine it on the branch until he's
-  happy; the release doesn't re-test each change. The dev server stays up
-  through the rounds of feedback and comes down when the PR merges or
-  Shawn drops the work.
+  pass, start the dev servers (`scripts/phone.sh up`, and `scripts/web.sh
+up` when the website changed), then tell Shawn it is ready to test
+  ([below](#telling-shawn-a-change-is-ready-to-test)) and **stop**. Shawn
+  tests every change before it merges, on his phone in Freemail Dev and on
+  the worktree's website, and you refine it on the branch until he's happy;
+  the release doesn't re-test each change. The dev servers stay up through
+  the rounds of feedback and come down when the PR merges or Shawn drops
+  the work.
 - **Merge only after Shawn approves that PR in the thread** ("merge it",
   "ship it", "approved"), following the `merge` skill: squash and merge,
   deleting the branch, then the dev server and devices down and the thread
   settled. Approval of one PR is not approval of another. CI passing,
   your own review, and your own simulator checks are never approval.
+
+## Telling Shawn a change is ready to test
+
+Shawn reads this message on his phone and acts on it without the PR open,
+so it has to stand alone. In this order:
+
+1. **The phone block** `scripts/phone.sh up` printed, exactly as printed
+   (see [Phone builds](#phone-builds)), and the install link if he has to
+   install.
+2. **The web block** `scripts/web.sh up` printed, when the website
+   changed. It's a link to this worktree's website on his Mac.
+3. **What to look for, per surface.** For each of iPhone and web: the
+   screen, the exact control (its label, or its icon and where it sits:
+   "an envelope button left of the filter button, top right of the
+   inbox"), numbered steps, and what he should see after each one. Cover
+   the states a change has (nothing to act on, one item, many), not just
+   the happy path.
+4. **How he knows he's on the right build.** Freemail Dev shows the branch
+   under Settings → Developer → Branch; the website's tab title starts with
+   the worktree id. Name the branch.
+5. **Sign-in and data.** Both open on fake mail, never his own: tap **Sign
+   in as test owner**. Say what doesn't work there (an isolated backend
+   can't sync, send, run AI, or deliver notifications) and offer to reset
+   the mail (`scripts/backend.sh seed`).
+6. The PR link, a two-line summary, and anything to look at closely.
+
+If something on that list can't be tried yet, say so plainly instead of
+leaving him to find out.
 
 ## Releases
 
@@ -123,8 +157,9 @@ the `freemail-release` skill ([docs/releasing.md](docs/releasing.md)): list
 what changed since the last release and what to test where those changes
 overlap (each one was already tested on its own before it merged), run
 those tests yourself first in the simulator, put `main` on his phone in
-Freemail Dev for what only he can check, and ship only after he approves the
-release. Shipping is Convex functions to production with
+Freemail Dev (against the development deployment, with `main`'s functions
+pushed to it first) for what only he can check, and ship only after he
+approves the release. Real-mail checks happen in Freemail once it ships. Shipping is Convex functions to production with
 `pnpm exec convex deploy -y` (then `main` to the development deployment so
 it doesn't fall behind), the website with `vercel deploy --prod`, and a new
 local EAS build of Freemail for
@@ -144,12 +179,12 @@ line.
 Shawn's phone has two Freemail apps side by side: **Freemail**
 (`com.bentsignal.rodgemail`, the standalone build he reads his mail in,
 updated only in a release) and **Freemail Dev**
-(`com.bentsignal.rodgemail.dev`, amber icon, a dev client). Both talk to
-production (`colorful-ostrich-734`), so Freemail Dev shows his real mail; it
-never registers
-for push notifications, or every email would notify twice. Every
-development binary is Freemail Dev, the simulators' too. See
-[docs/phone-testing.md](docs/phone-testing.md).
+(`com.bentsignal.rodgemail.dev`, amber icon, a dev client). Freemail talks
+to production; Freemail Dev never does. It uses the worktree's backend (its
+isolated backend, otherwise development), so it shows fake mail and signs
+in with **Sign in as test owner**. It never registers for push
+notifications. Every development binary is Freemail Dev, the simulators'
+too. See [docs/phone-testing.md](docs/phone-testing.md).
 
 - **Day to day, Freemail Dev is main's dev client.** When your worktree's work
   is ready to test, run `scripts/phone.sh up` in it. One Metro serves the
@@ -172,9 +207,9 @@ development binary is Freemail Dev, the simulators' too. See
   (`phone.sh main` any time). Tell Shawn when he has to install something,
   with the install link `phone.sh` prints (a list item too); otherwise he
   only taps the open link. `phone.sh list` shows every cached dev client.
-- **Releases are tested in Freemail Dev too**, serving `main` (the
-  `freemail-release` skill), so fixes reach his phone without a build. Freemail
-  Mail gets the release build afterwards.
+- **Releases are tested in Freemail Dev too**, serving `main` against the
+  development deployment (the `freemail-release` skill), so fixes reach his
+  phone without a build. Freemail gets the release build afterwards.
 - When Shawn asks to test something "on his phone", that means
   `scripts/phone.sh up`. A Freemail build (the `freemail-expo-build`
   skill) is only for a release, or when he asks for one by name.

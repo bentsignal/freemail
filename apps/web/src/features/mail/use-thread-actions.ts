@@ -58,32 +58,26 @@ export function useThreadActions(unreadSession?: UnreadSessionActions) {
     );
   }
 
-  async function setThreadsRead(messages: InboxMessage[], isRead: boolean) {
+  function setThreadsRead(messages: InboxMessage[], isRead: boolean) {
     if (messages.length === 0) return;
-    try {
-      if (isRead) {
-        for (const message of messages) unreadSession?.preserve(message);
+    if (isRead) {
+      for (const message of messages) unreadSession?.preserve(message);
+    }
+    clearBulkSelection();
+    setBulkSelectionActive(false);
+    const updates = messages.map(async (message) => {
+      try {
+        await setThreadRead({ threadId: message.threadId, isRead });
+      } catch (error) {
+        if (isRead) unreadSession?.forget(message.threadId);
+        throw error;
       }
-      await Promise.all(
-        messages.map(async (message) => {
-          try {
-            await setThreadRead({ threadId: message.threadId, isRead });
-          } catch (error) {
-            if (isRead) unreadSession?.forget(message.threadId);
-            throw error;
-          }
-        }),
-      );
-      clearBulkSelection();
-      setBulkSelectionActive(false);
-      toast.success(
-        `${messages.length} conversation${messages.length === 1 ? "" : "s"} marked ${isRead ? "read" : "unread"}.`,
-      );
-    } catch (error) {
+    });
+    void Promise.all(updates).catch((error: unknown) =>
       toast.error(
         getErrorMessage(error, "Could not update the conversations."),
-      );
-    }
+      ),
+    );
   }
 
   return { markMessageRead, setThreadsRead, togglePinned, toggleRead };

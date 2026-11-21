@@ -62,22 +62,31 @@ function ThreadRowLeading({
   selected: boolean;
   showSelection: boolean;
 }) {
-  if (showSelection) return <ThreadSelectionMarker selected={selected} />;
+  if (showSelection) {
+    return <ThreadSelectionMarker isRead={isRead} selected={selected} />;
+  }
   return <SenderAvatar isRead={isRead} name={name} />;
 }
 
-function ThreadSelectionMarker({ selected }: { selected: boolean }) {
+function ThreadSelectionMarker({
+  isRead,
+  selected,
+}: {
+  isRead: boolean;
+  selected: boolean;
+}) {
   return (
     <span
       aria-hidden="true"
       className={cn(
-        "flex size-8 shrink-0 items-center justify-center rounded-[10px] border transition-colors",
+        "relative flex size-8 shrink-0 items-center justify-center rounded-[10px] border transition-colors",
         selected
           ? "border-primary bg-primary text-primary-foreground"
           : "bg-muted border-border text-transparent",
       )}
     >
       <Check className="size-4" strokeWidth={2.5} />
+      <UnreadDot isRead={isRead} />
     </span>
   );
 }

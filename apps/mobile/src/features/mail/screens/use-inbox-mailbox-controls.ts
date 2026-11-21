@@ -5,7 +5,7 @@ import type { MailThread } from "@freemail/features/mail";
 import type { MailboxFilter } from "./mailbox-controls";
 import type { MailboxBulkAction } from "./mailbox-thread-list";
 import { useMailStore } from "../store";
-import { filterMailboxThreads, toggleSelectedThread } from "./mailbox-controls";
+import { filterMailboxThreads } from "./mailbox-controls";
 
 export function useInboxMailboxControls(threads: MailThread[]) {
   const archiveThread = useMailStore((store) => store.archiveThread);
@@ -13,39 +13,40 @@ export function useInboxMailboxControls(threads: MailThread[]) {
   const [filter, setFilter] = useState<MailboxFilter>("all");
   const selectionMode = useMailStore((store) => store.selectionMode);
   const setSelectionMode = useMailStore((store) => store.setSelectionMode);
-  const [selectedIds, setSelectedIds] = useState(() => new Set<string>());
+  const selectedIds = useMailStore((store) => store.selectedThreadIds);
+  const clearThreadSelection = useMailStore(
+    (store) => store.clearThreadSelection,
+  );
   const [retainedUnreadIds, setRetainedUnreadIds] = useState(
     () => new Set<string>(),
   );
 
   function toggleSelectionMode() {
     setSelectionMode((current) => !current);
-    setSelectedIds(new Set());
+    clearThreadSelection();
   }
   function changeFilter(nextFilter: MailboxFilter) {
     setFilter(nextFilter);
-    setSelectedIds(new Set());
+    clearThreadSelection();
     setRetainedUnreadIds(new Set());
   }
   function retainThreadInUnreadSession(threadId: string) {
     if (filter !== "unread") return;
     setRetainedUnreadIds((current) => new Set(current).add(threadId));
   }
-  function toggleThreadSelection(threadId: string) {
-    setSelectedIds((current) => toggleSelectedThread(current, threadId));
-  }
   function getSelectedThreads() {
     return threads.filter((thread) => selectedIds.has(thread.id));
   }
-  async function archiveSelected() {
-    await Promise.all(
-      getSelectedThreads()
-        .filter((thread) => (thread.location?.kind ?? "inbox") === "inbox")
-        .map(async (thread) => archiveThread(thread.id)),
-    );
+  function archiveSelected() {
+    const selectedThreads = getSelectedThreads();
     toggleSelectionMode();
+    for (const thread of selectedThreads) {
+      if ((thread.location?.kind ?? "inbox") === "inbox") {
+        void archiveThread(thread.id);
+      }
+    }
   }
-  async function setSelectedRead(isRead: boolean) {
+  function setSelectedRead(isRead: boolean) {
     const selectedThreads = getSelectedThreads();
     if (isRead && filter === "unread") {
       setRetainedUnreadIds(
@@ -53,29 +54,27 @@ export function useInboxMailboxControls(threads: MailThread[]) {
           new Set([...current, ...selectedThreads.map((thread) => thread.id)]),
       );
     }
-    await Promise.all(
-      selectedThreads
-        .filter((thread) => thread.isRead !== isRead)
-        .map(async (thread) => toggleRead(thread.id, thread.isRead)),
-    );
     toggleSelectionMode();
+    for (const thread of selectedThreads) {
+      if (thread.isRead !== isRead) void toggleRead(thread.id, thread.isRead);
+    }
   }
 
   const bulkActions = [
     {
       label: "Archive",
       systemImage: "archivebox",
-      onPress: () => void archiveSelected(),
+      onPress: archiveSelected,
     },
     {
       label: "Mark read",
       systemImage: "envelope.open",
-      onPress: () => void setSelectedRead(true),
+      onPress: () => setSelectedRead(true),
     },
     {
       label: "Mark unread",
       systemImage: "envelope.badge",
-      onPress: () => void setSelectedRead(false),
+      onPress: () => setSelectedRead(false),
     },
   ] satisfies MailboxBulkAction[];
   return {
@@ -88,6 +87,5 @@ export function useInboxMailboxControls(threads: MailThread[]) {
     retainThreadInUnreadSession,
     threads: filterMailboxThreads(threads, filter, retainedUnreadIds),
     toggleSelectionMode,
-    toggleThreadSelection,
   };
 }

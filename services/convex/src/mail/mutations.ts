@@ -93,8 +93,13 @@ export const setThreadRead = authedMutation({
     threadId: v.id("threads"),
     isRead: v.boolean(),
   },
-  handler: async (ctx, args) =>
-    await setOwnedThreadRead(ctx, ctx.ownerId, args.threadId, args.isRead),
+  handler: async (ctx, args) => {
+    await setOwnedThreadRead(ctx, {
+      isRead: args.isRead,
+      ownerId: ctx.ownerId,
+      threadId: args.threadId,
+    });
+  },
 });
 
 export const archiveThread = authedMutation({

@@ -9,10 +9,10 @@
 #                                 plus n older filler threads for paging
 #   scripts/backend.sh teardown   delete it and go back to the default
 #
-# Without `isolate`, a worktree's mobile app talks to production
-# (colorful-ostrich-734, Shawn's real mail) and its local website to the
-# shared development deployment (tidy-emu-857, a fake owner). Nothing here
-# touches either. An isolated backend is a named Convex dev deployment (`dev/<branch>`)
+# Without `isolate`, a worktree's Freemail Dev (phone and simulators) and
+# its local website talk to the shared development deployment (tidy-emu-857,
+# a fake owner). Only Freemail and mail.rodgers.dev use production. Nothing
+# here touches either. An isolated backend is a named Convex dev deployment (`dev/<branch>`)
 # with only the settings the app needs to boot and sign in: a fresh
 # BETTER_AUTH_SECRET, DEV_TOOLS=true, and harmless placeholders. No provider,
 # AI, email, or AWS secret is copied, so syncing, sending, AI features, and
@@ -102,7 +102,7 @@ status() {
     echo "site: $SITE_URL"
     echo "sign in the simulator: scripts/sim.sh signin"
   else
-    echo "default: the mobile app uses production (colorful-ostrich-734, Shawn's real mail), the local website uses development (tidy-emu-857); scripts/backend.sh isolate to test signed in"
+    echo "default: Freemail Dev and the local website use development (tidy-emu-857, fake mail); scripts/backend.sh isolate for this branch's own"
   fi
 }
 

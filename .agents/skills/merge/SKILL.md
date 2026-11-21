@@ -26,7 +26,8 @@ scripts/sim.sh status        # ios: none, android: none, metro: stopped
 xcrun simctl list devices | grep "Freemail $(basename "$PWD")" || echo gone
 ```
 
-Stop a web dev server you started in this worktree (only its own process).
+`scripts/web.sh down` stops this worktree's website; also stop any other
+web dev server you started in this worktree (only its own process).
 If a simulator won't shut down (stuck "Shutting Down"), the Mac's simulator
 service is jammed: tell Shawn in your report, and don't settle the thread
 as if everything is stopped. If this worktree had its own dev client,

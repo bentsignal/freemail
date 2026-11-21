@@ -68,35 +68,38 @@ Send Shawn the write-up with the list in two parts:
 
 - **Checked:** each step you ran, what you saw, any fix, and its evidence.
 - **For you:** only what the simulator can't settle, each with why: how
-  motion and gestures feel on a real phone, his real mail and accounts,
-  real push notifications (in Freemail, after it's built), and anything
-  you ran but couldn't judge.
+  motion and gestures feel on a real phone, and anything you ran but
+  couldn't judge. His real mail and accounts, and real push notifications,
+  can only be checked in Freemail after it ships: list those separately as
+  "after shipping".
 
 ## 3. Put main on his phone in Freemail Dev
 
 From the release checkout (detached at `origin/main`, no isolated
-backend):
+backend), Freemail Dev runs `main` against the development deployment, so
+push `main`'s functions there first (from `services/convex`, whose
+`.env.local` selects development; `main` is the one branch allowed there):
 
 ```sh
+(cd services/convex && pnpm exec convex dev --once --tail-logs disable)
 scripts/phone.sh up
+scripts/web.sh up    # when the website changed
 ```
 
 It builds a dev client only when `main`'s native fingerprint has none yet
 (about 15 minutes); otherwise Shawn just taps the open link. Send him the
 block it prints, first and exactly as printed (the `freemail-feature` skill,
-step 4b). Freemail Dev runs `main`'s JavaScript against the functions already
-on production. If the release has Convex changes, the parts of the
-list that need them can't be tried there yet: say which, and ask whether to
-deploy Convex first (step 5's Convex part, safe for the installed apps
-because every Convex change stays compatible with them) so he can test
-them before the website and the Freemail build ship.
+step 4b), then the web block, and follow AGENTS.md, "Telling Shawn a change
+is ready to test". Both show fake mail; he signs in with **Sign in as test
+owner**, and Settings → Developer → Branch shows `main` (a detached
+checkout shows an empty branch: say so).
 
 Then wait. He works through the "For you" list at his own pace and either
 approves ("ship it", "release it", "looks good") or asks for fixes. Fixes
 found during the release test go through PRs he approves (the
 `freemail-feature` skill); once they merge, update the write-up and serve
 `main` again. Don't ship without an explicit approval of this release.
-`scripts/phone.sh down` once he's done.
+`scripts/phone.sh down` and `scripts/web.sh down` once he's done.
 
 ## 4. Go-ahead
 
@@ -121,8 +124,9 @@ Then call what changed (`npx convex run --prod` on an internal query, or
 errors. Every Convex command needs `--prod` to reach production; without it
 the command runs against development.
 
-Then push `main` to the development deployment (`tidy-emu-857`, which
-`.env.local` selects) so the local website doesn't fall behind:
+Then push `main` to the development deployment again (`tidy-emu-857`,
+which `.env.local` selects) so Freemail Dev and the local website don't
+fall behind:
 
 ```sh
 pnpm exec convex dev --once --tail-logs disable

@@ -173,7 +173,11 @@ export const performQuickAction = internalMutation({
     if (args.action === "pin") {
       await setOwnedThreadPinned(ctx, delivery.ownerId, message.threadId, true);
     } else if (args.action === "mark-read") {
-      await setOwnedThreadRead(ctx, delivery.ownerId, message.threadId, true);
+      await setOwnedThreadRead(ctx, {
+        isRead: true,
+        ownerId: delivery.ownerId,
+        threadId: message.threadId,
+      });
     } else {
       await archiveOwnedThread(ctx, delivery.ownerId, message.threadId);
     }

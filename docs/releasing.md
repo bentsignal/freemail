@@ -4,7 +4,9 @@ Merging to `main` ships nothing. Shawn decides when to release, and an
 agent runs it with the `freemail-release` skill. Each change was tested on his
 phone in Freemail Dev before it merged ([phone-testing.md](phone-testing.md));
 the release tests where the merged changes meet, first in the simulator,
-then `main` in Freemail Dev on his phone, and ships only after he approves it.
+then `main` in Freemail Dev on his phone against the development deployment,
+and ships only after he approves it. Checks on his real mail happen in
+Freemail once it ships.
 A release has up to three parts, always from `origin/main`, in this order:
 
 | Part          | What it updates                                         | Command                                                       | Needed when                                  |
@@ -23,11 +25,11 @@ embedded JavaScript until Shawn installs a new build.
 
 Convex project `rodge-mail` (team `bentsignal`):
 
-| Deployment             | Reference    | What it is                                                         |
-| ---------------------- | ------------ | ------------------------------------------------------------------ |
-| `colorful-ostrich-734` | `production` | Shawn's real mail: the website, both phone apps, the CLI, SES mail |
-| `tidy-emu-857`         | `dev/agents` | Development: a fake owner and seeded mail, for the local website   |
-| `dazzling-dog-633`     | `dev/shawn`  | Retired and paused, the rollback copy of the move to production    |
+| Deployment             | Reference    | What it is                                                                        |
+| ---------------------- | ------------ | --------------------------------------------------------------------------------- |
+| `colorful-ostrich-734` | `production` | Shawn's real mail: the website, Freemail, the CLI, SES mail                       |
+| `tidy-emu-857`         | `dev/agents` | Development: a fake owner and seeded mail, for Freemail Dev and the local website |
+| `dazzling-dog-633`     | `dev/shawn`  | Retired and paused, the rollback copy of the move to production                   |
 
 `convex deploy` targets the project's production deployment whatever
 `services/convex/.env.local` selects. `.env.local` selects development, so
@@ -70,8 +72,9 @@ Development uses a different app, Freemail Dev (`com.bentsignal.rodgemail.dev`):
 the simulators' `development:client:sim` dev client (`scripts/sim.sh`) and
 the phone's `development:client` dev client (`scripts/phone.sh`), each
 cached per native fingerprint. Freemail Dev sits next to Freemail on the
-phone and loads a worktree's JavaScript from its Metro, so testing needs no
-release ([phone-testing.md](phone-testing.md)).
+phone and loads a worktree's JavaScript from its Metro, against that
+worktree's backend (never production), so testing needs no release
+([phone-testing.md](phone-testing.md)).
 
 ## Release notes and extra steps
 

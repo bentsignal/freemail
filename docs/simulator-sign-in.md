@@ -4,8 +4,8 @@ Agents test signed-in screens on an **isolated backend**: a throwaway
 Convex dev deployment for one branch, with a fake owner and seeded fake
 mail. Nothing on it is Shawn's, so screenshots of it are safe to publish as
 PR evidence. Production (`colorful-ostrich-734`) is never touched, and
-neither is the development deployment every worktree's local website shares
-(`tidy-emu-857`); each branch gets its own so its functions can be pushed
+neither is the development deployment every worktree's Freemail Dev and
+local website share by default (`tidy-emu-857`); each branch gets its own so its functions can be pushed
 without colliding with another's.
 
 ```sh
@@ -16,7 +16,7 @@ scripts/backend.sh push       # after changing services/convex/src
 scripts/backend.sh seed       # a fresh mailbox, dated now
 scripts/backend.sh seed 150   # the same, plus 150 older threads to page through
 scripts/backend.sh status     # which deployment this worktree talks to
-scripts/backend.sh teardown   # delete it; the app goes back to production, the local website to development
+scripts/backend.sh teardown   # delete it; Freemail Dev and the local website go back to development
 ```
 
 ## What `isolate` does
@@ -52,15 +52,16 @@ scripts/backend.sh teardown   # delete it; the app goes back to production, the 
 
 The state lives in `.cache/backend/`. `teardown` deletes the deployment
 through the Convex API, restores `.env.local`, and resets the overrides, so
-the mobile app talks to production again and the local website to
-development.
+Freemail Dev and the local website talk to the development deployment
+again.
 Deployments expire on their own after 14 days.
 
 ## How sign-in works, and why it can't reach production
 
 `scripts/sim.sh signin` calls the debug-only `globalThis.freemailDev.signIn()`
 (`apps/mobile/src/features/dev/automation.ts`) over Metro's debugger
-connection. It POSTs to `/api/mobile-auth/dev/sign-in` through the app's
+connection, which does what Freemail Dev's **Sign in as test owner** button
+does (`apps/mobile/src/features/auth/test-owner-sign-in.ts`). It POSTs to `/api/mobile-auth/dev/sign-in` through the app's
 own Better Auth client, so `@better-auth/expo` stores the session cookie in
 SecureStore exactly as after a passkey sign-in.
 
