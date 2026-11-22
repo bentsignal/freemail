@@ -172,6 +172,9 @@ configure() {
     convex env set AUTH_ALLOWED_USER_ID pending
   fi
   push
+  # The auth signing keys, as production has them, so Convex checks tokens
+  # without fetching them (services/convex/AUTH.md, "Signing keys").
+  convex env set AUTH_JWKS "$(curl -fsS "$SITE_URL/api/auth/convex/jwks" || true)"
 
   owner="$(convex run devTools:ensureOwner | tr -d '"[:space:]')"
   [ -n "$owner" ] || {

@@ -4,12 +4,14 @@ import { ConvexError, v } from "convex/values";
 import type { Doc } from "../_generated/dataModel";
 import { authedQuery } from "../utils";
 import {
+  createListReads,
   ensureListableAccount,
   ensureOwnedMessage,
   getActiveAccount,
   toMessageDetail,
   toMessageListItem,
 } from "./helpers";
+import { toListRow } from "./listRows";
 import { isAllMailLocation } from "./location";
 import { paginateMessageSearch } from "./messageSearch";
 import {
@@ -171,6 +173,7 @@ export const getMessagesByIds = authedQuery({
     const messages = await Promise.all(
       messageIds.map(async (messageId) => await ctx.db.get(messageId)),
     );
+    const reads = createListReads(ctx);
     const items = await Promise.all(
       messages
         .filter(
@@ -179,14 +182,16 @@ export const getMessagesByIds = authedQuery({
             (message.inInbox || !inboxOnly) &&
             matchesUnreadScope(args.unreadOnly, message),
         )
-        .map(async (message) => await toMessageListItem(ctx, message)),
+        .map(async (message) => await toMessageListItem(ctx, message, reads)),
     );
-    return items.filter(
-      (message): message is NonNullable<typeof message> =>
-        message !== null &&
-        message.classification?.isSpam !== true &&
-        (inboxOnly || isAllMailLocation(message, message.location)),
-    );
+    return items
+      .filter(
+        (message): message is NonNullable<typeof message> =>
+          message !== null &&
+          message.classification?.isSpam !== true &&
+          (inboxOnly || isAllMailLocation(message, message.location)),
+      )
+      .map(toListRow);
   },
 });
 
@@ -250,19 +255,22 @@ export const listSpam = authedQuery({
             }
           : paginationOpts,
       );
+    const reads = createListReads(ctx);
     const page = await Promise.all(
       classifications.page.map(async (classification) => {
         const message = await ctx.db.get(classification.messageId);
         if (!message?.inInbox || message.ownerId !== ctx.ownerId) return null;
         if (accountId && message.accountId !== accountId) return null;
-        return await toMessageListItem(ctx, message);
+        return await toMessageListItem(ctx, message, reads);
       }),
     );
     return {
       ...classifications,
-      page: page.filter((message): message is NonNullable<typeof message> =>
-        Boolean(message),
-      ),
+      page: page
+        .filter((message): message is NonNullable<typeof message> =>
+          Boolean(message),
+        )
+        .map(toListRow),
     };
   },
 });

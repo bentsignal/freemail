@@ -11,6 +11,7 @@ import {
   isolatedMailbox,
 } from "./devSeedMailbox";
 import { seedSentMail } from "./devSeedSent";
+import { projectDemoInboxMessages } from "./devSeedThreads";
 import {
   deleteDemoAccountRecords,
   ensureDemoAccount,
@@ -86,6 +87,7 @@ export const seed = internalMutation({
       if (!accountId) throw new ConvexError("Seed account not found");
       messages += await ensureDemoMessage(ctx, ownerId, accountId, fixture);
     }
+    await projectDemoInboxMessages(ctx, accountIds.values());
     await seedSentMail(ctx, ownerId, accountIds, Date.now());
     return { accounts: accountIds.size, messages };
   },

@@ -34,7 +34,9 @@ scripts/backend.sh teardown   # delete it; Freemail Dev and the local website go
    `DESKTOP_BROWSER_AUTH_URL` (this worktree's Portless origin),
    and `AUTH_EMAIL_FROM` (`noreply@example.invalid`). No production
    setting is copied.
-3. Pushes the functions (`convex dev --once`).
+3. Pushes the functions (`convex dev --once`), then sets `AUTH_JWKS` from
+   the deployment's own `/api/auth/convex/jwks`, as production has it
+   ([AUTH.md](../services/convex/AUTH.md#signing-keys)).
 4. Runs `devTools:ensureOwner`, an internal mutation that creates the test
    user `alex.rivera@example.com` through Better Auth's raw adapter
    (registration stays closed in `privateAccountHooks`), and sets

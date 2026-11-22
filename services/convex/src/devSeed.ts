@@ -3,6 +3,7 @@ import { ConvexError } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { env } from "./convex.env";
 import { DEMO_ACCOUNTS, DEMO_MESSAGES } from "./devSeedFixtures";
+import { projectDemoInboxMessages } from "./devSeedThreads";
 import {
   deleteDemoAccountRecords,
   ensureDemoAccount,
@@ -37,6 +38,7 @@ export const seedDemoMail = authedMutation({
       );
     }
 
+    await projectDemoInboxMessages(ctx, accountIds.values());
     return {
       accountCount: accountIds.size,
       insertedMessages,

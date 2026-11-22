@@ -44,3 +44,18 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
 - Verify: `scripts/backend.sh status` in a new worktree names
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
   the consent screen and returns to Freemail; Notes emails a sign-in code.
+
+## Check tokens without fetching the signing keys (#PR)
+
+- When: after the Convex deploy
+- Commands: from `services/convex`,
+  `pnpm exec convex env set --prod AUTH_JWKS "$(curl -fsS https://colorful-ostrich-734.convex.site/api/auth/convex/jwks)"`,
+  then the same for development after `main` is pushed there:
+  `pnpm exec convex env set AUTH_JWKS "$(curl -fsS https://tidy-emu-857.convex.site/api/auth/convex/jwks)"`
+  (with `.env.local` selecting `tidy-emu-857`). It's the public key set,
+  not a secret ([AUTH.md](../services/convex/AUTH.md#signing-keys)).
+- Verify: `pnpm exec convex env get --prod AUTH_JWKS` prints `{"keys":[…]}`
+  with the same `kid` as the curl output; the website and Freemail still
+  open signed in with mail; `pnpm exec convex logs --prod` shows no
+  `GET /api/auth/*` when Freemail opens (before, each open logged one).
+
