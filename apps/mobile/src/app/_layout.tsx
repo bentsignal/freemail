@@ -13,6 +13,7 @@ import {
   convex,
   launchedSignedIn,
   launchToken,
+  useHasDeviceSession,
 } from "~/features/auth/client";
 import { useLaunchSplash } from "~/features/auth/use-launch-splash";
 import { useStableAuthState } from "~/features/auth/use-stable-auth-state";
@@ -61,8 +62,10 @@ function AppShell({ readiness }: { readiness: ReturnType<typeof useInitApp> }) {
   const backgroundColor = useColor("background");
   const colorScheme = useResolvedMobileColorScheme();
   const liquidGlassIsAvailable = isLiquidGlassAvailable();
-  const { isAuthenticated, isInitialLoading } =
-    useStableAuthState(launchedSignedIn);
+  const { isAuthenticated, isInitialLoading } = useStableAuthState({
+    hasDeviceSession: useHasDeviceSession(),
+    launchedSignedIn,
+  });
   const appIsReady =
     readiness.backgroundColorsAreLoaded && readiness.fontsAreLoaded;
   markStartup("appReady", appIsReady);

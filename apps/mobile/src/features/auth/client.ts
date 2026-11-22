@@ -98,6 +98,15 @@ function forgetSavedSession() {
   forgetSavedInbox();
 }
 
+/**
+ * Whether the device has a session: true while it's being checked, false
+ * from the moment signing out starts (the expo plugin drops it then).
+ */
+export function useHasDeviceSession() {
+  const { data, error, isPending } = authClient.useSession();
+  return isPending || error !== null || Boolean(data?.session);
+}
+
 /** The saved Convex token, if it's still valid (saved-token.ts). */
 export const launchToken = readSavedToken();
 

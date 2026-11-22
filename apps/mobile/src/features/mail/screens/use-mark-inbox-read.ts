@@ -1,5 +1,5 @@
 import { Alert } from "react-native";
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 
 import type { MailAccountFilter } from "@freemail/features/mail";
 import { api } from "@freemail/convex/api";
@@ -11,17 +11,18 @@ import { getMarkAllReadMessage, getScopedUnreadCount } from "./mark-all-read";
 
 /**
  * Mark All as Read for the inbox, after a confirmation. The count it
- * confirms is asked for once the inbox's live page is in, so a cold open's
- * first answer from the server doesn't wait on it.
+ * confirms is asked for once the inbox's live page is in and the server has
+ * confirmed the session, so a cold open's first answer doesn't wait on it.
  */
 export function useMarkInboxRead(
   accountFilter: MailAccountFilter,
   accounts: MobileMailAccount[],
   inboxIsLive: boolean,
 ) {
+  const serverAuthenticated = useConvexAuth().isAuthenticated;
   const unreadCounts = useQuery(
     api.mail.queries.getUnreadCounts,
-    inboxIsLive ? {} : "skip",
+    inboxIsLive && serverAuthenticated ? {} : "skip",
   );
   const markInboxRead = useMutation(
     api.mail.inboxRead.markInboxRead,

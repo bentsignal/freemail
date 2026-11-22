@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   initialAuthState,
+  isSignedIn,
   resolveStableAuthState,
 } from "./use-stable-auth-state";
 
@@ -75,5 +76,11 @@ describe("stable auth state", () => {
 
   it("waits for the server without a session on the device", () => {
     expect(initialAuthState(false)).toBeUndefined();
+  });
+
+  it("signs out the moment the device's session goes, before the server says", () => {
+    expect(isSignedIn(true, true)).toBe(true);
+    expect(isSignedIn(true, false)).toBe(false);
+    expect(isSignedIn(undefined, true)).toBe(false);
   });
 });

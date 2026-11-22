@@ -4,7 +4,7 @@ import * as Crypto from "expo-crypto";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import * as SecureStore from "expo-secure-store";
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 
 import { api } from "@freemail/convex/api";
 
@@ -50,9 +50,12 @@ export function useMobileNotifications(isAuthenticated: boolean) {
   const registerPushToken = useMutation(
     api.notifications.mutations.registerPushToken,
   );
-  // Registration can wait for the inbox: these don't draw anything.
+  // These draw nothing, so they wait for the inbox, and for the server to
+  // have confirmed the session: the app shows signed in before it does, and
+  // a query running while auth is cleared (signing out) throws.
   const inboxIsLive = useInboxIsLive();
-  const queriesReady = isAuthenticated && inboxIsLive;
+  const serverAuthenticated = useConvexAuth().isAuthenticated;
+  const queriesReady = isAuthenticated && serverAuthenticated && inboxIsLive;
   const preferences = useQuery(
     api.notifications.queries.getPreferences,
     queriesReady ? {} : "skip",
