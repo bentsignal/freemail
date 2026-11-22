@@ -45,7 +45,7 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
   the consent screen and returns to Freemail; Notes emails a sign-in code.
 
-## Check tokens without fetching the signing keys (#PR)
+## Check tokens without fetching the signing keys (#58)
 
 `auth.config.ts` now reads `AUTH_JWKS`, and Convex refuses to push it to a
 deployment that doesn't have the variable, so it's set first. It's the
