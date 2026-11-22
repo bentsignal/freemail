@@ -32,14 +32,14 @@ Convex project `rodge-mail` (team `bentsignal`):
 | `dazzling-dog-633`     | `dev/shawn`  | Retired and paused, the rollback copy of the move to production                   |
 
 `convex deploy` targets the project's production deployment whatever
-`services/convex/.env.local` selects. `.env.local` selects development, so
-after the production deploy the release also pushes `main` there, or it
-falls behind:
+`services/convex/.env.local` selects. After the production deploy the
+release also pushes `main` to development, or it falls behind. Name the
+deployment: a worktree's `.env.local` can still select `dazzling-dog-633`:
 
 ```sh
 cd services/convex
 pnpm exec convex deploy -y
-pnpm exec convex dev --once --tail-logs disable
+CONVEX_DEPLOYMENT=dev:tidy-emu-857 pnpm exec convex dev --once --tail-logs disable
 ```
 
 `convex dev --once` pushes once and exits; never leave `convex dev` running.
