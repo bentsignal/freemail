@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { usePaginatedQuery, useQuery } from "convex/react";
-import { Paperclip, RotateCcw } from "lucide-react-native";
 
 import { api } from "@freemail/convex/api";
 import {
@@ -18,6 +17,7 @@ import {
 
 import type { SentRow } from "./sent-row";
 import { ContentReveal } from "~/components/content-reveal";
+import { Paperclip, RotateCcw } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { useDebouncedValue } from "~/hooks/use-debounced-value";
 import { useCachedMailboxPage } from "../hooks/use-cached-mailbox-page";

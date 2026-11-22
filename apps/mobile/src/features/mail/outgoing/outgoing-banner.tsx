@@ -4,12 +4,12 @@ import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useQuery } from "convex/react";
-import { AlertCircle, Check, RotateCcw, X } from "lucide-react-native";
 
 import { api } from "@freemail/convex/api";
 import { getSentSubject } from "@freemail/features/mail";
 
 import type { OutgoingBannerState } from "./outgoing-status";
+import { AlertCircle, Check, RotateCcw, X } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { useMailStore } from "../store";
 import { getOutgoingBannerState } from "./outgoing-status";

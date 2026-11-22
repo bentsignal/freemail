@@ -3,12 +3,12 @@ import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { useAction } from "convex/react";
-import { Download, Paperclip } from "lucide-react-native";
 
 import type { MailAttachment } from "@freemail/features/mail";
 import { api } from "@freemail/convex/api";
 import { normalizeAttachmentFileName } from "@freemail/convex/attachments/constants";
 
+import { Download, Paperclip } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { toConvexId } from "../lib/convex-id";
 

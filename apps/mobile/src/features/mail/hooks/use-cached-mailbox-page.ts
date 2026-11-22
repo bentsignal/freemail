@@ -4,15 +4,8 @@ import { readCachedAccountPage } from "@freemail/features/mail";
 
 import type { MailStoreValue } from "../store";
 import type { AccountPageCache } from "./use-account-page-cache";
+import { getMailboxPageKey } from "../lib/mailbox-page-key";
 import { useMailStore } from "../store";
-
-export function getMailboxPageKey(
-  mailbox: string,
-  accountId: string | undefined,
-  searchTerm = "",
-) {
-  return `${mailbox}:${accountId ?? "all"}:${searchTerm}`;
-}
 
 /**
  * Each mailbox and account's last settled page, kept for the session, so

@@ -1,5 +1,10 @@
+import { DeferredTab } from "~/components/deferred-tab";
 import { ComposerScreen } from "~/features/mail/screens/composer-screen";
 
 export default function NewMessage() {
-  return <ComposerScreen variant="tab" />;
+  return (
+    <DeferredTab afterMs={2000}>
+      <ComposerScreen variant="tab" />
+    </DeferredTab>
+  );
 }

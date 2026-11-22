@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { ChevronDown, ChevronUp } from "lucide-react-native";
 
 import type { MailAddress, MailMessage } from "@freemail/features/mail";
 
+import { ChevronDown, ChevronUp } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { formatMessageTime } from "../lib/mail-format";
 import { getMessageAddressRows } from "./message-address-rows";

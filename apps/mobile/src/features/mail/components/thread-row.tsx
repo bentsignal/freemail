@@ -1,5 +1,10 @@
 import { Pressable, Text, View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+
+import type { MailThread } from "@freemail/features/mail";
+
+import type { MobileMailbox } from "../store";
+import type { ThreadRowProps } from "./thread-row-types";
 import {
   Archive,
   ArchiveRestore,
@@ -8,12 +13,7 @@ import {
   MailOpen,
   Pin,
   Trash2,
-} from "lucide-react-native";
-
-import type { MailThread } from "@freemail/features/mail";
-
-import type { MobileMailbox } from "../store";
-import type { ThreadRowProps } from "./thread-row-types";
+} from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { useMailStore } from "../store";
 import {

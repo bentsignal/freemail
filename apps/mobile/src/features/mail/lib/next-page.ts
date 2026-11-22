@@ -6,10 +6,12 @@ export type PageStatus =
   | "LoadingMore";
 
 /**
- * How far from the end, in screens, a list asks for its next page, so the
- * page is usually in before the user gets there. The web app uses the same.
+ * How far from the end, in screens, a list asks for its next page. A first
+ * page is three screens or more, so the next one is asked for once the user
+ * starts scrolling and is in long before they get there, while opening a
+ * list never asks for more than its first page.
  */
-export const NEXT_PAGE_THRESHOLD = 1.5;
+export const NEXT_PAGE_THRESHOLD = 2;
 
 /**
  * Whether the list should ask for its next page. Only when the query has a

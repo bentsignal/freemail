@@ -10,6 +10,7 @@ import { api } from "@freemail/convex/api";
 
 import type { NotificationSetupState } from "./notification-setup";
 import { isFreemailDev } from "../dev/app-variant";
+import { useInboxIsLive } from "../mail/inbox-live";
 import { getExpoProjectId } from "./expo-project-id";
 import { NEW_MAIL_CATEGORY } from "./notification-actions";
 import {
@@ -49,13 +50,16 @@ export function useMobileNotifications(isAuthenticated: boolean) {
   const registerPushToken = useMutation(
     api.notifications.mutations.registerPushToken,
   );
+  // Registration can wait for the inbox: these don't draw anything.
+  const inboxIsLive = useInboxIsLive();
+  const queriesReady = isAuthenticated && inboxIsLive;
   const preferences = useQuery(
     api.notifications.queries.getPreferences,
-    isAuthenticated ? {} : "skip",
+    queriesReady ? {} : "skip",
   );
   const accountPreferences = useQuery(
     api.notifications.queries.listAccountPreferences,
-    isAuthenticated ? {} : "skip",
+    queriesReady ? {} : "skip",
   );
   const registrationEnabled =
     preferences?.newMailEnabled === true ||

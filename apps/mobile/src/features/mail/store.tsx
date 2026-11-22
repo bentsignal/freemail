@@ -11,9 +11,12 @@ import {
 
 import type { InboxItem } from "./lib/convex-mail";
 import type { SentRow } from "./sent/sent-row";
+import { markStartup } from "../dev/startup-timing";
 import { useAccountPageCache } from "./hooks/use-account-page-cache";
+import { markInboxLive } from "./inbox-live";
 import { toConvexId } from "./lib/convex-id";
 import { toMailAccount, toMailThreads } from "./lib/convex-mail";
+import { keepInboxForSaving, savedInboxAtLaunch } from "./saved-inbox";
 import { toggleSelectedThread } from "./screens/mailbox-controls";
 
 interface ThreadOverride {
@@ -41,9 +44,6 @@ function useInternalStore() {
   );
   const accountRows = useQuery(api.accounts.queries.list, {});
   const setThreadPinned = useMutation(api.mail.mutations.setThreadPinned);
-  const [threadCache, setThreadCache] = useState(
-    () => new Map<MailAccountFilter, ReturnType<typeof toMailThreads>>(),
-  );
   const [threadOverrides, setThreadOverrides] = useState<
     Record<string, ThreadOverride>
   >({});
@@ -52,11 +52,11 @@ function useInternalStore() {
   const messages = inbox.results;
   const liveThreads = toMailThreads(messages);
   const hasLivePage = inbox.status !== "LoadingFirstPage";
-  const cachedPage = readCachedAccountPage({
-    accountId: accountFilter === "all" ? undefined : accountFilter,
-    cache: threadCache,
-    key: accountFilter,
-    unifiedKey: "all",
+  const { cachedPage, savedAccounts } = useInboxPageCache({
+    accountFilter,
+    accountRows,
+    hasLivePage,
+    messages,
   });
   const visibleThreads = hasLivePage ? liveThreads : cachedPage.items;
   const threads = sortPinnedMailRows(
@@ -64,19 +64,8 @@ function useInternalStore() {
       (thread) => !archivedThreadIds.has(thread.id),
     ),
   );
-  const accounts = accountRows?.map(toMailAccount) ?? [];
+  const accounts = accountRows?.map(toMailAccount) ?? savedAccounts ?? [];
   const { markRead, toggleRead } = useReadActions(threads, setThreadOverrides);
-
-  // eslint-disable-next-line no-restricted-syntax -- Cache the latest settled Convex subscription page for instant mailbox revisits.
-  useEffect(() => {
-    if (!hasLivePage) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- The Convex page is an external subscription snapshot.
-    setThreadCache((current) => {
-      const next = new Map(current);
-      next.set(accountFilter, toMailThreads(messages));
-      return next;
-    });
-  }, [accountFilter, hasLivePage, messages]);
 
   // eslint-disable-next-line no-restricted-syntax -- Reconcile local optimistic state when the Convex subscription confirms it.
   useEffect(() => {
@@ -134,6 +123,62 @@ function useInternalStore() {
 }
 
 export type MailStoreValue = ReturnType<typeof useInternalStore>;
+
+/**
+ * Each account filter's last live inbox page, kept for the session so
+ * switching filters shows rows at once. A cold open starts from the page
+ * saved on the device (saved-inbox.ts), and the live unified page is kept
+ * to save as the app leaves the screen.
+ */
+function useInboxPageCache({
+  accountFilter,
+  accountRows,
+  hasLivePage,
+  messages,
+}: {
+  accountFilter: MailAccountFilter;
+  accountRows: Parameters<typeof toMailAccount>[0][] | undefined;
+  hasLivePage: boolean;
+  messages: InboxItem[];
+}) {
+  const savedInbox = savedInboxAtLaunch();
+  const [threadCache, setThreadCache] = useState(
+    () =>
+      new Map<MailAccountFilter, ReturnType<typeof toMailThreads>>(
+        savedInbox ? [["all", savedInbox.threads]] : [],
+      ),
+  );
+  markStartup("inboxLive", hasLivePage);
+
+  // eslint-disable-next-line no-restricted-syntax -- Cache the latest settled Convex subscription page for instant mailbox revisits, and for the next cold open.
+  useEffect(() => {
+    if (!hasLivePage) return;
+    markInboxLive();
+    const page = toMailThreads(messages);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- The Convex page is an external subscription snapshot.
+    setThreadCache((current) => {
+      const next = new Map(current);
+      next.set(accountFilter, page);
+      return next;
+    });
+    if (accountFilter === "all" && accountRows) {
+      keepInboxForSaving({
+        accounts: accountRows.map(toMailAccount),
+        threads: page,
+      });
+    }
+  }, [accountFilter, accountRows, hasLivePage, messages]);
+
+  return {
+    cachedPage: readCachedAccountPage({
+      accountId: accountFilter === "all" ? undefined : accountFilter,
+      cache: threadCache,
+      key: accountFilter,
+      unifiedKey: "all",
+    }),
+    savedAccounts: savedInbox?.accounts,
+  };
+}
 
 export const { Store: MailStore, useStore: useMailStore } =
   createStore(useInternalStore);

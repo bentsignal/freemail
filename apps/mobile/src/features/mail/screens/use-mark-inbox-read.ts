@@ -9,12 +9,20 @@ import { optimisticallyMarkInboxRead } from "../inbox-read-optimistic";
 import { toConvexId } from "../lib/convex-id";
 import { getMarkAllReadMessage, getScopedUnreadCount } from "./mark-all-read";
 
-/** Mark All as Read for the inbox, after a confirmation. */
+/**
+ * Mark All as Read for the inbox, after a confirmation. The count it
+ * confirms is asked for once the inbox's live page is in, so a cold open's
+ * first answer from the server doesn't wait on it.
+ */
 export function useMarkInboxRead(
   accountFilter: MailAccountFilter,
   accounts: MobileMailAccount[],
+  inboxIsLive: boolean,
 ) {
-  const unreadCounts = useQuery(api.mail.queries.getUnreadCounts, {});
+  const unreadCounts = useQuery(
+    api.mail.queries.getUnreadCounts,
+    inboxIsLive ? {} : "skip",
+  );
   const markInboxRead = useMutation(
     api.mail.inboxRead.markInboxRead,
   ).withOptimisticUpdate(optimisticallyMarkInboxRead);

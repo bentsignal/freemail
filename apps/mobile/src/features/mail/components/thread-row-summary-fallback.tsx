@@ -1,9 +1,9 @@
 import { Pressable, Text, View } from "react-native";
-import { CheckCircle2, Circle, Pin } from "lucide-react-native";
 
 import type { MailThread } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
+import { CheckCircle2, Circle, Pin } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { formatInboxMessageTime } from "../lib/mail-format";
 import {

@@ -2,11 +2,11 @@ import { useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { Check, Copy } from "lucide-react-native";
 
 import type { MailMessage } from "@freemail/features/mail";
 
 import type { MessageViewMode } from "./thread-message-body";
+import { Check, Copy } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 
 export function CleanViewCodeCard({

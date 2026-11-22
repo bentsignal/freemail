@@ -21,6 +21,10 @@ export interface RouterContext {
 export function getRouter() {
   const convex = new ConvexReactClient(urls.convex.cloud, {
     expectAuth: true,
+    // The token the server rendered with is good for this connection;
+    // fetching a fresh one at once re-authenticates, which re-runs every
+    // query the page has open.
+    initialAuthTokenReuse: true,
   });
   const convexQueryClient = new ConvexQueryClient(convex);
   const queryClient = new QueryClient({

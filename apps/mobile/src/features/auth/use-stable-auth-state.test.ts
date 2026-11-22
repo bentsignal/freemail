@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveStableAuthState } from "./use-stable-auth-state";
+import {
+  initialAuthState,
+  resolveStableAuthState,
+} from "./use-stable-auth-state";
 
 describe("stable auth state", () => {
   it("shows loading only before the first resolved session", () => {
@@ -50,5 +53,27 @@ describe("stable auth state", () => {
       isInitialLoading: false,
       lastResolved: false,
     });
+  });
+
+  it("opens signed in with a session on the device, before the server confirms it", () => {
+    const state = resolveStableAuthState(
+      { isAuthenticated: false, isLoading: true },
+      initialAuthState(true),
+    );
+    expect(state).toEqual({
+      isAuthenticated: true,
+      isInitialLoading: false,
+      lastResolved: true,
+    });
+    expect(
+      resolveStableAuthState(
+        { isAuthenticated: false, isLoading: false },
+        state.lastResolved,
+      ).isAuthenticated,
+    ).toBe(false);
+  });
+
+  it("waits for the server without a session on the device", () => {
+    expect(initialAuthState(false)).toBeUndefined();
   });
 });

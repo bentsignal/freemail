@@ -6,7 +6,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const CONTENT_REVEAL_MS = 180;
+const CONTENT_REVEAL_MS = 120;
 
 /**
  * Shows the bare background until `isReady`, then fades its content in on

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getMailboxPageKey } from "./use-cached-mailbox-page";
+import { getMailboxPageKey } from "./mailbox-page-key";
 
 describe("mailbox page keys", () => {
   it("separates mailboxes, accounts, and searches", () => {
