@@ -20,7 +20,16 @@ Work in a clean checkout at `origin/main`. In a T3 worktree:
 
 ```sh
 git fetch origin --tags && git checkout --detach origin/main && pnpm install --frozen-lockfile
+git update-index --no-skip-worktree shared/config/src/overrides.ts shared/config/src/auth.ts
+git checkout -- shared/config/src/overrides.ts shared/config/src/auth.ts
 ```
+
+A worktree's setup writes its id into those two files and hides them from
+`git status`; left in, the website ships with the worktree id in its tab
+title. A worktree also has no Vercel link, and `vercel deploy` in an
+unlinked folder creates a new project named after it, so copy the main
+checkout's link: `mkdir -p .vercel && cp /Users/shawn/dev/rodge-mail/.vercel/project.json .vercel/`
+(it names `rodge-mail`).
 
 ## 1. Plan
 
@@ -77,11 +86,11 @@ Send Shawn the write-up with the list in two parts:
 
 From the release checkout (detached at `origin/main`, no isolated
 backend), Freemail Dev runs `main` against the development deployment, so
-push `main`'s functions there first (from `services/convex`, whose
-`.env.local` selects development; `main` is the one branch allowed there):
+push `main`'s functions there first (named, as in step 5; `main` is the
+one branch allowed there):
 
 ```sh
-(cd services/convex && pnpm exec convex dev --once --tail-logs disable)
+(cd services/convex && CONVEX_DEPLOYMENT=dev:tidy-emu-857 pnpm exec convex dev --once --tail-logs disable)
 scripts/phone.sh up
 scripts/web.sh up    # when the website changed
 ```
@@ -124,11 +133,13 @@ Then call what changed (`npx convex run --prod` on an internal query, or
 errors. Every Convex command needs `--prod` to reach production; without it
 the command runs against development.
 
-Then push `main` to the development deployment again (`tidy-emu-857`,
-which `.env.local` selects) so Freemail Dev and the local website don't
-fall behind:
+Then push `main` to the development deployment again (`tidy-emu-857`) so
+Freemail Dev and the local website don't fall behind. Name it: a
+worktree's `.env.local` can still select the retired `dazzling-dog-633`:
 
 ```sh
+export CONVEX_DEPLOYMENT=dev:tidy-emu-857
+pnpm exec convex dashboard --no-open   # must end in tidy-emu-857
 pnpm exec convex dev --once --tail-logs disable
 ```
 
