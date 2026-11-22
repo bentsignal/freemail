@@ -88,14 +88,14 @@ mounting the inbox's rows; "live" is the live page arriving.
 
 **Warm backend** (launches seconds apart), five launches each:
 
-|                            | Before (main)         | After                 |
-| -------------------------- | --------------------- | --------------------- |
-| First render               | 532–550               | 348–352               |
-| Inbox on screen            | 1,481–1,530           | 948–970 (saved)       |
-| Live inbox                 | 1,037–1,090           | 1,015–1,058           |
-| Token requests             | 2                     | 0 (saved token)       |
-| Authenticate messages      | 2 (every query reran) | 1                     |
-| Queries in the first batch | 5, answered in 48 KB  | 2, answered in 26 KB  |
+|                            | Before (main)         | After                |
+| -------------------------- | --------------------- | -------------------- |
+| First render               | 532–550               | 348–352              |
+| Inbox on screen            | 1,481–1,530           | 948–970 (saved)      |
+| Live inbox                 | 1,037–1,090           | 1,015–1,058          |
+| Token requests             | 2                     | 0 (saved token)      |
+| Authenticate messages      | 2 (every query reran) | 1                    |
+| Queries in the first batch | 5, answered in 48 KB  | 2, answered in 26 KB |
 
 Without a saved inbox (the first open after signing in), the after build
 gets the live inbox at 612–839 and has it on screen at 958–1,176. With a
@@ -106,22 +106,25 @@ needs); it pays off when the server is slow to answer, as below.
 **Cold backend** (nothing for 15 minutes, so the saved token has expired
 and the auth routes start cold):
 
-|                 | Before (main) | After |
-| --------------- | ------------- | ----- |
-| Inbox on screen | 2,248         | 869 (saved) |
-| Live inbox      | 1,842         | 1,368 |
+|                 | Before (main) | After              |
+| --------------- | ------------- | ------------------ |
+| Inbox on screen | 2,248         | 869, 1,011 (saved) |
+| Live inbox      | 1,842         | 1,368, 1,425       |
 
-After 15 minutes the token request is most of the wait for live data (723
-ms, 623 of it the auth HTTP action starting cold). See "Left as they are".
+After 15 minutes the token request is most of the wait for live data
+(723–888 ms, mostly the auth HTTP action starting cold). See "Left as they
+are". The second after run had `AUTH_JWKS` set: the websocket's auth reply
+came 47 ms after sending, against 185 ms in the first (which fetched the
+keys).
 
 **Server, one run of each query** (`scripts/query-cost.mjs`, nothing
 cached, the same mailbox):
 
-| Query                     | Before                         | After                           |
-| ------------------------- | ------------------------------ | ------------------------------- |
-| `listInbox` (26 rows)     | 120 docs, 71.6 KB read, 46.6 KB sent | 94 docs, 63.9 KB read, 23.3 KB sent |
-| `getUnreadCounts`         | 220 docs, 129.8 KB read        | 112 docs, 62.7 KB read          |
-| `accounts:list`           | 4 docs                         | 4 docs                          |
+| Query                 | Before                               | After                               |
+| --------------------- | ------------------------------------ | ----------------------------------- |
+| `listInbox` (26 rows) | 120 docs, 71.6 KB read, 46.6 KB sent | 94 docs, 63.9 KB read, 23.3 KB sent |
+| `getUnreadCounts`     | 220 docs, 129.8 KB read              | 112 docs, 62.7 KB read              |
+| `accounts:list`       | 4 docs                               | 4 docs                              |
 
 `listInbox` reruns whenever a thread on its page changes, and the unread
 count whenever any unread thread does, so the savings repeat with every
