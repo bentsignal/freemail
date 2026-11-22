@@ -113,8 +113,8 @@ describe("shouldRequestNextPage", () => {
 });
 
 describe("getThresholdRows", () => {
-  it("covers a screen and a half of rows", () => {
-    expect(getThresholdRows(800, 109)).toBe(12);
+  it("covers two screens of rows", () => {
+    expect(getThresholdRows(800, 109)).toBe(15);
     expect(getThresholdRows(0, 109)).toBe(0);
   });
 });

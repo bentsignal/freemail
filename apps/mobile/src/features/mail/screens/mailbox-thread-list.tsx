@@ -11,6 +11,7 @@ import type { PageStatus } from "../lib/next-page";
 import type { MobileMailbox } from "../store";
 import type { MailboxFilter } from "./mailbox-controls";
 import { ContentReveal } from "~/components/content-reveal";
+import { markStartup } from "~/features/dev/startup-timing";
 import { useColor } from "~/hooks/use-color";
 import { useNextPage } from "../hooks/use-next-page";
 import { useSteadyData } from "../hooks/use-steady-data";
@@ -206,6 +207,13 @@ function MailboxRows({
   });
   // LegendList keeps its rows hidden until it has laid them out.
   const [listIsLoaded, setListIsLoaded] = useState(false);
+  markStartup(
+    "inboxShown",
+    mailbox === "inbox",
+    feedback.isReady,
+    listIsLoaded,
+    transition.data.length > 0,
+  );
   return (
     <ContentReveal
       isReady={

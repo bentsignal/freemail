@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery } from "convex/react";
-import { AlertCircle, Check, Paperclip } from "lucide-react-native";
 
 import type { api as Api } from "@freemail/convex/api";
 import { api } from "@freemail/convex/api";
@@ -20,6 +19,7 @@ import {
 } from "@freemail/features/mail";
 
 import { ContentReveal } from "~/components/content-reveal";
+import { AlertCircle, Check, Paperclip } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { toConvexId } from "../lib/convex-id";
 import { formatMessageTime } from "../lib/mail-format";

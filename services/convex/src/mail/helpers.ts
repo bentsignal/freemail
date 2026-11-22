@@ -110,12 +110,37 @@ export async function getCleanViewForMessage(
     .unique();
 }
 
+/**
+ * Reads a list query makes more than once, made once: every row of a page
+ * reads its account, and a page's rows share a few accounts. One per query
+ * run, never shared between runs.
+ */
+export function createListReads(ctx: Pick<QueryCtx, "db">) {
+  const accounts = new Map<
+    Id<"mailAccounts">,
+    Promise<Doc<"mailAccounts"> | null>
+  >();
+  return {
+    account(accountId: Id<"mailAccounts">) {
+      let account = accounts.get(accountId);
+      if (!account) {
+        account = ctx.db.get(accountId);
+        accounts.set(accountId, account);
+      }
+      return account;
+    },
+  };
+}
+
+export type ListReads = ReturnType<typeof createListReads>;
+
 export async function toMessageListItem(
   ctx: Pick<QueryCtx, "db">,
   message: Doc<"messages">,
+  reads?: ListReads,
 ) {
   const [account, classification] = await Promise.all([
-    ctx.db.get(message.accountId),
+    reads ? reads.account(message.accountId) : ctx.db.get(message.accountId),
     getClassificationForMessage(ctx, message._id),
   ]);
   if (!account) {
@@ -150,25 +175,33 @@ function getMailingListPresentation(
   };
 }
 
-export async function toThreadListItem(
+/** A thread's newest message in the inbox, from its projection when current. */
+export async function getLatestInboxMessage(
   ctx: Pick<QueryCtx, "db">,
   thread: Doc<"threads">,
 ) {
   const projectedMessage = thread.latestInboxMessageId
     ? await ctx.db.get(thread.latestInboxMessageId)
     : null;
-  const latestMessage =
-    projectedMessage?.threadId === thread._id && projectedMessage.inInbox
-      ? projectedMessage
-      : await ctx.db
-          .query("messages")
-          .withIndex("by_thread_received", (q) => q.eq("threadId", thread._id))
-          .order("desc")
-          .filter((q) => q.eq(q.field("inInbox"), true))
-          .first();
+  return projectedMessage?.threadId === thread._id && projectedMessage.inInbox
+    ? projectedMessage
+    : await ctx.db
+        .query("messages")
+        .withIndex("by_thread_received", (q) => q.eq("threadId", thread._id))
+        .order("desc")
+        .filter((q) => q.eq(q.field("inInbox"), true))
+        .first();
+}
+
+export async function toThreadListItem(
+  ctx: Pick<QueryCtx, "db">,
+  thread: Doc<"threads">,
+  reads?: ListReads,
+) {
+  const latestMessage = await getLatestInboxMessage(ctx, thread);
   if (!latestMessage) return null;
   const [listItem, legacyPinnedMessage] = await Promise.all([
-    toMessageListItem(ctx, latestMessage),
+    toMessageListItem(ctx, latestMessage, reads),
     thread.isPinned === undefined
       ? ctx.db
           .query("messages")
@@ -199,9 +232,10 @@ const ALL_MAIL_THREAD_SCAN = 20;
 export async function toAllMailThreadListItem(
   ctx: Pick<QueryCtx, "db">,
   thread: Doc<"threads">,
+  reads?: ListReads,
 ) {
   if (thread.inInbox !== false) {
-    const inboxItem = await toThreadListItem(ctx, thread);
+    const inboxItem = await toThreadListItem(ctx, thread, reads);
     if (inboxItem) return inboxItem;
   }
   const messages = await ctx.db
@@ -211,7 +245,7 @@ export async function toAllMailThreadListItem(
     .take(ALL_MAIL_THREAD_SCAN);
   for (const message of messages) {
     if (message.hiddenAt !== undefined) continue;
-    const listItem = await toMessageListItem(ctx, message);
+    const listItem = await toMessageListItem(ctx, message, reads);
     if (!listItem) return null;
     if (
       !isAllMailLocation(message, listItem.location) ||
@@ -232,6 +266,7 @@ export async function toAllMailThreadListItem(
 export async function toArchivedThreadListItem(
   ctx: Pick<QueryCtx, "db">,
   thread: Doc<"threads">,
+  reads?: ListReads,
 ) {
   const latestArchivedMessage = await ctx.db
     .query("messages")
@@ -240,7 +275,7 @@ export async function toArchivedThreadListItem(
     .filter((q) => q.neq(q.field("archivedAt"), undefined))
     .first();
   if (!latestArchivedMessage || thread.archivedAt === undefined) return null;
-  const listItem = await toMessageListItem(ctx, latestArchivedMessage);
+  const listItem = await toMessageListItem(ctx, latestArchivedMessage, reads);
   if (!listItem) return null;
   return {
     ...listItem,

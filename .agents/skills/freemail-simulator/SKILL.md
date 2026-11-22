@@ -66,6 +66,7 @@ scripts/sim.sh reload         # reload the JavaScript
 scripts/sim.sh shot <name>    # screenshot to .cache/evidence/<name>.png
 scripts/sim.sh record <name>  # start a video; `scripts/sim.sh stop` ends it
 scripts/sim.sh frames start   # record UI-thread frames; `frames stop` prints the report
+scripts/sim.sh timings        # this launch's startup marks, auth requests, websocket, and stalls (docs/data-loading.md)
 scripts/sim.sh status         # this worktree's devices and Metro
 scripts/sim.sh queue          # every device on the Mac, who is waiting, and why
 scripts/sim.sh down           # delete the device; Metro stops with the last one

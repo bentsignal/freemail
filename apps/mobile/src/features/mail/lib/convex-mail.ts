@@ -54,6 +54,8 @@ export function toMailThread(item: InboxItem) {
   };
 }
 
+export type MobileMailThread = ReturnType<typeof toMailThread>;
+
 export function toMailThreads(items: InboxItem[]) {
   return sortPinnedMailRows(dedupeThreadRows(items).map(toMailThread));
 }

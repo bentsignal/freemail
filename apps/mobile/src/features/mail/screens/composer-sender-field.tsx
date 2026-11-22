@@ -1,8 +1,8 @@
 import { Pressable, Text } from "react-native";
 import { MenuView } from "@expo/ui/community/menu";
-import { ChevronsUpDown } from "lucide-react-native";
 
 import type { MobileMailAccount } from "../lib/convex-mail";
+import { ChevronsUpDown } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 import { ComposerRow } from "./composer-field";
 import { getComposerAccountLabel } from "./composer-presentation";

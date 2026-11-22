@@ -14,6 +14,7 @@
 #   reload           reload the JavaScript
 #   relaunch         restart the app (clears in-memory state)
 #   eval "<js>"      evaluate JavaScript in the running app
+#   timings          this launch's startup marks and auth requests, in ms
 #   frames start     record the UI thread's frames (to measure an animation);
 #                    waits until no device on the Mac is booting
 #   frames stop      stop, and report the frames that drew slowly and how
@@ -586,6 +587,7 @@ case "$command" in
   up) up ;;
   open) require_up && open_path "${1:?path}" ;;
   eval) require_up && app_eval "${1:?expression}" ;;
+  timings) require_up && app_eval "globalThis.freemailDev.timings()" ;;
   frames) frames "${1:-}" ;;
   relaunch) require_up && launch && echo "relaunched" ;;
   shot) shot "${1:?name}" ;;

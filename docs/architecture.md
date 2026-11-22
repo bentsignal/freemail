@@ -19,6 +19,10 @@ Expo mobile ─────────┼─> Convex queries, mutations, and au
 freemail CLI ────────┘
 ```
 
+Opening the app reads the session, the Convex token, and the inbox's first
+page from the device, then reconciles with live data
+([data-loading.md](data-loading.md)).
+
 ## Identity and mailbox access
 
 Freemail authentication and mailbox authorization are separate concerns.

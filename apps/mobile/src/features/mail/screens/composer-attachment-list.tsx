@@ -5,9 +5,9 @@ import {
   Text,
   View,
 } from "react-native";
-import { FileText, Image as ImageIcon, X } from "lucide-react-native";
 
 import type { NativeComposerAttachment } from "./use-native-attachments";
+import { FileText, Image as ImageIcon, X } from "~/components/icons";
 import { useColor } from "~/hooks/use-color";
 
 /** A horizontal strip of compact attachment chips under the subject. */

@@ -8,6 +8,7 @@ import * as SystemUI from "expo-system-ui";
 import { Roboto_500Medium } from "@expo-google-fonts/roboto/500Medium";
 import { useFonts } from "@expo-google-fonts/roboto/useFonts";
 
+import { markStartup } from "~/features/dev/startup-timing";
 import { loadMobileAppearance } from "~/features/theme/mobile-theme";
 import { useColor } from "~/hooks/use-color";
 
@@ -47,6 +48,10 @@ export function useInitApp() {
   const [fontsAreLoaded] = useFonts({
     Roboto_500Medium,
   });
+  markStartup("rootRender");
+  markStartup("appearanceLoaded", appearanceIsLoaded);
+  markStartup("systemBackground", backgroundColorsAreLoaded);
+  markStartup("fontsLoaded", fontsAreLoaded);
 
   return {
     backgroundColorsAreLoaded,

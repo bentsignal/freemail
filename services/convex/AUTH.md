@@ -55,6 +55,32 @@ plugin to registration codes, on both `/api/auth` and `/api/mobile-auth`:
 - Every other email OTP route (password reset, email verification and change,
   code checks) answers 404.
 
+## Signing keys
+
+Better Auth signs the Convex tokens with the newest key in its own `jwks`
+table (`/api/auth` and `/api/mobile-auth` share it). To check a token on a
+new connection, Convex needs the public half. Without `AUTH_JWKS` it fetches
+it from `/api/auth/convex/jwks`, an HTTP action that loads the whole auth
+bundle (about 1.5 MB, mostly Better Auth and zod), so on a cold backend
+every app open waited on it before its first query.
+
+`AUTH_JWKS` holds that public key set, exactly as the route serves it, and
+`auth.config.ts` passes it to Convex inline, so tokens are checked without a
+request. It's public, not a secret. Empty or invalid, Convex fetches the
+keys as before, but it must exist: Convex refuses to push functions whose
+auth config reads a variable the deployment doesn't have (and the config
+can't tell an unset variable apart without reading it).
+`scripts/backend.sh push` sets it on isolated backends when it's missing.
+Changing it takes effect at once, without a deploy:
+
+```sh
+npx convex env set --prod AUTH_JWKS "$(curl -fsS https://colorful-ostrich-734.convex.site/api/auth/convex/jwks)"
+```
+
+If the keys are ever rotated (Better Auth's `rotateKeys`), set it again
+right after, or tokens signed with the new key are turned down and the apps
+sign out. `scripts/backend.sh isolate` sets it on isolated backends.
+
 ## Email code limits
 
 Registration and recovery codes share two token buckets in the

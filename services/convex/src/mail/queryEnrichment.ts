@@ -2,11 +2,15 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import type { AuthedQueryCtx } from "../utils";
 import {
+  createListReads,
+  getClassificationForMessage,
+  getLatestInboxMessage,
   isActiveAccount,
   toAllMailThreadListItem,
   toMessageListItem,
   toThreadListItem,
 } from "./helpers";
+import { toListRow } from "./listRows";
 import { isAllMailLocation } from "./location";
 import { getUnreadCountSummary } from "./unreadCounts";
 
@@ -41,6 +45,10 @@ export async function getVisibleUnreadInboxThreads(
       .filter(isActiveAccount)
       .map((account) => account._id),
   );
+  // A thread counts when the inbox would show its row: it has a message in
+  // the inbox, and that message isn't spam. Only that message's
+  // classification is read, not the row, and the thread's projection names
+  // the message (INBOX.md); threads from before it read the message too.
   const visibleThreads = await Promise.all(
     threads
       .filter(
@@ -48,14 +56,20 @@ export async function getVisibleUnreadInboxThreads(
           activeAccountIds.has(thread.accountId) &&
           (accountId === undefined || thread.accountId === accountId),
       )
-      .map(async (thread) => ({
-        item: await toThreadListItem(ctx, thread),
-        thread,
-      })),
+      .map(async (thread) => {
+        const messageId =
+          thread.inInbox === true && thread.latestInboxMessageId
+            ? thread.latestInboxMessageId
+            : (await getLatestInboxMessage(ctx, thread))?._id;
+        if (!messageId) return null;
+        const classification = await getClassificationForMessage(
+          ctx,
+          messageId,
+        );
+        return classification?.isSpam === true ? null : thread;
+      }),
   );
-  return visibleThreads
-    .filter(({ item }) => item?.classification?.isSpam !== true)
-    .map(({ thread }) => thread);
+  return visibleThreads.filter((thread) => thread !== null);
 }
 
 export async function enrichMessagePage<T extends { page: Doc<"messages">[] }>(
@@ -63,19 +77,23 @@ export async function enrichMessagePage<T extends { page: Doc<"messages">[] }>(
   results: T,
   scope: MailSearchScope = "inbox",
 ) {
+  const { page: messages, ...pagination } = results;
+  const reads = createListReads(ctx);
   const page = await Promise.all(
-    results.page.map(async (message) => {
-      return await toMessageListItem(ctx, message);
+    messages.map(async (message) => {
+      return await toMessageListItem(ctx, message, reads);
     }),
   );
   return {
-    ...results,
-    page: page.filter(
-      (message): message is NonNullable<typeof message> =>
-        message !== null &&
-        message.classification?.isSpam !== true &&
-        (scope === "inbox" || isAllMailLocation(message, message.location)),
-    ),
+    ...pagination,
+    page: page
+      .filter(
+        (message): message is NonNullable<typeof message> =>
+          message !== null &&
+          message.classification?.isSpam !== true &&
+          (scope === "inbox" || isAllMailLocation(message, message.location)),
+      )
+      .map(toListRow),
   };
 }
 
@@ -84,15 +102,20 @@ export async function enrichAllMailPage<T extends { page: Doc<"threads">[] }>(
   results: T,
 ) {
   const { page, ...pagination } = results;
+  const reads = createListReads(ctx);
   const items = await Promise.all(
-    page.map(async (thread) => await toAllMailThreadListItem(ctx, thread)),
+    page.map(
+      async (thread) => await toAllMailThreadListItem(ctx, thread, reads),
+    ),
   );
   return {
     ...pagination,
-    page: items.filter(
-      (item): item is NonNullable<typeof item> =>
-        item !== null && item.classification?.isSpam !== true,
-    ),
+    page: items
+      .filter(
+        (item): item is NonNullable<typeof item> =>
+          item !== null && item.classification?.isSpam !== true,
+      )
+      .map(toListRow),
   };
 }
 
@@ -102,16 +125,19 @@ export async function enrichThreadPage<T extends { page: Doc<"threads">[] }>(
   pinnedOnly = false,
 ) {
   const { page, ...pagination } = results;
+  const reads = createListReads(ctx);
   const items = await Promise.all(
-    page.map(async (thread) => await toThreadListItem(ctx, thread)),
+    page.map(async (thread) => await toThreadListItem(ctx, thread, reads)),
   );
   return {
     ...pagination,
-    page: items.filter(
-      (item): item is NonNullable<typeof item> =>
-        item !== null &&
-        item.classification?.isSpam !== true &&
-        (!pinnedOnly || item.isPinned),
-    ),
+    page: items
+      .filter(
+        (item): item is NonNullable<typeof item> =>
+          item !== null &&
+          item.classification?.isSpam !== true &&
+          (!pinnedOnly || item.isPinned),
+      )
+      .map(toListRow),
   };
 }

@@ -6,12 +6,20 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { useConvexAuth } from "convex/react";
 
-import { authClient, convex } from "~/features/auth/client";
+import {
+  authClient,
+  convex,
+  launchedSignedIn,
+  launchToken,
+  useHasDeviceSession,
+} from "~/features/auth/client";
 import { useLaunchSplash } from "~/features/auth/use-launch-splash";
 import { useStableAuthState } from "~/features/auth/use-stable-auth-state";
 import { installDevAutomation } from "~/features/dev/automation";
 import { DevMailBridge } from "~/features/dev/dev-mail";
+import { markStartup } from "~/features/dev/startup-timing";
 import { OutgoingMailBanner } from "~/features/mail/outgoing/outgoing-banner";
 import { OutgoingMailStore } from "~/features/mail/outgoing/outgoing-store";
 import { MailStore } from "~/features/mail/store";
@@ -37,7 +45,11 @@ export default function RootLayout() {
     >
       <SafeAreaProvider>
         <StrictMode>
-          <ConvexBetterAuthProvider authClient={authClient} client={convex}>
+          <ConvexBetterAuthProvider
+            authClient={authClient}
+            client={convex}
+            initialToken={launchToken}
+          >
             <AppShell readiness={readiness} />
           </ConvexBetterAuthProvider>
         </StrictMode>
@@ -50,9 +62,15 @@ function AppShell({ readiness }: { readiness: ReturnType<typeof useInitApp> }) {
   const backgroundColor = useColor("background");
   const colorScheme = useResolvedMobileColorScheme();
   const liquidGlassIsAvailable = isLiquidGlassAvailable();
-  const { isAuthenticated, isInitialLoading } = useStableAuthState();
+  const { isAuthenticated, isInitialLoading } = useStableAuthState({
+    hasDeviceSession: useHasDeviceSession(),
+    launchedSignedIn,
+  });
   const appIsReady =
     readiness.backgroundColorsAreLoaded && readiness.fontsAreLoaded;
+  markStartup("appReady", appIsReady);
+  markStartup("authKnown", !isInitialLoading);
+  markStartup("serverAuthed", useConvexAuth().isAuthenticated);
   useMobileNotifications(isAuthenticated);
   useLaunchSplash({ appIsReady, authIsLoading: isInitialLoading });
 

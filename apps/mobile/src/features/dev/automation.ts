@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import { signInAsTestOwner } from "~/features/auth/test-owner-sign-in";
 import { devMailActions } from "./dev-mail-actions";
 import { frameReport, startFrames, stopFrames } from "./frames";
+import { startupTimings } from "./startup-timing";
 
 function isAppPath(path: string): path is Href & string {
   return path.startsWith("/");
@@ -28,12 +29,14 @@ function signIn() {
 }
 
 /**
- * Debug builds only: lets `scripts/sim.sh` navigate, reload, sign in, and
- * measure frames over Metro's debugger connection. iOS asks "Open in Freemail
+ * Debug and profile bundles only: lets `scripts/sim.sh` navigate, reload,
+ * sign in, and measure frames and startup over Metro's debugger connection. iOS asks "Open in Freemail
  * Mail?" before every `simctl openurl`, which scripts cannot answer.
  */
 export function installDevAutomation() {
-  if (!__DEV__) return;
+  if (!__DEV__ && process.env.EXPO_PUBLIC_FREEMAIL_PROFILE_BUNDLE !== "1") {
+    return;
+  }
   Object.assign(globalThis, {
     freemailDev: {
       open(path: string) {
@@ -46,6 +49,7 @@ export function installDevAutomation() {
       signIn,
       signInStatus: () => signInStatus,
       frames: { report: frameReport, start: startFrames, stop: stopFrames },
+      timings: () => JSON.stringify(startupTimings()),
       /** The inbox's rows by index: `mail.pin(0)`, `archive`, `read`; `select()` toggles selection mode. */
       mail: {
         archive: (index: number) => devMailActions()?.archive(index),

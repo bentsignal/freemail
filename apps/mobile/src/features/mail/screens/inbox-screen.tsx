@@ -99,7 +99,11 @@ function InboxMailbox({ searchMode, searchTerm }: InboxMailboxProps) {
   const primary = useColor("primary");
   const { isRefreshing, refresh, refreshError } = useInboxRefresh(accounts);
   const moveToInbox = useMoveToInbox();
-  const confirmMarkAllRead = useMarkInboxRead(accountFilter, accounts);
+  const confirmMarkAllRead = useMarkInboxRead(
+    accountFilter,
+    accounts,
+    inboxPageStatus !== "LoadingFirstPage",
+  );
   const search = usePaginatedQuery(
     api.mail.queries.searchHeaders,
     getSearchArgs(debouncedSearchTerm, getSelectedAccountId(accountFilter)),

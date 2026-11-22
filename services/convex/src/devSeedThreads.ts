@@ -69,3 +69,32 @@ export async function ensureDemoThread({
     updatedAt: now,
   });
 }
+
+/**
+ * Each seeded inbox thread names its newest inbox message, as provider sync
+ * does (`latestInboxMessageId`), so the lists read it the way production's
+ * do.
+ */
+export async function projectDemoInboxMessages(
+  ctx: MutationCtx,
+  accountIds: Iterable<Id<"mailAccounts">>,
+) {
+  for (const accountId of accountIds) {
+    const threads = await ctx.db
+      .query("threads")
+      .withIndex("by_account_latest", (q) => q.eq("accountId", accountId))
+      .collect();
+    for (const thread of threads) {
+      if (!thread.inInbox) continue;
+      const latest = await ctx.db
+        .query("messages")
+        .withIndex("by_thread_received", (q) => q.eq("threadId", thread._id))
+        .order("desc")
+        .filter((q) => q.eq(q.field("inInbox"), true))
+        .first();
+      if (latest && latest._id !== thread.latestInboxMessageId) {
+        await ctx.db.patch(thread._id, { latestInboxMessageId: latest._id });
+      }
+    }
+  }
+}

@@ -134,6 +134,9 @@ clones a per-worktree simulator, installs a cached dev client, and runs the
 worktree's own Metro on a plain port. To test signed in, give the worktree
 an isolated backend (`scripts/backend.sh isolate`) and run
 `scripts/sim.sh signin`; see [simulator-sign-in.md](simulator-sign-in.md).
+To time a cold open (in a production bundle, with
+`FREEMAIL_METRO_PROFILE=1 scripts/sim.sh up` and `scripts/sim.sh timings`)
+and what its queries cost, see [data-loading.md](data-loading.md).
 
 ## Validation
 
