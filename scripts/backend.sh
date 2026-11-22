@@ -173,7 +173,8 @@ configure() {
   fi
   push
   # The auth signing keys, as production has them, so Convex checks tokens
-  # without fetching them (services/convex/AUTH.md, "Signing keys").
+  # without fetching them (services/convex/AUTH.md, "Signing keys"). A new
+  # deployment has none until its first push.
   convex env set AUTH_JWKS "$(curl -fsS "$SITE_URL/api/auth/convex/jwks" || true)"
 
   owner="$(convex run devTools:ensureOwner | tr -d '"[:space:]')"
@@ -190,6 +191,11 @@ configure() {
 
 push() {
   require_isolated
+  # auth.config.ts reads AUTH_JWKS, and Convex refuses a push while it's
+  # unset (services/convex/AUTH.md, "Signing keys").
+  if ! convex env list 2>/dev/null | grep -q '^AUTH_JWKS='; then
+    convex env set AUTH_JWKS "$(curl -fsS "$SITE_URL/api/auth/convex/jwks" || true)"
+  fi
   convex dev --once --tail-logs disable
 }
 

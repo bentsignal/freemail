@@ -62,9 +62,9 @@ function isJwks(value: string) {
 // Used by Convex's auth system — includes worktree trust for non-main deployments
 export default {
   providers: [
-    getPrimaryProvider(
-      "AUTH_JWKS" in process.env ? process.env.AUTH_JWKS : undefined,
-    ),
+    // Convex refuses a push while a variable read here is unset; empty
+    // is fine (AUTH.md, "Signing keys").
+    getPrimaryProvider(process.env.AUTH_JWKS),
     ...(trustsSharedDevelopmentAuth ? sharedDevelopmentAuthProviders : []),
   ],
 } satisfies AuthConfig;

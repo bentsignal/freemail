@@ -66,9 +66,12 @@ every app open waited on it before its first query.
 
 `AUTH_JWKS` holds that public key set, exactly as the route serves it, and
 `auth.config.ts` passes it to Convex inline, so tokens are checked without a
-request. It's public, not a secret, and optional: unset or invalid, Convex
-fetches the keys as before. Setting it takes effect at once, without a
-deploy:
+request. It's public, not a secret. Empty or invalid, Convex fetches the
+keys as before, but it must exist: Convex refuses to push functions whose
+auth config reads a variable the deployment doesn't have (and the config
+can't tell an unset variable apart without reading it).
+`scripts/backend.sh push` sets it on isolated backends when it's missing.
+Changing it takes effect at once, without a deploy:
 
 ```sh
 npx convex env set --prod AUTH_JWKS "$(curl -fsS https://colorful-ostrich-734.convex.site/api/auth/convex/jwks)"

@@ -47,15 +47,19 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
 
 ## Check tokens without fetching the signing keys (#PR)
 
-- When: after the Convex deploy
+`auth.config.ts` now reads `AUTH_JWKS`, and Convex refuses to push it to a
+deployment that doesn't have the variable, so it's set first. It's the
+public key set, not a secret
+([AUTH.md](../services/convex/AUTH.md#signing-keys)).
+
+- When: before the Convex deploy, and on development before `main` is
+  pushed there
 - Commands: from `services/convex`,
   `pnpm exec convex env set --prod AUTH_JWKS "$(curl -fsS https://colorful-ostrich-734.convex.site/api/auth/convex/jwks)"`,
-  then the same for development after `main` is pushed there:
-  `pnpm exec convex env set AUTH_JWKS "$(curl -fsS https://tidy-emu-857.convex.site/api/auth/convex/jwks)"`
-  (with `.env.local` selecting `tidy-emu-857`). It's the public key set,
-  not a secret ([AUTH.md](../services/convex/AUTH.md#signing-keys)).
+  and with `.env.local` selecting development (`tidy-emu-857`),
+  `pnpm exec convex env set AUTH_JWKS "$(curl -fsS https://tidy-emu-857.convex.site/api/auth/convex/jwks)"`.
 - Verify: `pnpm exec convex env get --prod AUTH_JWKS` prints `{"keys":[…]}`
-  with the same `kid` as the curl output; the website and Freemail still
-  open signed in with mail; `pnpm exec convex logs --prod` shows no
-  `GET /api/auth/*` when Freemail opens (before, each open logged one).
-
+  with the same `kid` as the curl output; the deploy succeeds; the website
+  and Freemail open signed in with mail; `pnpm exec convex logs --prod`
+  shows no `GET /api/auth/*` when Freemail opens (before, each open logged
+  one).
