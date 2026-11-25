@@ -1,5 +1,5 @@
 import type { SetStateAction } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -32,33 +32,50 @@ export function useComposerDraft(params: {
 }) {
   const router = useRouter();
   const threadId = params.threadId;
-  const [saved] = useState(() =>
-    threadId ? readReplyDraft(threadId) : undefined,
-  );
+  const [initial] = useState(() => {
+    const saved = threadId ? readReplyDraft(threadId) : undefined;
+    return {
+      accountId: saved?.accountId ?? params.accountId,
+      draft: saved?.draft ?? createComposerDraft(params),
+    };
+  });
   const [selectedAccountId, setSelectedAccountState] = useState(
-    saved?.accountId ?? params.accountId,
+    initial.accountId,
   );
-  const [draft, setDraftState] = useState(
-    () => saved?.draft ?? createComposerDraft(params),
-  );
+  const [draft, setDraftState] = useState(initial.draft);
+  // The newest values, for updates that arrive between renders (uploads).
+  const latest = useRef(initial);
+  // Sent or deleted: an upload finishing afterwards mustn't bring it back.
+  const finished = useRef(false);
+
+  function update(next: { accountId: string | undefined; draft: Draft }) {
+    latest.current = next;
+    setDraftState(next.draft);
+    setSelectedAccountState(next.accountId);
+    if (threadId && !finished.current) {
+      saveReplyDraft(threadId, next.draft, next.accountId);
+    }
+  }
 
   function setDraft(action: SetStateAction<Draft>) {
-    setDraftState((current) => {
-      const next = typeof action === "function" ? action(current) : action;
-      if (threadId) saveReplyDraft(threadId, next, selectedAccountId);
-      return next;
+    const current = latest.current;
+    update({
+      ...current,
+      draft: typeof action === "function" ? action(current.draft) : action,
     });
   }
 
   function setSelectedAccountId(action: SetStateAction<string | undefined>) {
-    setSelectedAccountState((current) => {
-      const next = typeof action === "function" ? action(current) : action;
-      if (threadId) saveReplyDraft(threadId, draft, next);
-      return next;
+    const current = latest.current;
+    update({
+      ...current,
+      accountId:
+        typeof action === "function" ? action(current.accountId) : action,
     });
   }
 
-  function onSent() {
+  function discard() {
+    finished.current = true;
     if (threadId) deleteReplyDraft(threadId);
   }
 
@@ -72,7 +89,7 @@ export function useComposerDraft(params: {
         text: "Delete Draft",
         style: "destructive",
         onPress: () => {
-          deleteReplyDraft(threadId);
+          discard();
           router.back();
         },
       },
@@ -84,7 +101,7 @@ export function useComposerDraft(params: {
   return {
     cancel,
     draft,
-    onSent,
+    onSent: discard,
     selectedAccountId,
     setDraft,
     setSelectedAccountId,

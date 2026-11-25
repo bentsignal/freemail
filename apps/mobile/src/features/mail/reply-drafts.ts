@@ -16,7 +16,6 @@ import {
 
 let drafts: ReplyDrafts | undefined;
 let unsaved = false;
-let notifying = false;
 let writeTimer: ReturnType<typeof setTimeout> | undefined;
 const WRITE_DELAY_MS = 500;
 const listeners = new Set<() => void>();
@@ -50,15 +49,8 @@ function change(next: ReplyDrafts) {
   writeTimer = setTimeout(writeUnsaved, WRITE_DELAY_MS);
 }
 
-// The composer saves from its state updates, which React may run while
-// rendering, so subscribers hear about it once that render is done.
 function notify() {
-  if (notifying) return;
-  notifying = true;
-  queueMicrotask(() => {
-    notifying = false;
-    for (const listener of listeners) listener();
-  });
+  for (const listener of listeners) listener();
 }
 
 function subscribe(listener: () => void) {
