@@ -4,7 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 
 import { api } from "@freemail/convex/api";
-import { getReplyAddress } from "@freemail/features/mail";
+import { getReplyRecipient } from "@freemail/features/mail";
 import { toast } from "@freemail/ui-web/toast";
 
 import type { MailMode } from "./live-data-types";
@@ -44,16 +44,18 @@ export function useLiveMailActions(
   function replyToSelectedThread() {
     const latestMessage = selectedThread?.messages.at(-1);
     if (!selectedThread || !latestMessage) return;
-    const address = getReplyAddress(
+    const recipient = getReplyRecipient(
       selectedThread.messages,
       selectedThread.account.address,
     );
-    if (!address) return;
+    if (!recipient) return;
     openReply({
       accountId: selectedThread.accountId,
-      address,
+      address: recipient.address,
       messageId: latestMessage._id,
+      name: recipient.name ?? recipient.address,
       subject: selectedThread.subject,
+      threadId: selectedThread._id,
     });
   }
   function moveThreadToInbox(message: Pick<InboxMessage, "threadId">) {

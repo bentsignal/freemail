@@ -3,10 +3,10 @@ import { useMutation } from "convex/react";
 import { AlertCircle, LoaderCircle, Paperclip, X } from "lucide-react";
 
 import type { Id } from "@freemail/convex/model";
+import type { ComposerAttachment } from "@freemail/features/mail";
 import { api } from "@freemail/convex/api";
 import { toast } from "@freemail/ui-web/toast";
 
-import type { WebComposerAttachment } from "../store";
 import { useMailStore } from "../store";
 
 export function DraftAttachments() {
@@ -17,7 +17,7 @@ export function DraftAttachments() {
   const removeDraft = useMutation(api.attachments.mutations.removeDraft);
   if (attachments.length === 0) return null;
 
-  function remove(attachment: WebComposerAttachment) {
+  function remove(attachment: ComposerAttachment) {
     if (attachment.draftAttachmentId) {
       void removeDraft({
         attachmentId: attachment.draftAttachmentId as Id<"draftAttachments">,
@@ -58,7 +58,7 @@ export function DraftAttachments() {
 function AttachmentStatusIcon({
   status,
 }: {
-  status: WebComposerAttachment["status"];
+  status: ComposerAttachment["status"];
 }) {
   if (status === "uploading") {
     return (
@@ -71,7 +71,7 @@ function AttachmentStatusIcon({
   return <Paperclip className="text-muted-foreground size-3" />;
 }
 
-function getAttachmentStatus(attachment: WebComposerAttachment) {
+function getAttachmentStatus(attachment: ComposerAttachment) {
   if (attachment.status === "uploading") return "uploading";
   if (attachment.status === "error") return attachment.error ?? "failed";
   return formatAttachmentSize(attachment.size);

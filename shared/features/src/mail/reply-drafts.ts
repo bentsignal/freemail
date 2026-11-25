@@ -1,8 +1,6 @@
-import type { ComposerDraft } from "@freemail/features/mail";
+import type { ComposerAttachment, ComposerDraft } from "./types";
 
-import type { NativeComposerAttachment } from "../screens/use-native-attachments";
-
-/** Bumped when the saved shape changes, so an older file is ignored. */
+/** Bumped when the saved shape changes, so an older copy is ignored. */
 export const REPLY_DRAFTS_VERSION = 1;
 
 /**
@@ -11,16 +9,16 @@ export const REPLY_DRAFTS_VERSION = 1;
  */
 export const ATTACHMENT_KEEP_MS = 20 * 60 * 60 * 1000;
 
-type Draft = ComposerDraft<NativeComposerAttachment>;
-
-export interface SavedAttachment {
-  attachment: NativeComposerAttachment;
+export interface SavedAttachment<TAttachment extends ComposerAttachment> {
+  attachment: TAttachment;
   savedAt: number;
 }
 
-export interface ReplyDraft {
+export interface ReplyDraft<
+  TAttachment extends ComposerAttachment = ComposerAttachment,
+> {
   accountId?: string;
-  attachments: SavedAttachment[];
+  attachments: SavedAttachment<TAttachment>[];
   bcc: string;
   body: string;
   cc: string;
@@ -29,15 +27,12 @@ export interface ReplyDraft {
   updatedAt: number;
 }
 
-export type ReplyDrafts = Record<string, ReplyDraft>;
-
-interface ReplyDraftsFile {
-  drafts: ReplyDrafts;
-  version: typeof REPLY_DRAFTS_VERSION;
-}
+export type ReplyDrafts<
+  TAttachment extends ComposerAttachment = ComposerAttachment,
+> = Record<string, ReplyDraft<TAttachment>>;
 
 /** A reply with nothing written in it isn't worth keeping. */
-export function isWorthKeeping(draft: Draft) {
+export function isReplyDraftWorthKeeping(draft: ComposerDraft) {
   return (
     draft.body.trim().length > 0 ||
     draft.cc.trim().length > 0 ||
@@ -50,16 +45,16 @@ export function isWorthKeeping(draft: Draft) {
  * Only uploaded attachments are kept: an upload still running when the
  * composer closes has nowhere to report back to.
  */
-export function toReplyDraft({
+export function toReplyDraft<TAttachment extends ComposerAttachment>({
   accountId,
   draft,
   now,
   previous,
 }: {
   accountId: string | undefined;
-  draft: Draft;
+  draft: ComposerDraft<TAttachment>;
   now: number;
-  previous: ReplyDraft | undefined;
+  previous: ReplyDraft<TAttachment> | undefined;
 }) {
   return {
     accountId,
@@ -78,10 +73,13 @@ export function toReplyDraft({
     subject: draft.subject,
     to: draft.to,
     updatedAt: now,
-  } satisfies ReplyDraft;
+  } satisfies ReplyDraft<TAttachment>;
 }
 
-export function toComposerDraft(saved: ReplyDraft, now: number) {
+export function toComposerDraft<TAttachment extends ComposerAttachment>(
+  saved: ReplyDraft<TAttachment>,
+  now: number,
+) {
   return {
     attachments: saved.attachments
       .filter((item) => now - item.savedAt < ATTACHMENT_KEEP_MS)
@@ -91,21 +89,28 @@ export function toComposerDraft(saved: ReplyDraft, now: number) {
     cc: saved.cc,
     subject: saved.subject,
     to: saved.to,
-  } satisfies Draft;
+  } satisfies ComposerDraft<TAttachment>;
 }
 
-export function serializeReplyDrafts(drafts: ReplyDrafts) {
-  return JSON.stringify({
-    drafts,
-    version: REPLY_DRAFTS_VERSION,
-  } satisfies ReplyDraftsFile);
+export function serializeReplyDrafts<TAttachment extends ComposerAttachment>(
+  drafts: ReplyDrafts<TAttachment>,
+) {
+  return JSON.stringify({ drafts, version: REPLY_DRAFTS_VERSION });
 }
 
-export function parseReplyDrafts(text: string) {
-  return toReplyDrafts(JSON.parse(text));
+/** The drafts saved by this app, or none when the copy is unreadable. */
+export function parseReplyDrafts<TAttachment extends ComposerAttachment>(
+  text: string,
+) {
+  return Object.fromEntries(
+    Object.entries(getCurrentDrafts(JSON.parse(text)) ?? {}).filter(
+      (entry): entry is [string, ReplyDraft<TAttachment>] =>
+        isReplyDraft(entry[1]),
+    ),
+  );
 }
 
-function toReplyDrafts(saved: unknown) {
+function getCurrentDrafts(saved: unknown) {
   if (
     typeof saved !== "object" ||
     saved === null ||
@@ -115,23 +120,29 @@ function toReplyDrafts(saved: unknown) {
     typeof saved.drafts !== "object" ||
     saved.drafts === null
   ) {
-    return {} satisfies ReplyDrafts;
+    return undefined;
   }
-  return Object.fromEntries(
-    Object.entries(saved.drafts).filter(
-      (entry): entry is [string, ReplyDraft] => isReplyDraft(entry[1]),
-    ),
-  );
+  return saved.drafts;
 }
 
 const TEXT_FIELDS = ["bcc", "body", "cc", "subject", "to"] as const;
 
-function isReplyDraft(draft: unknown): draft is ReplyDraft {
+function isReplyDraft(draft: unknown) {
   if (typeof draft !== "object" || draft === null) return false;
   const fields = new Map(Object.entries(draft));
   return (
     TEXT_FIELDS.every((field) => typeof fields.get(field) === "string") &&
     typeof fields.get("updatedAt") === "number" &&
     Array.isArray(fields.get("attachments"))
+  );
+}
+
+/** Copies the drafts without one thread's. */
+export function withoutReplyDraft<TAttachment extends ComposerAttachment>(
+  drafts: ReplyDrafts<TAttachment>,
+  threadId: string,
+) {
+  return Object.fromEntries(
+    Object.entries(drafts).filter(([key]) => key !== threadId),
   );
 }

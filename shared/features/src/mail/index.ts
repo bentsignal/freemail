@@ -53,3 +53,13 @@ export type {
   RecipientFieldsResult,
   RecipientParseResult,
 } from "./recipients";
+export {
+  ATTACHMENT_KEEP_MS,
+  isReplyDraftWorthKeeping,
+  parseReplyDrafts,
+  serializeReplyDrafts,
+  toComposerDraft,
+  toReplyDraft,
+  withoutReplyDraft,
+} from "./reply-drafts";
+export type { ReplyDraft, ReplyDrafts } from "./reply-drafts";

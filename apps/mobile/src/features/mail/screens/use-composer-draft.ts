@@ -4,9 +4,9 @@ import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 
 import type { ComposerDraft } from "@freemail/features/mail";
+import { isReplyDraftWorthKeeping } from "@freemail/features/mail";
 
 import type { NativeComposerAttachment } from "./use-native-attachments";
-import { isWorthKeeping } from "../lib/reply-drafts-file";
 import {
   deleteReplyDraft,
   readReplyDraft,
@@ -80,7 +80,7 @@ export function useComposerDraft(params: {
   }
 
   function cancel() {
-    if (!threadId || !isWorthKeeping(draft)) {
+    if (!threadId || !isReplyDraftWorthKeeping(draft)) {
       router.back();
       return;
     }

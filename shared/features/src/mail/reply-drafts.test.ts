@@ -1,18 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import type { NativeComposerAttachment } from "../screens/use-native-attachments";
+import type { ComposerAttachment, ComposerDraft } from "./types";
 import {
   ATTACHMENT_KEEP_MS,
-  isWorthKeeping,
+  isReplyDraftWorthKeeping,
   parseReplyDrafts,
   serializeReplyDrafts,
   toComposerDraft,
   toReplyDraft,
-} from "./reply-drafts-file";
+  withoutReplyDraft,
+} from "./reply-drafts";
 
 function attachment(
   id: string,
-  status: NativeComposerAttachment["status"] = "ready",
+  status: ComposerAttachment["status"] = "ready",
 ) {
   return {
     contentType: "image/png",
@@ -21,11 +22,10 @@ function attachment(
     id,
     size: 10,
     status,
-    uri: `file:///${id}.png`,
-  } satisfies NativeComposerAttachment;
+  } satisfies ComposerAttachment;
 }
 
-function draft(overrides: Partial<Parameters<typeof isWorthKeeping>[0]> = {}) {
+function draft(overrides: Partial<ComposerDraft> = {}) {
   return {
     attachments: [],
     bcc: "",
@@ -39,16 +39,20 @@ function draft(overrides: Partial<Parameters<typeof isWorthKeeping>[0]> = {}) {
 
 describe("reply drafts", () => {
   it("keeps a reply only once something is written in it", () => {
-    expect(isWorthKeeping(draft())).toBe(false);
-    expect(isWorthKeeping(draft({ body: "  " }))).toBe(false);
-    expect(isWorthKeeping(draft({ body: "Sounds good" }))).toBe(true);
-    expect(isWorthKeeping(draft({ cc: "sam@example.com" }))).toBe(true);
-    expect(
-      isWorthKeeping(draft({ attachments: [attachment("a", "uploading")] })),
-    ).toBe(false);
-    expect(isWorthKeeping(draft({ attachments: [attachment("a")] }))).toBe(
+    expect(isReplyDraftWorthKeeping(draft())).toBe(false);
+    expect(isReplyDraftWorthKeeping(draft({ body: "  " }))).toBe(false);
+    expect(isReplyDraftWorthKeeping(draft({ body: "Sounds good" }))).toBe(true);
+    expect(isReplyDraftWorthKeeping(draft({ cc: "sam@example.com" }))).toBe(
       true,
     );
+    expect(
+      isReplyDraftWorthKeeping(
+        draft({ attachments: [attachment("a", "uploading")] }),
+      ),
+    ).toBe(false);
+    expect(
+      isReplyDraftWorthKeeping(draft({ attachments: [attachment("a")] })),
+    ).toBe(true);
   });
 
   it("restores what was written, with its sender", () => {
@@ -118,5 +122,17 @@ describe("reply drafts", () => {
         JSON.stringify({ drafts: { "thread-1": { body: 1 } }, version: 1 }),
       ),
     ).toEqual({});
+  });
+
+  it("removes one thread's draft and keeps the rest", () => {
+    const saved = toReplyDraft({
+      accountId: undefined,
+      draft: draft({ body: "Sounds good" }),
+      now: 1000,
+      previous: undefined,
+    });
+    expect(
+      withoutReplyDraft({ "thread-1": saved, "thread-2": saved }, "thread-1"),
+    ).toEqual({ "thread-2": saved });
   });
 });

@@ -2,19 +2,19 @@ import { useSyncExternalStore } from "react";
 import { AppState } from "react-native";
 import { File, Paths } from "expo-file-system";
 
-import type { ComposerDraft } from "@freemail/features/mail";
-
-import type { ReplyDrafts } from "./lib/reply-drafts-file";
-import type { NativeComposerAttachment } from "./screens/use-native-attachments";
+import type { ComposerDraft, ReplyDrafts } from "@freemail/features/mail";
 import {
-  isWorthKeeping,
+  isReplyDraftWorthKeeping,
   parseReplyDrafts,
   serializeReplyDrafts,
   toComposerDraft,
   toReplyDraft,
-} from "./lib/reply-drafts-file";
+  withoutReplyDraft,
+} from "@freemail/features/mail";
 
-let drafts: ReplyDrafts | undefined;
+import type { NativeComposerAttachment } from "./screens/use-native-attachments";
+
+let drafts: ReplyDrafts<NativeComposerAttachment> | undefined;
 let unsaved = false;
 let writeTimer: ReturnType<typeof setTimeout> | undefined;
 const WRITE_DELAY_MS = 500;
@@ -35,13 +35,13 @@ function readDrafts() {
   try {
     const file = draftsFile();
     if (!file.exists) return {};
-    return parseReplyDrafts(file.textSync());
+    return parseReplyDrafts<NativeComposerAttachment>(file.textSync());
   } catch {
     return {};
   }
 }
 
-function change(next: ReplyDrafts) {
+function change(next: ReplyDrafts<NativeComposerAttachment>) {
   drafts = next;
   unsaved = true;
   notify();
@@ -77,7 +77,7 @@ export function saveReplyDraft(
   draft: ComposerDraft<NativeComposerAttachment>,
   accountId: string | undefined,
 ) {
-  if (!isWorthKeeping(draft)) {
+  if (!isReplyDraftWorthKeeping(draft)) {
     deleteReplyDraft(threadId);
     return;
   }
@@ -96,11 +96,7 @@ export function saveReplyDraft(
 export function deleteReplyDraft(threadId: string) {
   const current = loaded();
   if (!(threadId in current)) return;
-  change(
-    Object.fromEntries(
-      Object.entries(current).filter(([key]) => key !== threadId),
-    ),
-  );
+  change(withoutReplyDraft(current, threadId));
 }
 
 /** Signing out deletes every draft with the rest of the account's data. */
