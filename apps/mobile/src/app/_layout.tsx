@@ -145,6 +145,7 @@ function AppNavigation({
           <Stack.Screen
             name="compose"
             options={{
+              title: "New Message",
               presentation: "formSheet",
               sheetAllowedDetents: [0.92, 1],
               sheetGrabberVisible: true,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getReplyAddress } from "./reply";
+import { getReplyAddress, getReplyRecipient } from "./reply";
 
 const owner = "owner@example.com";
 
@@ -51,5 +51,48 @@ describe("reply recipient selection", () => {
         owner,
       ),
     ).toBeUndefined();
+  });
+});
+
+describe("reply recipient name", () => {
+  it("names the sender being replied to", () => {
+    expect(
+      getReplyRecipient(
+        [
+          {
+            from: { address: "maya@example.com", name: "Maya Chen" },
+            to: [{ address: owner }],
+          },
+        ],
+        owner,
+      ),
+    ).toEqual({ address: "maya@example.com", name: "Maya Chen" });
+  });
+
+  it("finds the name elsewhere in the thread when the reply address has none", () => {
+    expect(
+      getReplyRecipient(
+        [
+          {
+            from: { address: "maya@example.com", name: "Maya Chen" },
+            to: [{ address: owner }],
+          },
+          {
+            from: { address: owner },
+            to: [{ address: "maya@example.com" }],
+          },
+        ],
+        owner,
+      ),
+    ).toEqual({ address: "maya@example.com", name: "Maya Chen" });
+  });
+
+  it("leaves the name out when nobody in the thread gives one", () => {
+    expect(
+      getReplyRecipient(
+        [{ from: { address: "maya@example.com" }, to: [{ address: owner }] }],
+        owner,
+      ),
+    ).toEqual({ address: "maya@example.com", name: undefined });
   });
 });

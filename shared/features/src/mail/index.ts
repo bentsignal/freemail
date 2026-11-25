@@ -19,7 +19,7 @@ export type {
   MailLocationKind,
   MailThreadPlacement,
 } from "./location";
-export { getReplyAddress } from "./reply";
+export { getReplyAddress, getReplyRecipient } from "./reply";
 export {
   getStrongSemanticMessageIds,
   mergeSearchResults,

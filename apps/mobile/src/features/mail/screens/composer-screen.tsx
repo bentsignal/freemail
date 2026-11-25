@@ -12,14 +12,11 @@ import { useColor } from "~/hooks/use-color";
 import { useMailStore } from "../store";
 import { ComposerAttachmentList } from "./composer-attachment-list";
 import { ComposerRow, ComposerTextField } from "./composer-field";
-import {
-  canSendFromAccount,
-  createComposerDraft,
-  getSelectedAccount,
-} from "./composer-helpers";
+import { canSendFromAccount, getSelectedAccount } from "./composer-helpers";
 import { ComposerNavigationHeader } from "./composer-navigation-header";
 import { ComposerRecipientField } from "./composer-recipient-field";
 import { ComposerSenderField, SenderPicker } from "./composer-sender-field";
+import { useComposerDraft } from "./use-composer-draft";
 import { useNativeAttachments } from "./use-native-attachments";
 import { useSendMessage } from "./use-send-message";
 
@@ -29,8 +26,10 @@ type ComposerParams = {
   bcc?: string;
   body?: string;
   cc?: string;
+  replyName?: string;
   replyToMessageId?: string;
   subject?: string;
+  threadId?: string;
   to?: string;
 };
 
@@ -43,10 +42,14 @@ export function ComposerScreen({
   const router = useRouter();
   const accounts = useMailStore((store) => store.accounts);
   const accountFilter = useMailStore((store) => store.accountFilter);
-  const [selectedAccountId, setSelectedAccountId] = useState<
-    string | undefined
-  >(params.accountId);
-  const [draft, setDraft] = useState(() => createComposerDraft(params));
+  const {
+    cancel,
+    draft,
+    onSent,
+    selectedAccountId,
+    setDraft,
+    setSelectedAccountId,
+  } = useComposerDraft(params);
   const sendingAccounts = accounts.filter(canSendFromAccount);
   const selectedAccount = getSelectedAccount(
     sendingAccounts,
@@ -60,6 +63,7 @@ export function ComposerScreen({
   });
   const { canSend, idempotencyKey, recipientErrors, send } = useSendMessage({
     draft,
+    onSent,
     replyToMessageId: params.replyToMessageId,
     selectedAccount,
     setDraft,
@@ -76,11 +80,11 @@ export function ComposerScreen({
     <View style={{ backgroundColor, flex: 1 }}>
       <ComposerNavigationHeader
         canSend={canSend}
-        title={draft.subject.trim() || "New Message"}
+        title={getComposerTitle(params.replyName, draft.subject)}
         variant={variant}
         onAttachFiles={() => void attachFiles()}
         onAttachPhotos={() => void attachImages()}
-        onCancel={router.back}
+        onCancel={cancel}
         onSend={send}
       />
       <ComposerBody
@@ -97,6 +101,11 @@ export function ComposerScreen({
       />
     </View>
   );
+}
+
+function getComposerTitle(replyName: string | undefined, subject: string) {
+  if (replyName) return `Reply to ${replyName}`;
+  return subject.trim() || "New Message";
 }
 
 function getInitialFocus(variant: "modal" | "tab", to: string | undefined) {
