@@ -1,8 +1,7 @@
 import { useId, useState } from "react";
-import { ArrowUp, Paperclip, Trash2, X } from "lucide-react";
+import { ArrowUp, Paperclip, X } from "lucide-react";
 
 import { MAX_ATTACHMENT_COUNT } from "@freemail/convex/attachments/constants";
-import { isReplyDraftWorthKeeping } from "@freemail/features/mail";
 import * as Dialog from "@freemail/ui-web/dialog";
 
 import { useLiveMail } from "../live-data";
@@ -12,6 +11,7 @@ import {
   getSendingAccount,
 } from "./compose-account-field";
 import { DraftAttachments } from "./compose-attachment-list";
+import { DeleteDraftButton } from "./compose-delete-draft";
 import { ComposeRow } from "./compose-row";
 import { useComposeSend } from "./use-compose-send";
 
@@ -132,28 +132,6 @@ function ComposeHeader({
 function getComposeTitle(replyName: string | undefined, subject: string) {
   if (replyName) return `Reply to ${replyName}`;
   return subject.trim() || "New Message";
-}
-
-/** A reply is saved as it's written; this throws it away. */
-function DeleteDraftButton() {
-  const isReply = useMailStore((store) => store.composerReply !== undefined);
-  const hasContent = useMailStore((store) =>
-    isReplyDraftWorthKeeping(store.composerDraft),
-  );
-  const deleteDraft = useMailStore((store) => store.deleteComposerDraft);
-  if (!isReply || !hasContent) return null;
-
-  return (
-    <button
-      aria-label="Delete draft"
-      className="mail-icon-button flex size-9 items-center justify-center rounded-full transition"
-      onClick={deleteDraft}
-      title="Delete draft"
-      type="button"
-    >
-      <Trash2 className="size-4" />
-    </button>
-  );
 }
 
 function AttachButton({ onAttach }: { onAttach: (files: File[]) => void }) {
