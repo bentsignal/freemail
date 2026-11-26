@@ -45,7 +45,7 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
   the consent screen and returns to Freemail; Notes emails a sign-in code.
 
-## Count unread mail from counters (#PR)
+## Count unread mail from counters (#62)
 
 `getUnreadCounts` scans unread threads until the counters are backfilled
 once on production.
