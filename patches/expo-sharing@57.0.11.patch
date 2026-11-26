@@ -1,0 +1,112 @@
+diff --git a/ios/SharingModule.swift b/ios/SharingModule.swift
+index 3e1772c7799e632feaea40e2a7c115cee808302b..23625ce6847d11a551a36ddad1a2ed48555dbf90 100644
+--- a/ios/SharingModule.swift
++++ b/ios/SharingModule.swift
+@@ -21,6 +21,10 @@ public final class SharingModule: Module {
+       let activityController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+       activityController.title = options.dialogTitle
+ 
++      guard let presenter = SharePresenterWindow.make() else {
++        throw MissingCurrentViewControllerException()
++      }
++
+       activityController.completionWithItemsHandler = { _, _, _, _ in
+         // Resolve unconditionally. UIActivityViewController invokes this once
+         // on dismissal for every (activityType, completed) permutation. The
+@@ -28,18 +32,15 @@ public final class SharingModule: Module {
+         // the promise when the user picked an activity and then cancelled
+         // its follow-up dialog (e.g. tapped Print, then cancelled the print
+         // dialog: activityType != nil, completed == false).
++        presenter.closeAfterDismissal()
+         promise.resolve(nil)
+       }
+ 
+-      guard let currentViewcontroller = appContext?.utilities?.currentViewController() else {
+-        throw MissingCurrentViewControllerException()
+-      }
+-
+       // Apple docs state that `UIActivityViewController` must be presented in a
+       // popover on iPad https://developer.apple.com/documentation/uikit/uiactivityviewcontroller
+-      if UIDevice.current.userInterfaceIdiom == .pad {
++      if UIDevice.current.userInterfaceIdiom == .pad, let sourceView = presenter.rootViewController?.view {
+         let rect = options.anchor
+-        let viewFrame = currentViewcontroller.view.frame
++        let viewFrame = sourceView.frame
+ 
+         activityController.popoverPresentationController?.sourceRect = CGRect(
+           x: rect?.x ?? viewFrame.midX,
+@@ -47,11 +48,11 @@ public final class SharingModule: Module {
+           width: rect?.width ?? 0,
+           height: rect?.height ?? 0
+         )
+-        activityController.popoverPresentationController?.sourceView = currentViewcontroller.view
++        activityController.popoverPresentationController?.sourceView = sourceView
+         activityController.modalPresentationStyle = .pageSheet
+       }
+ 
+-      currentViewcontroller.present(activityController, animated: true)
++      presenter.present(activityController)
+     }
+     .runOnQueue(.main)
+ 
+@@ -103,3 +104,60 @@ public final class SharingModule: Module {
+     return rawPayloads
+   }
+ }
++
++// Freemail: the share sheet is presented from a full-screen window of its
++// own instead of whatever the app's window is presenting, which on iOS 27
++// could squeeze the sheet into a narrow column.
++private final class SharePresenterWindow: UIWindow {
++  private static var active = Set<SharePresenterWindow>()
++  private weak var previousKeyWindow: UIWindow?
++
++  static func make() -> SharePresenterWindow? {
++    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
++    guard let scene = scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first else {
++      return nil
++    }
++    let window = SharePresenterWindow(windowScene: scene)
++    window.previousKeyWindow = scene.keyWindow
++    window.overrideUserInterfaceStyle = scene.keyWindow?.overrideUserInterfaceStyle ?? .unspecified
++    window.windowLevel = .normal + 1
++    window.backgroundColor = .clear
++    let root = UIViewController()
++    root.view.backgroundColor = .clear
++    window.rootViewController = root
++    return window
++  }
++
++  func present(_ controller: UIViewController) {
++    Self.active.insert(self)
++    makeKeyAndVisible()
++    rootViewController?.present(controller, animated: true)
++  }
++
++  func closeAfterDismissal() {
++    if let presented = rootViewController?.presentedViewController {
++      if let coordinator = presented.transitionCoordinator {
++        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
++          self?.closeAfterDismissal()
++        }
++      } else {
++        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
++          self?.closeAfterDismissal()
++        }
++      }
++      return
++    }
++    isHidden = true
++    previousKeyWindow?.makeKey()
++    Self.active.remove(self)
++  }
++
++  // Touches reach the app if the window outlives the sheet.
++  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
++    let view = super.hitTest(point, with: event)
++    if rootViewController?.presentedViewController == nil, view === rootViewController?.view {
++      return nil
++    }
++    return view
++  }
++}
