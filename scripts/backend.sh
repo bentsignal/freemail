@@ -207,6 +207,7 @@ seed() {
     exit 2
   }
   convex run devTools:seed "{\"bulkThreads\": $bulk}"
+  convex run devTools:storeSeedAttachmentFiles >/dev/null
 }
 
 teardown() {

@@ -112,6 +112,9 @@ patchedDependencies:
   expo-modules-jsi@57.0.4:
     hash: htli53nmvwhrzont2jtlep67p4
     path: patches/expo-modules-jsi@57.0.4.patch
+  expo-sharing@57.0.11:
+    hash: 4cnphepjajnsjruxo4tfaruydi
+    path: patches/expo-sharing@57.0.11.patch
   react-native-screens@4.26.2:
     hash: 6nga67ljckzwvihsw6dgv73uem
     path: patches/react-native-screens@4.26.2.patch
@@ -273,7 +276,7 @@ importers:
         version: 57.0.1(expo@57.0.12)
       expo-sharing:
         specifier: ~57.0.11
-        version: 57.0.11(expo@57.0.12)(react-native@0.86.3(@babel/core@7.28.5)(@react-native/metro-config@0.86.3(@babel/core@7.28.5)(bufferutil@4.0.8))(@types/react@19.2.17)(bufferutil@4.0.8)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
+        version: 57.0.11(patch_hash=4cnphepjajnsjruxo4tfaruydi)(expo@57.0.12)(react-native@0.86.3(@babel/core@7.28.5)(@react-native/metro-config@0.86.3(@babel/core@7.28.5)(bufferutil@4.0.8))(@types/react@19.2.17)(bufferutil@4.0.8)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
       expo-splash-screen:
         specifier: ~57.0.6
         version: 57.0.6(expo@57.0.12)(typescript@6.0.3)
@@ -16583,7 +16586,7 @@ snapshots:
 
   expo-server@57.0.2: {}
 
-  expo-sharing@57.0.11(expo@57.0.12)(react-native@0.86.3(@babel/core@7.28.5)(@react-native/metro-config@0.86.3(@babel/core@7.28.5)(bufferutil@4.0.8))(@types/react@19.2.17)(bufferutil@4.0.8)(react@19.2.3))(react@19.2.3)(typescript@6.0.3):
+  expo-sharing@57.0.11(patch_hash=4cnphepjajnsjruxo4tfaruydi)(expo@57.0.12)(react-native@0.86.3(@babel/core@7.28.5)(@react-native/metro-config@0.86.3(@babel/core@7.28.5)(bufferutil@4.0.8))(@types/react@19.2.17)(bufferutil@4.0.8)(react@19.2.3))(react@19.2.3)(typescript@6.0.3):
     dependencies:
       '@expo/config-plugins': 57.0.7(typescript@6.0.3)
       '@expo/config-types': 57.0.2
