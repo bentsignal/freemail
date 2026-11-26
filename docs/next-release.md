@@ -45,7 +45,7 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
   the consent screen and returns to Freemail; Notes emails a sign-in code.
 
-## CLI send, delete, and mark-read (#PR)
+## CLI send, delete, and mark-read (#65)
 
 - When: after the Convex deploy (the CLI's new commands call `cli/mail:*`,
   which production doesn't have until then; nothing else depends on order)
