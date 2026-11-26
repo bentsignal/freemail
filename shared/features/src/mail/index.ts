@@ -54,12 +54,21 @@ export type {
   RecipientParseResult,
 } from "./recipients";
 export {
-  ATTACHMENT_KEEP_MS,
   isReplyDraftWorthKeeping,
-  parseReplyDrafts,
-  serializeReplyDrafts,
+  mergeServerReplyDrafts,
+  parseReplyDraftState,
+  serializeReplyDraftState,
   toComposerDraft,
   toReplyDraft,
-  withoutReplyDraft,
 } from "./reply-drafts";
-export type { ReplyDraft, ReplyDrafts } from "./reply-drafts";
+export type {
+  ReplyDraft,
+  ReplyDraftState,
+  ServerReplyDraft,
+} from "./reply-drafts";
+export { createReplyDraftStore } from "./reply-draft-store";
+export type {
+  ReplyDraftRemote,
+  ReplyDraftStorage,
+  SavedReplyDraft,
+} from "./reply-draft-store";

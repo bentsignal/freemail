@@ -9,10 +9,16 @@ import type { MobileMailAccount } from "../lib/convex-mail";
 import type { ComposerFieldName } from "./composer-helpers";
 import type { NativeComposerAttachment } from "./use-native-attachments";
 import { useColor } from "~/hooks/use-color";
+import { useReplyDraftEditVersion } from "../reply-drafts";
 import { useMailStore } from "../store";
 import { ComposerAttachmentList } from "./composer-attachment-list";
 import { ComposerRow, ComposerTextField } from "./composer-field";
-import { canSendFromAccount, getSelectedAccount } from "./composer-helpers";
+import {
+  canSendFromAccount,
+  getComposerTitle,
+  getInitialFocus,
+  getSelectedAccount,
+} from "./composer-helpers";
 import { ComposerNavigationHeader } from "./composer-navigation-header";
 import { ComposerRecipientField } from "./composer-recipient-field";
 import { ComposerSenderField, SenderPicker } from "./composer-sender-field";
@@ -39,6 +45,18 @@ export function ComposerScreen({
   variant?: "modal" | "tab";
 }) {
   const params = useLocalSearchParams<ComposerParams>();
+  // Another device's edit to this reply starts the form over with it.
+  const editVersion = useReplyDraftEditVersion(params.threadId);
+  return <ComposerForm key={editVersion} params={params} variant={variant} />;
+}
+
+function ComposerForm({
+  params,
+  variant,
+}: {
+  params: ComposerParams;
+  variant: "modal" | "tab";
+}) {
   const router = useRouter();
   const accounts = useMailStore((store) => store.accounts);
   const accountFilter = useMailStore((store) => store.accountFilter);
@@ -101,16 +119,6 @@ export function ComposerScreen({
       />
     </View>
   );
-}
-
-function getComposerTitle(replyName: string | undefined, subject: string) {
-  if (replyName) return `Reply to ${replyName}`;
-  return subject.trim() || "New Message";
-}
-
-function getInitialFocus(variant: "modal" | "tab", to: string | undefined) {
-  if (variant === "tab") return undefined;
-  return to ? "body" : "to";
 }
 
 function ComposerBody({

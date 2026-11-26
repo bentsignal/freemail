@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
 import { internal } from "../_generated/api";
+import { deleteDraft } from "../replyDrafts/model";
 import { authedMutation } from "../utils";
 import {
   ensureOwnedAccount,
@@ -186,6 +187,9 @@ export const enqueuePlainText = authedMutation({
         });
       }),
     );
+    if (replyMessage) {
+      await deleteDraft(ctx, ctx.ownerId, replyMessage.threadId);
+    }
     await ctx.scheduler.runAfter(
       0,
       internal.sync.internal.deliverProviderOutbox,

@@ -178,6 +178,10 @@ import type * as providers_microsoft_oauth from "../providers/microsoft/oauth.js
 import type * as providers_microsoft_tokenAccess from "../providers/microsoft/tokenAccess.js";
 import type * as providers_types from "../providers/types.js";
 import type * as registrationEmail from "../registrationEmail.js";
+import type * as replyDrafts_model from "../replyDrafts/model.js";
+import type * as replyDrafts_mutations from "../replyDrafts/mutations.js";
+import type * as replyDrafts_queries from "../replyDrafts/queries.js";
+import type * as replyDrafts_validators from "../replyDrafts/validators.js";
 import type * as sync_gmailOutbox from "../sync/gmailOutbox.js";
 import type * as sync_internal from "../sync/internal.js";
 import type * as sync_stale from "../sync/stale.js";
@@ -363,6 +367,10 @@ declare const fullApi: ApiFromModules<{
   "providers/microsoft/tokenAccess": typeof providers_microsoft_tokenAccess;
   "providers/types": typeof providers_types;
   registrationEmail: typeof registrationEmail;
+  "replyDrafts/model": typeof replyDrafts_model;
+  "replyDrafts/mutations": typeof replyDrafts_mutations;
+  "replyDrafts/queries": typeof replyDrafts_queries;
+  "replyDrafts/validators": typeof replyDrafts_validators;
   "sync/gmailOutbox": typeof sync_gmailOutbox;
   "sync/internal": typeof sync_internal;
   "sync/stale": typeof sync_stale;

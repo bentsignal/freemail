@@ -18,6 +18,7 @@ import { InboxPane } from "./inbox-pane";
 import { MailDataErrorBoundary } from "./mail-data-error-boundary";
 import { OutboxStatus } from "./outbox-status";
 import { ReaderPane } from "./reader-pane";
+import { ReplyDraftSync } from "./reply-draft-sync";
 import { SentReader } from "./sent-message-pane";
 import { SentPane } from "./sent-pane";
 
@@ -48,6 +49,7 @@ export function MailShell({
         >
           {children}
           <MailWorkspace />
+          <ReplyDraftSync />
         </MailModeProvider>
       </MailDataErrorBoundary>
     </MailStore>

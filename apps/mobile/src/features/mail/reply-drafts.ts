@@ -2,23 +2,17 @@ import { useSyncExternalStore } from "react";
 import { AppState } from "react-native";
 import { File, Paths } from "expo-file-system";
 
-import type { ComposerDraft, ReplyDrafts } from "@freemail/features/mail";
+import type { ComposerDraft, ReplyDraftRemote } from "@freemail/features/mail";
 import {
-  isReplyDraftWorthKeeping,
-  parseReplyDrafts,
-  serializeReplyDrafts,
+  createReplyDraftStore,
   toComposerDraft,
-  toReplyDraft,
-  withoutReplyDraft,
 } from "@freemail/features/mail";
 
 import type { NativeComposerAttachment } from "./screens/use-native-attachments";
 
-let drafts: ReplyDrafts<NativeComposerAttachment> | undefined;
-let unsaved = false;
-let writeTimer: ReturnType<typeof setTimeout> | undefined;
 const WRITE_DELAY_MS = 500;
-const listeners = new Set<() => void>();
+let unsaved: string | undefined;
+let writeTimer: ReturnType<typeof setTimeout> | undefined;
 
 function draftsFile() {
   // Documents, not the cache: the OS may clear the cache, and a draft is
@@ -26,49 +20,64 @@ function draftsFile() {
   return new File(Paths.document, "reply-drafts.json");
 }
 
-function loaded() {
-  drafts ??= readDrafts();
-  return drafts;
-}
-
-function readDrafts() {
+function writeUnsaved() {
+  clearTimeout(writeTimer);
+  if (unsaved === undefined) return;
   try {
-    const file = draftsFile();
-    if (!file.exists) return {};
-    return parseReplyDrafts<NativeComposerAttachment>(file.textSync());
+    draftsFile().write(unsaved);
+    unsaved = undefined;
   } catch {
-    return {};
+    // Kept in memory; the next write tries again.
   }
 }
 
-function change(next: ReplyDrafts<NativeComposerAttachment>) {
-  drafts = next;
-  unsaved = true;
-  notify();
-  clearTimeout(writeTimer);
-  writeTimer = setTimeout(writeUnsaved, WRITE_DELAY_MS);
-}
+const store = createReplyDraftStore({
+  storage: {
+    read: () => {
+      const file = draftsFile();
+      return file.exists ? file.textSync() : undefined;
+    },
+    // Written shortly after typing pauses, and at once as the app leaves
+    // the screen.
+    write: (text) => {
+      unsaved = text;
+      clearTimeout(writeTimer);
+      writeTimer = setTimeout(writeUnsaved, WRITE_DELAY_MS);
+    },
+  },
+});
 
-function notify() {
-  for (const listener of listeners) listener();
-}
+// "inactive" too: an app closed from the app switcher is only inactive.
+AppState.addEventListener("change", (state) => {
+  if (state !== "active") writeUnsaved();
+});
 
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-/** The unsent reply to a thread, kept on this device until it's sent. */
+/** The unsent reply to a thread, synced with the user's other devices. */
 export function useReplyDraft(threadId: string) {
-  return useSyncExternalStore(subscribe, () => loaded()[threadId]);
+  return useSyncExternalStore(store.subscribe, () => store.get(threadId));
+}
+
+/** Changes when another device edits the thread's reply. */
+export function useReplyDraftEditVersion(threadId: string | undefined) {
+  return useSyncExternalStore(store.subscribe, () =>
+    threadId ? store.getEditVersion(threadId) : 0,
+  );
 }
 
 export function readReplyDraft(threadId: string) {
-  const saved = loaded()[threadId];
+  const saved = store.get(threadId);
   if (!saved) return undefined;
+  const draft = toComposerDraft(saved);
   return {
     accountId: saved.accountId,
-    draft: toComposerDraft(saved, Date.now()),
+    draft: {
+      ...draft,
+      // Uploaded already: the local file is only needed to upload.
+      attachments: draft.attachments.map((attachment) => ({
+        uri: "",
+        ...attachment,
+      })),
+    } satisfies ComposerDraft<NativeComposerAttachment>,
   };
 }
 
@@ -77,56 +86,25 @@ export function saveReplyDraft(
   draft: ComposerDraft<NativeComposerAttachment>,
   accountId: string | undefined,
 ) {
-  if (!isReplyDraftWorthKeeping(draft)) {
-    deleteReplyDraft(threadId);
-    return;
-  }
-  const current = loaded();
-  change({
-    ...current,
-    [threadId]: toReplyDraft({
-      accountId,
-      draft,
-      now: Date.now(),
-      previous: current[threadId],
-    }),
-  });
+  store.save(threadId, draft, accountId);
 }
 
 export function deleteReplyDraft(threadId: string) {
-  const current = loaded();
-  if (!(threadId in current)) return;
-  change(withoutReplyDraft(current, threadId));
+  store.remove(threadId);
 }
 
-/** Signing out deletes every draft with the rest of the account's data. */
+export function applyServerReplyDrafts(
+  rows: Parameters<typeof store.applyServer>[0],
+) {
+  store.applyServer(rows);
+}
+
+export function connectReplyDrafts(remote: ReplyDraftRemote | undefined) {
+  store.connect(remote);
+}
+
+/** Signing out deletes this device's copy of every draft. */
 export function forgetReplyDrafts() {
-  drafts = {};
-  unsaved = false;
-  clearTimeout(writeTimer);
-  notify();
-  try {
-    const file = draftsFile();
-    if (file.exists) file.delete();
-  } catch {
-    // Nothing saved.
-  }
+  store.forget();
+  writeUnsaved();
 }
-
-function writeUnsaved() {
-  clearTimeout(writeTimer);
-  if (!unsaved || !drafts) return;
-  unsaved = false;
-  try {
-    draftsFile().write(serializeReplyDrafts(drafts));
-  } catch {
-    unsaved = true;
-  }
-}
-
-// Written shortly after typing pauses, and at once as the app leaves the
-// screen ("inactive" too: an app closed from the app switcher is only
-// inactive).
-AppState.addEventListener("change", (state) => {
-  if (state !== "active") writeUnsaved();
-});

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Id } from "@freemail/convex/model";
 import type {
@@ -10,6 +10,7 @@ import {
   deleteReplyDraft,
   readReplyDraft,
   saveReplyDraft,
+  useReplyDraftEditVersion,
 } from "./reply-drafts";
 
 /** The thread a reply answers, and who it's to, for its title. */
@@ -129,6 +130,21 @@ function useComposerValues() {
   }));
   // The newest values, for updates that arrive between renders (uploads).
   const latest = useRef(values);
+  const editVersion = useReplyDraftEditVersion(values.reply?.threadId);
+
+  // eslint-disable-next-line no-restricted-syntax -- Another device's edit to the open reply arrives through the drafts store outside React, and replaces what the composer shows.
+  useEffect(() => {
+    const current = latest.current;
+    const saved = current.reply && readReplyDraft(current.reply.threadId);
+    if (!saved) return;
+    const next = {
+      ...current,
+      accountId: saved.accountId ?? current.accountId,
+      draft: saved.draft,
+    };
+    latest.current = next;
+    setValues(next);
+  }, [editVersion]);
 
   function update(next: Partial<ComposerValues>) {
     const merged = { ...latest.current, ...next };

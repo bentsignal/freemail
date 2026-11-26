@@ -36,6 +36,7 @@ import {
   vHostedDomain,
   vMailImport,
 } from "./providers/hosted/validators";
+import { vReplyDraft } from "./replyDrafts/validators";
 
 export default defineSchema(
   {
@@ -178,6 +179,10 @@ export default defineSchema(
       .index("by_status_created", ["status", "createdAt"])
       .index("by_outbox", ["outboxId"])
       .index("by_storage", ["storageId"]),
+    replyDrafts: defineTable(vReplyDraft).index("by_owner_thread", [
+      "ownerId",
+      "threadId",
+    ]),
     mobilePushTokens: defineTable(vMobilePushToken)
       .index("by_owner", ["ownerId"])
       .index("by_owner_device", ["ownerId", "deviceId"])

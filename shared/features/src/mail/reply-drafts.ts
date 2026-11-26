@@ -1,35 +1,52 @@
 import type { ComposerAttachment, ComposerDraft } from "./types";
 
 /** Bumped when the saved shape changes, so an older copy is ignored. */
-export const REPLY_DRAFTS_VERSION = 1;
+export const REPLY_DRAFTS_VERSION = 2;
 
 /**
- * The server deletes an unsent attachment a day after its upload
- * (attachments/internal.ts), so a draft drops one a little before that.
+ * A reply being written, as this device has it. `updatedAt` is when it was
+ * last edited (on whichever device); `syncedAt` is the edit the server is
+ * known to have, so a draft whose two differ still has to be sent.
  */
-export const ATTACHMENT_KEEP_MS = 20 * 60 * 60 * 1000;
-
-export interface SavedAttachment<TAttachment extends ComposerAttachment> {
-  attachment: TAttachment;
-  savedAt: number;
-}
-
-export interface ReplyDraft<
-  TAttachment extends ComposerAttachment = ComposerAttachment,
-> {
+export interface ReplyDraft {
   accountId?: string;
-  attachments: SavedAttachment<TAttachment>[];
+  attachments: ComposerAttachment[];
   bcc: string;
   body: string;
   cc: string;
   subject: string;
+  syncedAt?: number;
   to: string;
   updatedAt: number;
 }
 
-export type ReplyDrafts<
-  TAttachment extends ComposerAttachment = ComposerAttachment,
-> = Record<string, ReplyDraft<TAttachment>>;
+export interface ReplyDraftState {
+  /** Drafts deleted here that the server may still have, by deletion time. */
+  deleted: Record<string, number>;
+  drafts: Record<string, ReplyDraft>;
+}
+
+/** A draft as the server lists it (replyDrafts/queries.ts). */
+export interface ServerReplyDraft {
+  accountId?: string;
+  attachments: {
+    _id: string;
+    contentType: string;
+    fileName: string;
+    size: number;
+  }[];
+  bcc: string;
+  body: string;
+  cc: string;
+  subject: string;
+  threadId: string;
+  to: string;
+  updatedAt: number;
+}
+
+export function createEmptyReplyDraftState() {
+  return { deleted: {}, drafts: {} } satisfies ReplyDraftState;
+}
 
 /** A reply with nothing written in it isn't worth keeping. */
 export function isReplyDraftWorthKeeping(draft: ComposerDraft) {
@@ -41,88 +58,179 @@ export function isReplyDraftWorthKeeping(draft: ComposerDraft) {
   );
 }
 
+export function isReplyDraftUnsynced(draft: ReplyDraft) {
+  return draft.syncedAt !== draft.updatedAt;
+}
+
 /**
  * Only uploaded attachments are kept: an upload still running when the
- * composer closes has nowhere to report back to.
+ * composer closes has nowhere to report back to. Each edit is newer than
+ * the last, even when that one came from a device whose clock is ahead.
  */
-export function toReplyDraft<TAttachment extends ComposerAttachment>({
+export function toReplyDraft({
   accountId,
   draft,
   now,
   previous,
 }: {
   accountId: string | undefined;
-  draft: ComposerDraft<TAttachment>;
+  draft: ComposerDraft;
   now: number;
-  previous: ReplyDraft<TAttachment> | undefined;
+  previous: ReplyDraft | undefined;
 }) {
   return {
     accountId,
-    attachments: draft.attachments
-      .filter((attachment) => attachment.status === "ready")
-      .map((attachment) => ({
-        attachment,
-        savedAt:
-          previous?.attachments.find(
-            (saved) => saved.attachment.id === attachment.id,
-          )?.savedAt ?? now,
-      })),
+    attachments: draft.attachments.filter(
+      (attachment) => attachment.status === "ready",
+    ),
     bcc: draft.bcc,
     body: draft.body,
     cc: draft.cc,
     subject: draft.subject,
+    syncedAt: previous?.syncedAt,
     to: draft.to,
-    updatedAt: now,
-  } satisfies ReplyDraft<TAttachment>;
+    updatedAt: Math.max(now, (previous?.updatedAt ?? 0) + 1),
+  } satisfies ReplyDraft;
 }
 
-export function toComposerDraft<TAttachment extends ComposerAttachment>(
-  saved: ReplyDraft<TAttachment>,
-  now: number,
-) {
+export function toComposerDraft(saved: ReplyDraft) {
   return {
-    attachments: saved.attachments
-      .filter((item) => now - item.savedAt < ATTACHMENT_KEEP_MS)
-      .map((item) => item.attachment),
+    attachments: saved.attachments,
     bcc: saved.bcc,
     body: saved.body,
     cc: saved.cc,
     subject: saved.subject,
     to: saved.to,
-  } satisfies ComposerDraft<TAttachment>;
+  } satisfies ComposerDraft;
 }
 
-export function serializeReplyDrafts<TAttachment extends ComposerAttachment>(
-  drafts: ReplyDrafts<TAttachment>,
+/**
+ * Folds the server's drafts into this device's. The newer edit of each
+ * wins. A draft the server no longer has was sent or deleted elsewhere, so
+ * it goes here too, unless it has edits the server hasn't seen. Returns the
+ * threads whose draft another device edited.
+ */
+export function mergeServerReplyDrafts(
+  state: ReplyDraftState,
+  server: ServerReplyDraft[],
 ) {
-  return JSON.stringify({ drafts, version: REPLY_DRAFTS_VERSION });
+  const serverByThread = new Map(server.map((row) => [row.threadId, row]));
+  const drafts = new Map<string, ReplyDraft>();
+  const edited = new Set<string>();
+  for (const [threadId, local] of Object.entries(state.drafts)) {
+    if (!serverByThread.has(threadId) && isReplyDraftUnsynced(local)) {
+      drafts.set(threadId, local);
+    }
+  }
+  for (const row of server) {
+    const merged = mergeServerRow(
+      row,
+      state.drafts[row.threadId],
+      state.deleted[row.threadId],
+    );
+    if (!merged) continue;
+    drafts.set(row.threadId, merged.draft);
+    if (merged.edited) edited.add(row.threadId);
+  }
+  // Still to delete: only what the server has, unedited since.
+  const deleted = Object.fromEntries(
+    Object.entries(state.deleted).filter(
+      ([threadId, deletedAt]) =>
+        (serverByThread.get(threadId)?.updatedAt ?? Infinity) <= deletedAt,
+    ),
+  );
+  return {
+    edited: [...edited],
+    state: {
+      deleted,
+      drafts: Object.fromEntries(drafts),
+    } satisfies ReplyDraftState,
+  };
+}
+
+function mergeServerRow(
+  row: ServerReplyDraft,
+  local: ReplyDraft | undefined,
+  deletedAt: number | undefined,
+) {
+  if (deletedAt !== undefined && deletedAt >= row.updatedAt) return undefined;
+  if (local && local.updatedAt > row.updatedAt) {
+    return { draft: local, edited: false };
+  }
+  if (local?.updatedAt === row.updatedAt) {
+    const draft =
+      local.syncedAt === row.updatedAt
+        ? local
+        : { ...local, syncedAt: row.updatedAt };
+    return { draft, edited: false };
+  }
+  return { draft: fromServer(row, local), edited: true };
+}
+
+function fromServer(row: ServerReplyDraft, local: ReplyDraft | undefined) {
+  return {
+    accountId: row.accountId,
+    attachments: row.attachments.map(
+      (attachment) =>
+        local?.attachments.find(
+          (item) => item.draftAttachmentId === attachment._id,
+        ) ?? {
+          contentType: attachment.contentType,
+          draftAttachmentId: attachment._id,
+          fileName: attachment.fileName,
+          id: attachment._id,
+          size: attachment.size,
+          status: "ready" as const,
+        },
+    ),
+    bcc: row.bcc,
+    body: row.body,
+    cc: row.cc,
+    subject: row.subject,
+    syncedAt: row.updatedAt,
+    to: row.to,
+    updatedAt: row.updatedAt,
+  } satisfies ReplyDraft;
+}
+
+export function serializeReplyDraftState(state: ReplyDraftState) {
+  return JSON.stringify({ ...state, version: REPLY_DRAFTS_VERSION });
 }
 
 /** The drafts saved by this app, or none when the copy is unreadable. */
-export function parseReplyDrafts<TAttachment extends ComposerAttachment>(
-  text: string,
-) {
-  return Object.fromEntries(
-    Object.entries(getCurrentDrafts(JSON.parse(text)) ?? {}).filter(
-      (entry): entry is [string, ReplyDraft<TAttachment>] =>
-        isReplyDraft(entry[1]),
-    ),
-  );
+export function parseReplyDraftState(text: string) {
+  return toReplyDraftState(JSON.parse(text));
 }
 
-function getCurrentDrafts(saved: unknown) {
+function toReplyDraftState(saved: unknown) {
   if (
     typeof saved !== "object" ||
     saved === null ||
     !("version" in saved) ||
     saved.version !== REPLY_DRAFTS_VERSION ||
-    !("drafts" in saved) ||
-    typeof saved.drafts !== "object" ||
-    saved.drafts === null
+    !("deleted" in saved) ||
+    !("drafts" in saved)
   ) {
-    return undefined;
+    return createEmptyReplyDraftState();
   }
-  return saved.drafts;
+  return {
+    deleted: Object.fromEntries(
+      entriesOf(saved.deleted).filter(
+        (entry): entry is [string, number] => typeof entry[1] === "number",
+      ),
+    ),
+    drafts: Object.fromEntries(
+      entriesOf(saved.drafts).filter((entry): entry is [string, ReplyDraft] =>
+        isReplyDraft(entry[1]),
+      ),
+    ),
+  } satisfies ReplyDraftState;
+}
+
+function entriesOf(value: unknown) {
+  return typeof value === "object" && value !== null
+    ? Object.entries(value)
+    : [];
 }
 
 const TEXT_FIELDS = ["bcc", "body", "cc", "subject", "to"] as const;
@@ -134,15 +242,5 @@ function isReplyDraft(draft: unknown) {
     TEXT_FIELDS.every((field) => typeof fields.get(field) === "string") &&
     typeof fields.get("updatedAt") === "number" &&
     Array.isArray(fields.get("attachments"))
-  );
-}
-
-/** Copies the drafts without one thread's. */
-export function withoutReplyDraft<TAttachment extends ComposerAttachment>(
-  drafts: ReplyDrafts<TAttachment>,
-  threadId: string,
-) {
-  return Object.fromEntries(
-    Object.entries(drafts).filter(([key]) => key !== threadId),
   );
 }
