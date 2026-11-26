@@ -14,7 +14,11 @@ export function browserCommand(url: string, platform: NodeJS.Platform) {
     return { executable: "open", arguments: [url] };
   }
   if (platform === "win32") {
-    return { executable: "cmd", arguments: ["/c", "start", "", url] };
+    // cmd's start would cut the URL at its first "&".
+    return {
+      executable: "rundll32",
+      arguments: ["url.dll,FileProtocolHandler", url],
+    };
   }
   return { executable: "xdg-open", arguments: [url] };
 }
