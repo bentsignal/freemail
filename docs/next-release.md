@@ -45,25 +45,6 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
   the consent screen and returns to Freemail; Notes emails a sign-in code.
 
-## Count unread mail from counters (#62)
-
-`getUnreadCounts` scans unread threads until the counters are backfilled
-once on production.
-
-- When: right after the Convex deploy
-- Commands: from `services/convex`,
-  `pnpm exec convex run --prod mail/inboxUnreadBackfill:backfill '{}'`. It
-  schedules itself in batches of 50 threads and finishes within a minute.
-- Verify: `pnpm exec convex data --prod inboxUnreadCounts` shows one
-  document with `readyAt` set, and the unread counts in Freemail (the
-  inbox's account switcher) are what they were before the deploy. In
-  `pnpm exec convex logs --prod --success`, `mail/queries:getUnreadCounts`
-  runs read a few KB, and the next `providers/icloud/sync:synchronize` runs
-  call `sync/internal:getProviderMessageReadStates` once per mailbox at most
-  and never `listProviderMessageStatesPage`. The day after, Convex's usage
-  page shows Freemail's database bandwidth at a small fraction of the
-  ~2 GB/day before.
-
 ## CLI send, delete, and mark-read (#65)
 
 - When: after the Convex deploy (the CLI's new commands call `cli/mail:*`,
