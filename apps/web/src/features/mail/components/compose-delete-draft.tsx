@@ -42,7 +42,7 @@ function DeleteDraftDialog({
 
   return (
     <Dialog.Container onOpenChange={onOpenChange} open={open}>
-      <Dialog.Content className="mail-dialog bg-background max-w-sm overflow-hidden rounded-[18px] border p-0">
+      <Dialog.Content className="mail-dialog bg-background max-w-sm gap-0 overflow-hidden rounded-[18px] border p-0">
         <div className="border-b p-6">
           <Dialog.Title className="text-xl font-semibold tracking-tight">
             Delete this draft?
