@@ -147,6 +147,8 @@ import type * as providers_env from "../providers/env.js";
 import type * as providers_gmail_api from "../providers/gmail/api.js";
 import type * as providers_gmail_http from "../providers/gmail/http.js";
 import type * as providers_gmail_oauth from "../providers/gmail/oauth.js";
+import type * as providers_gmail_push from "../providers/gmail/push.js";
+import type * as providers_gmail_pushPayload from "../providers/gmail/pushPayload.js";
 import type * as providers_gmail_tokenAccess from "../providers/gmail/tokenAccess.js";
 import type * as providers_hosted_addresses from "../providers/hosted/addresses.js";
 import type * as providers_hosted_admin from "../providers/hosted/admin.js";
@@ -338,6 +340,8 @@ declare const fullApi: ApiFromModules<{
   "providers/gmail/api": typeof providers_gmail_api;
   "providers/gmail/http": typeof providers_gmail_http;
   "providers/gmail/oauth": typeof providers_gmail_oauth;
+  "providers/gmail/push": typeof providers_gmail_push;
+  "providers/gmail/pushPayload": typeof providers_gmail_pushPayload;
   "providers/gmail/tokenAccess": typeof providers_gmail_tokenAccess;
   "providers/hosted/addresses": typeof providers_hosted_addresses;
   "providers/hosted/admin": typeof providers_hosted_admin;

@@ -2,6 +2,7 @@ import { ConvexHttpClient } from "convex/browser";
 import { makeFunctionReference } from "convex/server";
 
 import type {
+  AgentMailAccount,
   GetThreadOutput,
   ListAccountsOutput,
   SearchMailOutput,
@@ -92,6 +93,23 @@ const MARK_READ = makeFunctionReference<
   { changedMessages: number; read: true; threadId: string }
 >("cli/mail:markRead");
 
+const SYNC_ALL = makeFunctionReference<
+  "mutation",
+  Record<string, never>,
+  { scheduled: number; skipped: number }
+>("accounts/mutations:syncAllNow");
+const SYNC_ACCOUNT = {
+  gmail: makeFunctionReference<"mutation", { accountId: string }, null>(
+    "accounts/mutations:syncGmailNow",
+  ),
+  icloud: makeFunctionReference<"mutation", { accountId: string }, null>(
+    "accounts/mutations:syncICloudNow",
+  ),
+  microsoft: makeFunctionReference<"mutation", { accountId: string }, null>(
+    "accounts/mutations:syncMicrosoftNow",
+  ),
+};
+
 export async function createMailClient(urls: CliUrls) {
   const { token } = await authenticatedSession(urls);
   const client = new ConvexHttpClient(urls.convexCloud);
@@ -111,5 +129,14 @@ export async function createMailClient(urls: CliUrls) {
       await client.action(LIST_MAIL, args),
     searchMail: async (query: string, args: MailPageArgs) =>
       await client.action(SEARCH_MAIL, { ...args, query }),
+    syncAccount: async (account: AgentMailAccount) => {
+      if (account.provider === "hosted") return;
+      await client.mutation(SYNC_ACCOUNT[account.provider], {
+        accountId: account.id,
+      });
+    },
+    syncAll: async () => {
+      await client.mutation(SYNC_ALL, {});
+    },
   };
 }

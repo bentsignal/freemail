@@ -1,4 +1,6 @@
 /* eslint-disable complexity, no-restricted-syntax -- This small CLI parser keeps its discriminated command contract explicit. */
+import type { SyncOptions } from "./sync.ts";
+
 export type Command =
   | { kind: "accounts" }
   | { kind: "auth-login" }
@@ -15,6 +17,7 @@ export type Command =
   | { id: string; kind: "mail-delete" }
   | { id: string; kind: "mail-mark-read" }
   | ({ kind: "mail-send" } & SendOptions)
+  | ({ kind: "mail-sync" } & SyncOptions)
   | {
       accountId?: string;
       cursor?: string;
@@ -78,6 +81,8 @@ function parseMailCommand(action: string | undefined, rest: string[]): Command {
   }
   if (action === "send")
     return { kind: "mail-send", ...parseSendOptions(rest) };
+  if (action === "sync")
+    return { kind: "mail-sync", ...parseSyncOptions(rest) };
   const { options, positionals } = parseMailOptions(rest);
   if (action === "list") {
     assertNoArguments(positionals, "mail list");
@@ -168,6 +173,55 @@ function parseSendOptions(values: string[]): SendOptions {
     subject: options.subject,
     wait: options.wait ?? true,
   };
+}
+
+const DEFAULT_SYNC_TIMEOUT_SECONDS = 30;
+const DEFAULT_WAIT_TIMEOUT_SECONDS = 120;
+const DEFAULT_SINCE_MINUTES = 10;
+
+function parseSyncOptions(values: string[]): SyncOptions {
+  const options: Partial<SyncOptions> = {};
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (value === "--account") {
+      options.accountId = requiredOptionValue(values, ++index, value);
+    } else if (value === "--wait-for") {
+      options.waitFor = requiredOptionValue(values, ++index, value, true);
+      if (options.waitFor.trim().length < 2) {
+        throw new Error("--wait-for needs at least 2 characters");
+      }
+    } else if (value === "--timeout") {
+      options.timeoutSeconds = positiveNumber(values, ++index, value, 600);
+    } else if (value === "--since") {
+      options.sinceMinutes = positiveNumber(values, ++index, value, 1440);
+    } else if (value === "--json") {
+      continue;
+    } else {
+      throw new Error(`Unknown option for mail sync: ${value}`);
+    }
+  }
+  return {
+    ...options,
+    sinceMinutes: options.sinceMinutes ?? DEFAULT_SINCE_MINUTES,
+    timeoutSeconds:
+      options.timeoutSeconds ??
+      (options.waitFor === undefined
+        ? DEFAULT_SYNC_TIMEOUT_SECONDS
+        : DEFAULT_WAIT_TIMEOUT_SECONDS),
+  };
+}
+
+function positiveNumber(
+  values: string[],
+  index: number,
+  option: string,
+  max: number,
+) {
+  const number = Number(requiredOptionValue(values, index, option));
+  if (!Number.isFinite(number) || number <= 0 || number > max) {
+    throw new Error(`${option} must be a number between 1 and ${max}`);
+  }
+  return number;
 }
 
 function addressesOption(values: string[], index: number, option: string) {

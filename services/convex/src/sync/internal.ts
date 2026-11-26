@@ -34,6 +34,7 @@ import {
 import { queueNewMailNotification } from "../notifications/internal";
 import { shouldNotifyForProviderMessage } from "../notifications/policy";
 import { toSentAttachments } from "../outbox/sent";
+import { providerEnv } from "../providers/env";
 import { GmailAdapter, GmailApiError } from "../providers/gmail/api";
 import { getUsableGmailTokens } from "../providers/gmail/tokenAccess";
 import {
@@ -97,6 +98,10 @@ interface ProviderMessageStatePage {
 }
 
 const PROVIDER_MESSAGE_PAGE_SIZE = 10;
+// The cron ticks every minute; Gmail and Microsoft sync on every tick.
+const MAIL_API_SYNC_INTERVAL_MS = 45 * 1000;
+// With Gmail push configured, the poll only repairs dropped notifications.
+const PUSH_REPAIR_SYNC_INTERVAL_MS = 4 * 60 * 1000;
 
 export const storeOAuthState = internalMutation({
   args: {
@@ -585,6 +590,10 @@ export const executeGmailSync = internalAction({
         cursor: syncResult.cursor,
       });
     } catch (error) {
+      console.error(
+        `Gmail sync failed for account ${args.accountId} (${args.reason}):`,
+        safeErrorMessage(error),
+      );
       await ctx.runMutation(internal.sync.internal.finishRun, {
         syncRunId,
         error: safeErrorMessage(error),
@@ -928,7 +937,11 @@ export const listScheduledGmailAccounts = internalQuery({
   args: {},
   handler: async (ctx) => {
     const accounts = await ctx.db.query("mailAccounts").collect();
-    const cutoff = Date.now() - 4 * 60 * 1000;
+    const cutoff =
+      Date.now() -
+      (providerEnv.GMAIL_PUBSUB_TOPIC?.trim()
+        ? PUSH_REPAIR_SYNC_INTERVAL_MS
+        : MAIL_API_SYNC_INTERVAL_MS);
     return accounts
       .filter(
         (account) =>
@@ -949,7 +962,7 @@ export const listScheduledMicrosoftAccounts = internalQuery({
   args: {},
   handler: async (ctx) => {
     const accounts = await ctx.db.query("mailAccounts").collect();
-    const cutoff = Date.now() - 4 * 60 * 1000;
+    const cutoff = Date.now() - MAIL_API_SYNC_INTERVAL_MS;
     return accounts
       .filter(
         (account) =>
