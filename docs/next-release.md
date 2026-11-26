@@ -44,3 +44,15 @@ https://colorful-ostrich-734.convex.site/transactional-mail/send`, and
 - Verify: `scripts/backend.sh status` in a new worktree names
   `tidy-emu-857`; connecting a Gmail and a Microsoft 365 account reaches
   the consent screen and returns to Freemail; Notes emails a sign-in code.
+
+## CLI send, delete, and mark-read (#65)
+
+- When: after the Convex deploy (the CLI's new commands call `cli/mail:*`,
+  which production doesn't have until then; nothing else depends on order)
+- Commands: on the Mac, from the main checkout,
+  `pnpm --filter @freemail/cli start -- mail send --from shawn@rodgers.dev
+--to <your Gmail address> --subject "Freemail CLI test" --body "Sent
+from the CLI."` (run `auth login` first if `auth status` says false). Then
+  the same on GamerBox for Vera.
+- Verify: the command prints `"status": "sent"`, the message arrives in the
+  Gmail inbox, and it shows in Freemail's Sent for shawn@rodgers.dev.
