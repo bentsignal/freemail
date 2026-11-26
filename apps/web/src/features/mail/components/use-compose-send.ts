@@ -9,7 +9,7 @@ import { getProviderAttachmentError } from "@freemail/convex/attachments/constan
 import { getSentSubject, parseRecipientFields } from "@freemail/features/mail";
 import { toast } from "@freemail/ui-web/toast";
 
-import type { ComposerSnapshot } from "../store";
+import type { ComposerSnapshot } from "../use-composer-state";
 import { useLiveMail } from "../live-data";
 import { addSendingOutboxRow } from "../outbox-optimistic";
 import { useMailStore } from "../store";
@@ -30,9 +30,7 @@ export function useComposeSend() {
   );
   const restoreComposer = useMailStore((store) => store.restoreComposer);
   const composerAccountId = useMailStore((store) => store.composerAccountId);
-  const replyToMessageId = useMailStore(
-    (store) => store.composerReplyToMessageId,
-  );
+  const reply = useMailStore((store) => store.composerReply);
   const draft = useMailStore((store) => store.composerDraft);
   const idempotencyKey = useMailStore((store) => store.idempotencyKey);
   const enqueue = useMutation(
@@ -71,7 +69,7 @@ export function useComposeSend() {
       accountId: account._id,
       draft,
       idempotencyKey,
-      replyToMessageId,
+      reply,
     } satisfies ComposerSnapshot;
     enqueue({
       accountId: account._id,
@@ -84,7 +82,7 @@ export function useComposeSend() {
       cc: recipients.recipients.cc,
       idempotencyKey,
       plainText: draft.body,
-      replyToMessageId,
+      replyToMessageId: reply?.messageId,
       subject: draft.subject.trim(),
       to: recipients.recipients.to,
     }).catch((error: unknown) => {

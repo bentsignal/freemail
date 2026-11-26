@@ -19,7 +19,7 @@ export type {
   MailLocationKind,
   MailThreadPlacement,
 } from "./location";
-export { getReplyAddress } from "./reply";
+export { getReplyAddress, getReplyRecipient } from "./reply";
 export {
   getStrongSemanticMessageIds,
   mergeSearchResults,
@@ -53,3 +53,22 @@ export type {
   RecipientFieldsResult,
   RecipientParseResult,
 } from "./recipients";
+export {
+  isReplyDraftWorthKeeping,
+  mergeServerReplyDrafts,
+  parseReplyDraftState,
+  serializeReplyDraftState,
+  toComposerDraft,
+  toReplyDraft,
+} from "./reply-drafts";
+export type {
+  ReplyDraft,
+  ReplyDraftState,
+  ServerReplyDraft,
+} from "./reply-drafts";
+export { createReplyDraftStore } from "./reply-draft-store";
+export type {
+  ReplyDraftRemote,
+  ReplyDraftStorage,
+  SavedReplyDraft,
+} from "./reply-draft-store";

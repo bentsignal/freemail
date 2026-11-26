@@ -22,6 +22,7 @@ import { DevMailBridge } from "~/features/dev/dev-mail";
 import { markStartup } from "~/features/dev/startup-timing";
 import { OutgoingMailBanner } from "~/features/mail/outgoing/outgoing-banner";
 import { OutgoingMailStore } from "~/features/mail/outgoing/outgoing-store";
+import { ReplyDraftSync } from "~/features/mail/reply-draft-sync";
 import { MailStore } from "~/features/mail/store";
 import { useMobileNotifications } from "~/features/notifications/mobile-notifications";
 import { useResolvedMobileColorScheme } from "~/features/theme/mobile-theme";
@@ -81,6 +82,7 @@ function AppShell({ readiness }: { readiness: ReturnType<typeof useInitApp> }) {
       <MailStore>
         <OutgoingMailStore>
           <DevMailBridge />
+          <ReplyDraftSync />
           <AppNavigation
             backgroundColor={backgroundColor}
             colorScheme={colorScheme}
@@ -145,6 +147,7 @@ function AppNavigation({
           <Stack.Screen
             name="compose"
             options={{
+              title: "New Message",
               presentation: "formSheet",
               sheetAllowedDetents: [0.92, 1],
               sheetGrabberVisible: true,

@@ -61,14 +61,19 @@ export function useNotificationActions(isAuthenticated: boolean) {
       );
       if (!target) return;
       if (!action) {
-        router.push({
-          pathname: MOBILE_THREAD_ROUTE,
-          params: {
-            id: target.threadId,
-            messageId: target.messageId,
-            title: response.notification.request.content.title ?? undefined,
+        router.push(
+          {
+            pathname: MOBILE_THREAD_ROUTE,
+            params: {
+              id: target.threadId,
+              messageId: target.messageId,
+              title: response.notification.request.content.title ?? undefined,
+            },
           },
-        });
+          // Opened at launch, the inbox isn't on screen yet; the anchor
+          // puts it under the thread so Back returns to it.
+          { withAnchor: true },
+        );
         return;
       }
       await executeMailNotificationAction(

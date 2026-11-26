@@ -58,3 +58,19 @@ export function draftCanSend(draft: {
     draft.attachments.every((attachment) => attachment.status === "ready")
   );
 }
+
+export function getComposerTitle(
+  replyName: string | undefined,
+  subject: string,
+) {
+  if (replyName) return `Reply to ${replyName}`;
+  return subject.trim() || "New Message";
+}
+
+export function getInitialFocus(
+  variant: "modal" | "tab",
+  to: string | undefined,
+) {
+  if (variant === "tab") return undefined;
+  return to ? "body" : "to";
+}

@@ -2,11 +2,9 @@ import { useState } from "react";
 import { createStore } from "rostra";
 
 import type { Id } from "@freemail/convex/model";
-import type {
-  ComposerAttachment,
-  ComposerDraft,
-} from "@freemail/features/mail";
 import { useDebouncedInput } from "@freemail/std/use-debounced-input";
+
+import { useComposerState } from "./use-composer-state";
 
 const SEARCH_DEBOUNCE_MS = 600;
 
@@ -15,141 +13,6 @@ export type MailAccountFilter = "all" | Id<"mailAccounts">;
 export interface ThreadSelection {
   messageId: Id<"messages">;
   threadId: Id<"threads">;
-}
-
-interface ReplyTarget {
-  accountId: Id<"mailAccounts">;
-  address: string;
-  messageId: Id<"messages">;
-  subject: string;
-}
-
-export interface WebComposerAttachment extends ComposerAttachment {
-  file: File;
-}
-
-type WebComposerDraft = ComposerDraft<WebComposerAttachment>;
-
-export interface ComposerSnapshot {
-  accountId: Id<"mailAccounts">;
-  draft: WebComposerDraft;
-  idempotencyKey: string;
-  replyToMessageId: Id<"messages"> | undefined;
-}
-
-function createEmptyDraft() {
-  return {
-    attachments: [],
-    bcc: "",
-    body: "",
-    cc: "",
-    subject: "",
-    to: "",
-  } satisfies WebComposerDraft;
-}
-
-function useComposerState() {
-  const [composerIsOpen, setComposerIsOpen] = useState(false);
-  const [composerDraft, setComposerDraft] =
-    useState<WebComposerDraft>(createEmptyDraft);
-  const [composerAccountId, setComposerAccountId] =
-    useState<Id<"mailAccounts">>();
-  const [composerReplyToMessageId, setComposerReplyToMessageId] =
-    useState<Id<"messages">>();
-  const [idempotencyKey, setIdempotencyKey] = useState(createIdempotencyKey);
-  const composerCanSend =
-    composerDraft.to.trim().length > 0 && composerDraft.body.trim().length > 0;
-
-  function updateComposerDraft(
-    field: "bcc" | "body" | "cc" | "subject" | "to",
-    value: string,
-  ) {
-    setComposerDraft((current) => ({ ...current, [field]: value }));
-  }
-
-  function addComposerAttachments(attachments: WebComposerAttachment[]) {
-    setComposerDraft((current) => ({
-      ...current,
-      attachments: [...current.attachments, ...attachments],
-    }));
-  }
-
-  function updateComposerAttachment(
-    attachmentId: string,
-    update: Partial<WebComposerAttachment>,
-  ) {
-    setComposerDraft((current) => ({
-      ...current,
-      attachments: current.attachments.map((attachment) =>
-        attachment.id === attachmentId
-          ? { ...attachment, ...update }
-          : attachment,
-      ),
-    }));
-  }
-
-  function openReply({ accountId, address, messageId, subject }: ReplyTarget) {
-    setComposerDraft({
-      ...createEmptyDraft(),
-      subject: subject.startsWith("Re:") ? subject : `Re: ${subject}`,
-      to: address,
-    });
-    setComposerAccountId(accountId);
-    setComposerReplyToMessageId(messageId);
-    setComposerIsOpen(true);
-    setIdempotencyKey(createIdempotencyKey());
-  }
-
-  function completeComposerEnqueue() {
-    if (!composerCanSend) return;
-    setComposerIsOpen(false);
-    setComposerDraft(createEmptyDraft());
-    setComposerReplyToMessageId(undefined);
-    setIdempotencyKey(createIdempotencyKey());
-  }
-
-  /** Reopens a message whose send failed, as it was when Send was pressed. */
-  function restoreComposer(snapshot: ComposerSnapshot) {
-    setComposerDraft(snapshot.draft);
-    setComposerAccountId(snapshot.accountId);
-    setComposerReplyToMessageId(snapshot.replyToMessageId);
-    setIdempotencyKey(snapshot.idempotencyKey);
-    setComposerIsOpen(true);
-  }
-
-  return {
-    addComposerAttachments,
-    completeComposerEnqueue,
-    closeComposer: () => setComposerIsOpen(false),
-    composerCanSend,
-    composerAccountId,
-    composerDraft,
-    composerIsOpen,
-    composerReplyToMessageId,
-    idempotencyKey,
-    openComposer: () => {
-      setComposerDraft(createEmptyDraft());
-      setComposerReplyToMessageId(undefined);
-      setIdempotencyKey(createIdempotencyKey());
-      setComposerIsOpen(true);
-    },
-    openReply,
-    removeComposerAttachment: (attachmentId: string) =>
-      setComposerDraft((current) => ({
-        ...current,
-        attachments: current.attachments.filter(
-          (attachment) => attachment.id !== attachmentId,
-        ),
-      })),
-    restoreComposer,
-    setComposerAccountId,
-    updateComposerAttachment,
-    updateComposerDraft,
-  };
-}
-
-function createIdempotencyKey() {
-  return `freemail-web-${crypto.randomUUID()}`;
 }
 
 function useInternalStore({

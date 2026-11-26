@@ -2,6 +2,7 @@
 import { useMutation } from "convex/react";
 
 import type { Id } from "@freemail/convex/model";
+import type { ComposerAttachment } from "@freemail/features/mail";
 import { api } from "@freemail/convex/api";
 import {
   getProviderAttachmentError,
@@ -11,7 +12,6 @@ import {
 } from "@freemail/convex/attachments/constants";
 import { toast } from "@freemail/ui-web/toast";
 
-import type { WebComposerAttachment } from "../store";
 import type { MailAccountView } from "../types";
 import { useMailStore } from "../store";
 
@@ -28,7 +28,7 @@ export function useComposeAttachments(
   );
   const finalizeUpload = useMutation(api.attachments.mutations.finalizeUpload);
 
-  async function uploadAttachment(attachment: WebComposerAttachment) {
+  async function uploadAttachment(attachment: ComposerAttachment, file: File) {
     try {
       const upload = await generateUploadUrl({
         contentType: attachment.contentType,
@@ -43,7 +43,7 @@ export function useComposeAttachments(
       const response = await fetch(upload.uploadUrl, {
         method: "POST",
         headers: { "Content-Type": upload.contentType },
-        body: attachment.file,
+        body: file,
       });
       if (!response.ok) throw new Error("Attachment upload failed.");
       const finalized = await finalizeUpload({
@@ -71,9 +71,14 @@ export function useComposeAttachments(
       toast.error(error);
       return;
     }
-    const selected = files.map(createWebAttachment);
-    addAttachments(selected);
-    await Promise.all(selected.map(uploadAttachment));
+    const selected = files.map((file) => ({
+      attachment: createWebAttachment(file),
+      file,
+    }));
+    addAttachments(selected.map((item) => item.attachment));
+    await Promise.all(
+      selected.map((item) => uploadAttachment(item.attachment, item.file)),
+    );
   }
 
   return {
@@ -85,7 +90,7 @@ export function useComposeAttachments(
 }
 
 function getSelectionError(
-  attachments: WebComposerAttachment[],
+  attachments: ComposerAttachment[],
   files: File[],
   provider: MailAccountView["provider"] | undefined,
 ) {
@@ -113,12 +118,11 @@ function getSelectionError(
 function createWebAttachment(file: File) {
   return {
     id: crypto.randomUUID(),
-    file,
     fileName: file.name,
     contentType: file.type,
     size: file.size,
     status: "uploading",
-  } satisfies WebComposerAttachment;
+  } satisfies ComposerAttachment;
 }
 
 function parseStorageId(value: unknown) {

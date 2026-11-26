@@ -2,6 +2,7 @@ import { v } from "convex/values";
 
 import { internalMutation, internalQuery } from "../_generated/server";
 import { getActiveAccount } from "../mail/helpers";
+import { getHeldAttachmentIds } from "../replyDrafts/model";
 
 const DRAFT_RETENTION_MS = 24 * 60 * 60 * 1000;
 
@@ -69,8 +70,14 @@ export const cleanupExpiredDrafts = internalMutation({
         }),
       )
     ).flat();
+    const held = new Map<string, Set<string>>();
     for (const attachment of expired) {
       if (attachment.status === "claimed") continue;
+      const ownerHeld =
+        held.get(attachment.ownerId) ??
+        (await getHeldAttachmentIds(ctx, attachment.ownerId));
+      held.set(attachment.ownerId, ownerHeld);
+      if (ownerHeld.has(attachment._id)) continue;
       if (attachment.storageId) await ctx.storage.delete(attachment.storageId);
       await ctx.db.delete(attachment._id);
     }
