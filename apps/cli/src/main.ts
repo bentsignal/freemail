@@ -3,11 +3,13 @@ import { readFile } from "node:fs/promises";
 import { text } from "node:stream/consumers";
 
 import type { Command, SendOptions } from "./commands.ts";
+import type { SyncOptions } from "./sync.ts";
 import { isAuthenticated, login, logout } from "./auth.ts";
 import { parseCommand } from "./commands.ts";
 import { resolveCliUrls } from "./config.ts";
 import { help } from "./help.ts";
 import { createMailClient } from "./mail-client.ts";
+import { syncMail } from "./sync.ts";
 
 type MailClient = Awaited<ReturnType<typeof createMailClient>>;
 
@@ -50,6 +52,7 @@ async function runMailCommand(
     return await client.getThread(command.threadId);
   }
   if (command.kind === "mail-send") return await sendMail(client, command);
+  if (command.kind === "mail-sync") return await runSync(client, command);
   if (command.kind === "mail-delete") {
     return await client.deleteMail(command.id);
   }
@@ -60,6 +63,14 @@ async function runMailCommand(
     return await client.searchMail(command.query, mailPageArguments(command));
   }
   return await client.listMail(mailPageArguments(command));
+}
+
+async function runSync(client: MailClient, options: SyncOptions) {
+  const result = await syncMail(client, options);
+  if (result.timedOut || ("failed" in result && result.failed.length > 0)) {
+    process.exitCode = 1;
+  }
+  return result;
 }
 
 async function sendMail(client: MailClient, options: SendOptions) {

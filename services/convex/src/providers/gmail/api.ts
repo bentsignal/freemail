@@ -130,6 +130,21 @@ export class GmailAdapter implements MailProviderAdapter {
     };
   }
 
+  async watch(accessToken: string, topicName: string) {
+    const response = await gmailFetch<{
+      expiration?: string;
+      historyId?: string;
+    }>(accessToken, "/watch", {
+      method: "POST",
+      body: JSON.stringify({
+        topicName,
+        labelIds: ["INBOX"],
+        labelFilterBehavior: "INCLUDE",
+      }),
+    });
+    return { expiration: Number(response.expiration ?? 0) };
+  }
+
   async findDeletedMessageIds(accessToken: string, remoteMessageIds: string[]) {
     const results = await mapConcurrent(
       remoteMessageIds,

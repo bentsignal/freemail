@@ -10,7 +10,14 @@ pnpm --filter @freemail/cli start -- auth login
 pnpm --filter @freemail/cli start -- mail list
 pnpm --filter @freemail/cli start -- mail search "flight receipt"
 pnpm --filter @freemail/cli start -- mail get THREAD_ID
+pnpm --filter @freemail/cli start -- mail sync
+pnpm --filter @freemail/cli start -- mail sync --wait-for "spotify code" --timeout 120
 ```
+
+`mail sync` fetches new mail from every account now and prints what arrived.
+With `--wait-for QUERY` it keeps syncing until a message from the last
+`--since` minutes (default 10) matches, which is how an agent picks up a
+login code as soon as it lands. A timeout exits with status 1.
 
 ## Sending, deleting, and marking read
 

@@ -108,12 +108,23 @@ the current simple Graph attachment path limits each Microsoft file to 3 MB.
 - Read/unread changes are written locally first and propagated to Gmail and
   Microsoft with bounded retries. iCloud applies the same write-through model
   using IMAP `\\Seen` flags.
-- The shared cron schedules Gmail history, Microsoft Inbox delta, and iCloud
-  IMAP repair every five minutes and recovers expired outbox leases. Gmail
-  `watch`/Pub/Sub and Microsoft Graph change notifications can later reduce
-  latency; cursor-based reconciliation remains authoritative. Manual sync is
-  available through the provider-specific account mutations, and sends trigger
-  an incremental pass.
+- The shared cron ticks every minute. Gmail history and Microsoft Inbox
+  delta run on every tick (an account synced in the last 45 seconds is
+  skipped); iCloud IMAP repair runs when its last sync is over four minutes
+  old, so about every five minutes. The cron also recovers expired outbox
+  leases. A failed run is recorded on its `syncRuns` row and the account's
+  `lastSyncError`, logged with `console.error`, and retried on the next tick.
+- Gmail push: when `GMAIL_PUBSUB_TOPIC` is set, `providers/gmail/push:renewWatches`
+  (every 12 hours) calls `users.watch` for each Gmail account, limited to
+  the INBOX label. Gmail publishes to that topic, and a Pub/Sub push
+  subscription posts to `/providers/gmail/push?token=<GMAIL_PUSH_TOKEN>`,
+  which schedules an incremental Gmail sync for the mailbox right away.
+  Requests without the token get `403`. Setup is in
+  [docs/next-release.md](../../docs/next-release.md) until it ships. The
+  minute poll stays authoritative for dropped notifications.
+- Manual sync is available through the provider-specific account mutations
+  and `syncAllNow` (the CLI's `mail sync`), and sends trigger an incremental
+  pass.
 
 Primary references:
 

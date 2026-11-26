@@ -56,3 +56,30 @@ from the CLI."` (run `auth login` first if `auth status` says false). Then
   the same on GamerBox for Vera.
 - Verify: the command prints `"status": "sent"`, the message arrives in the
   Gmail inbox, and it shows in Freemail's Sent for shawn@rodgers.dev.
+
+## Gmail push and one-minute sync (#PR)
+
+The deploy alone moves Gmail and Microsoft to a one-minute poll. Gmail push
+(new mail in seconds) also needs a Pub/Sub topic that only Shawn can create
+in the Google Cloud project that owns Freemail's OAuth client.
+
+- When: after the Convex deploy
+- Commands (Shawn, with `gcloud` signed in to that project; `PROJECT` is
+  its ID, `TOKEN` a fresh random string such as `openssl rand -hex 24`):
+  - `gcloud services enable pubsub.googleapis.com --project PROJECT`
+  - `gcloud pubsub topics create freemail-gmail --project PROJECT`
+  - `gcloud pubsub topics add-iam-policy-binding freemail-gmail --project
+PROJECT --member serviceAccount:gmail-api-push@system.gserviceaccount.com
+--role roles/pubsub.publisher`
+  - `gcloud pubsub subscriptions create freemail-gmail-push --project
+PROJECT --topic freemail-gmail --ack-deadline 30
+--push-endpoint "https://colorful-ostrich-734.convex.site/providers/gmail/push?token=TOKEN"`
+  - From `services/convex`: `pnpm exec convex env set --prod
+GMAIL_PUSH_TOKEN TOKEN` and `pnpm exec convex env set --prod
+GMAIL_PUBSUB_TOPIC projects/PROJECT/topics/freemail-gmail`
+  - `pnpm exec convex run --prod providers/gmail/push:renewWatches` (the
+    12-hour cron keeps it renewed after that)
+- Verify: `renewWatches` prints `renewed: 1, failed: 0`; send a message to
+  the Gmail address and `pnpm exec convex logs --prod` shows an
+  `executeGmailSync` within a few seconds, before the next minute's cron
+  tick. `mail list` in the CLI shows it without `mail sync`.

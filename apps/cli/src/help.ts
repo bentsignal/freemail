@@ -16,6 +16,7 @@ Commands:
   mail list [options]      List recent inbox mail
   mail search <query>      Search inbox mail
   mail get <thread-id>     Read a mail thread
+  mail sync [options]      Fetch new mail now, or wait for a message
   mail send [options]      Send a plain-text message
   mail delete <id>         Move a thread to Freemail's archive
   mail mark-read <id>      Mark a thread read
@@ -41,6 +42,15 @@ Commands:
        [--idempotency-key KEY] [--no-wait]
   delete <thread-id | message-id>
   mark-read <thread-id | message-id>
+  sync [--account ID] [--timeout SECONDS]
+  sync --wait-for QUERY [--timeout SECONDS] [--since MINUTES] [--account ID]
+
+sync fetches new mail from Gmail, Microsoft, and iCloud now (hosted mailboxes
+receive mail as it arrives), waits up to --timeout seconds (default 30) for
+every account to finish, and prints what arrived. --wait-for keeps syncing
+until a message received in the last --since minutes (default 10) matches
+QUERY, then prints it; it gives up after --timeout seconds (default 120). A
+timeout or a failed account exits with status 1.
 
 send uses the connected account whose address (or account ID) is --from.
 --to, --cc, and --bcc repeat or take comma-separated addresses. --body-file -

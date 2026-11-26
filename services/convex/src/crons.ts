@@ -30,8 +30,15 @@ crons.interval(
 
 crons.interval(
   "sync connected providers and recover delivery work",
-  { minutes: 5 },
+  { minutes: 1 },
   internal.sync.internal.runScheduledProviderWork,
+  {},
+);
+
+crons.interval(
+  "renew Gmail push notifications",
+  { hours: 12 },
+  internal.providers.gmail.push.renewWatches,
   {},
 );
 

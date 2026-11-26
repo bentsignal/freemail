@@ -9,6 +9,7 @@ import {
 } from "./auth";
 import { performQuickAction } from "./notifications/http";
 import { oauthCallback as gmailOAuthCallback } from "./providers/gmail/http";
+import { pushWebhook as gmailPushWebhook } from "./providers/gmail/push";
 import { snsWebhook as hostedSnsWebhook } from "./providers/hosted/http";
 import { oauthCallback as microsoftOAuthCallback } from "./providers/microsoft/http";
 import { sendTransactionalMail } from "./transactionalMail/http";
@@ -66,6 +67,12 @@ http.route({
   path: "/providers/gmail/oauth/callback",
   method: "GET",
   handler: gmailOAuthCallback,
+});
+
+http.route({
+  path: "/providers/gmail/push",
+  method: "POST",
+  handler: gmailPushWebhook,
 });
 
 http.route({
