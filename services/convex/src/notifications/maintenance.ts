@@ -2,7 +2,7 @@ import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import { internalMutation } from "../_generated/server";
+import { internalMutation } from "../functions";
 import { EXPO_RECEIPT_DELAY_MS } from "./expo";
 import {
   NOTIFICATION_SEND_LEASE_MS,

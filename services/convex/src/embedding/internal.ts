@@ -3,11 +3,12 @@ import { ConvexError, v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { internalMutation, internalQuery } from "../_generated/server";
+import { internalQuery } from "../_generated/server";
 import {
   EMBEDDING_DIMENSIONS,
   MAX_JOB_ATTEMPTS,
 } from "../classification/constants";
+import { internalMutation } from "../functions";
 import { rateLimiter } from "../limiter";
 import { queueEmbeddingForMessage } from "./queue";
 import { isEmbeddingInputStale, isEmbeddingJobRunnable } from "./stale";

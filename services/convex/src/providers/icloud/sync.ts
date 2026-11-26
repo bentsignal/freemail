@@ -6,7 +6,7 @@ import { v } from "convex/values";
 import type { Id } from "../../_generated/dataModel";
 import type { ActionCtx } from "../../_generated/server";
 import type { ICloudCredential } from "./credentialAccess";
-import type { ICloudMailboxCursor, ICloudSyncCursor } from "./window";
+import type { ICloudSyncCursor } from "./window";
 import { internal } from "../../_generated/api";
 import { internalAction } from "../../_generated/server";
 import { vSyncReason } from "../../mail/validators";
@@ -18,20 +18,13 @@ import {
   safeLogout,
 } from "./client";
 import { decryptICloudCredential } from "./credentialAccess";
-import { parseRemoteMessageId } from "./identifiers";
 import {
   isSelectableMailbox,
   normalizeMessage,
   toNormalizedFolder,
 } from "./normalize";
-import {
-  getTrackedReadStateChanges,
-  parseICloudSyncCursor,
-  planIncrementalMailboxSync,
-  planInitialMailboxSync,
-  recentWindowCutoff,
-  toUidSequence,
-} from "./window";
+import { chunk, planMailbox } from "./syncPlan";
+import { parseICloudSyncCursor, withTrackedReadState } from "./window";
 
 const FETCH_BATCH_SIZE = 25;
 
@@ -62,17 +55,12 @@ export const synchronize = internalAction({
         accountId: args.accountId,
         encryptedCredential: connection.credential.encryptedTokens,
       });
-      const knownMessages = await ctx.runAction(
-        internal.sync.internal.listProviderMessageStates,
-        { ownerId: args.ownerId, accountId: args.accountId },
-      );
       const cursor = await synchronizeMailboxes({
         ctx,
         ownerId: args.ownerId,
         accountId: args.accountId,
         accountAddress: connection.account.address,
         credential,
-        knownMessages,
         reason: args.reason,
         previousCursor: parseICloudSyncCursor(connection.account.syncCursor),
       });
@@ -102,7 +90,6 @@ async function synchronizeMailboxes(args: {
   accountId: Id<"mailAccounts">;
   accountAddress: string;
   credential: ICloudCredential;
-  knownMessages: { remoteMessageId: string; isRead: boolean }[];
   previousCursor: ICloudSyncCursor | undefined;
   reason: "incremental" | "initial" | "manual" | "reconcile";
 }) {
@@ -141,38 +128,25 @@ async function synchronizeMailbox(
     ownerId: string;
     accountId: Id<"mailAccounts">;
     accountAddress: string;
-    knownMessages: { remoteMessageId: string; isRead: boolean }[];
     previousCursor: ICloudSyncCursor | undefined;
     reason: "incremental" | "initial" | "manual" | "reconcile";
   },
 ) {
   const opened = await client.mailboxOpen(mailbox.path, { readOnly: true });
   const uidValidity = opened.uidValidity.toString();
-  const known = args.knownMessages.flatMap((message) => {
-    const parsed = parseRemoteMessageId(message.remoteMessageId);
-    return parsed?.mailbox === mailbox.path ? [{ ...parsed, ...message }] : [];
-  });
-  const importedUids = new Set(
-    known
-      .filter((item) => item.uidValidity === uidValidity)
-      .map((item) => item.uid),
+  const { plan, stored, observed } = await planMailbox(
+    {
+      ctx: args.ctx,
+      ownerId: args.ownerId,
+      accountId: args.accountId,
+      client,
+      mailbox: mailbox.path,
+      uidValidity,
+      mailboxHighWaterUid: Math.max(0, opened.uidNext - 1),
+    },
+    args.previousCursor?.mailboxes[mailbox.path],
+    args.reason,
   );
-  const mailboxHighWaterUid = Math.max(0, opened.uidNext - 1);
-  const previous = args.previousCursor?.mailboxes[mailbox.path];
-  const plan =
-    previous?.uidValidity === uidValidity
-      ? await createIncrementalPlan({
-          client,
-          previous,
-          imported: known,
-          mailboxHighWaterUid,
-        })
-      : await createInitialPlan({
-          client,
-          uidValidity,
-          importedUids,
-          mailboxHighWaterUid,
-        });
 
   for (const remoteMessageId of plan.deletedRemoteMessageIds) {
     await args.ctx.runMutation(internal.sync.internal.deleteProviderMessage, {
@@ -204,6 +178,7 @@ async function synchronizeMailbox(
       },
       { uid: true },
     )) {
+      observed.set(message.uid, message.flags?.has("\\Seen") ?? false);
       const normalized = await normalizeMessage(
         args.accountAddress,
         mailbox,
@@ -223,80 +198,9 @@ async function synchronizeMailbox(
       });
     }
   }
-  return plan.nextCursor;
-}
-
-async function createInitialPlan(args: {
-  client: ReturnType<typeof createImapClient>;
-  uidValidity: string;
-  importedUids: Set<number>;
-  mailboxHighWaterUid: number;
-}) {
-  const found = await args.client.search(
-    { since: recentWindowCutoff(Date.now()) },
-    { uid: true },
+  return withTrackedReadState(
+    plan.nextCursor,
+    observed,
+    new Map(stored.map((item) => [item.uid, item.isRead])),
   );
-  return {
-    ...planInitialMailboxSync({
-      recentUids: found === false ? [] : found,
-      importedUids: args.importedUids,
-      mailboxHighWaterUid: args.mailboxHighWaterUid,
-      uidValidity: args.uidValidity,
-    }),
-    readStateChanges: [],
-  };
-}
-
-async function createIncrementalPlan(args: {
-  client: ReturnType<typeof createImapClient>;
-  previous: ICloudMailboxCursor;
-  imported: (NonNullable<ReturnType<typeof parseRemoteMessageId>> & {
-    remoteMessageId: string;
-    isRead: boolean;
-  })[];
-  mailboxHighWaterUid: number;
-}) {
-  const trackedSequence = toUidSequence(args.previous.trackedUids);
-  const observedTracked = new Array<{ uid: number; isRead: boolean }>();
-  if (trackedSequence) {
-    for await (const message of args.client.fetch(
-      trackedSequence,
-      { uid: true, flags: true },
-      { uid: true },
-    )) {
-      observedTracked.push({
-        uid: message.uid,
-        isRead: message.flags?.has("\\Seen") ?? false,
-      });
-    }
-  }
-  const newUids =
-    args.mailboxHighWaterUid > args.previous.highWaterUid
-      ? await args.client.search(
-          { uid: `${args.previous.highWaterUid + 1}:*` },
-          { uid: true },
-        )
-      : [];
-  return {
-    ...planIncrementalMailboxSync({
-      cursor: args.previous,
-      existingTrackedUids: observedTracked.map((item) => item.uid),
-      imported: args.imported,
-      mailboxHighWaterUid: args.mailboxHighWaterUid,
-      newUids: newUids === false ? [] : newUids,
-    }),
-    readStateChanges: getTrackedReadStateChanges({
-      cursor: args.previous,
-      imported: args.imported,
-      observed: observedTracked,
-    }),
-  };
-}
-
-function chunk<T>(values: T[], size: number) {
-  const batches = new Array<T[]>();
-  for (let index = 0; index < values.length; index += size) {
-    batches.push(values.slice(index, index + size));
-  }
-  return batches;
 }

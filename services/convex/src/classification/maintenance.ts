@@ -2,8 +2,8 @@ import { makeFunctionReference } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import { internalMutation } from "../_generated/server";
 import { reconcileEmbeddingSelection } from "../embedding/internal";
+import { internalMutation } from "../functions";
 import {
   nextBackfillRemaining,
   RECENT_BACKFILL_LIMIT,

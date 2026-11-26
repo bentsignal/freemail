@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
-import { internalMutation, internalQuery } from "../_generated/server";
+import { internalQuery } from "../_generated/server";
+import { internalMutation } from "../functions";
 import { getActiveAccount } from "../mail/helpers";
 
 const DRAFT_RETENTION_MS = 24 * 60 * 60 * 1000;

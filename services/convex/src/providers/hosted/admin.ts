@@ -3,8 +3,9 @@ import { v } from "convex/values";
 import type { Id } from "../../_generated/dataModel";
 import type { MutationCtx } from "../../_generated/server";
 import { internal } from "../../_generated/api";
-import { internalMutation, internalQuery } from "../../_generated/server";
+import { internalQuery } from "../../_generated/server";
 import { env } from "../../convex.env";
+import { internalMutation } from "../../functions";
 import { resolveReplyMetadata } from "../../mail/replies";
 import { normalizeHostedAddress, normalizeHostedDomain } from "./addresses";
 

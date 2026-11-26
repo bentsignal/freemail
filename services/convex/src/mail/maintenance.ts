@@ -3,7 +3,7 @@ import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 
 import type { Doc } from "../_generated/dataModel";
-import { internalMutation } from "../_generated/server";
+import { internalMutation } from "../functions";
 import {
   collectMessageRecords,
   deleteMessageRecords,

@@ -11,6 +11,7 @@ import type { ActionCtx, MutationCtx, QueryCtx } from "./_generated/server";
 import { action, mutation, query } from "./_generated/server";
 import { isAllowedUser } from "./authAccess";
 import { env } from "./convex.env";
+import { withTriggers } from "./functions";
 
 export async function checkIdentity(
   ctx: Pick<QueryCtx | MutationCtx | ActionCtx, "auth">,
@@ -29,7 +30,7 @@ export const authedMutation = customMutation(
   mutation,
   customCtx(async (ctx) => {
     const user = await checkIdentity(ctx);
-    return { ownerId: user.subject, user };
+    return { db: withTriggers(ctx).db, ownerId: user.subject, user };
   }),
 );
 

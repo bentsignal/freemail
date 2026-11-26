@@ -3,7 +3,8 @@ import { ConvexError, v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { internalMutation, internalQuery } from "../_generated/server";
+import { internalQuery } from "../_generated/server";
+import { internalMutation } from "../functions";
 import { resolveReceiptStatus, summarizeDeliveryTickets } from "./delivery";
 import {
   EXPO_RECEIPT_BATCH_SIZE,

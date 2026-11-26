@@ -185,12 +185,17 @@ requested.
 
 ### Incremental behavior and recovery
 
-- Canonical IMAP identifiers encode mailbox, UIDVALIDITY, and UID. The imported
-  Convex message rows are therefore the durable UID state; no second database is
-  needed.
-- Each run compares Apple's complete UID snapshot with imported identifiers,
-  removes confirmed deletions, and imports at most 200 missing messages per
-  mailbox in 25-message fetch batches. Repeated repair runs backfill older mail.
+- Canonical IMAP identifiers encode mailbox, UIDVALIDITY, and UID, so a
+  message row is found from its UID by index, without a scan.
+- The sync cursor tracks the newest 200 UIDs of each mailbox from the last 30
+  days, and which of them were unread on the server when the last run saw
+  them (`unreadUids`). A scheduled run compares the server's flags and UIDs
+  with the cursor alone: it reads no message rows, applies read changes made
+  on the server, removes tracked messages the server no longer has, and
+  imports new UIDs, at most 200 per mailbox in 25-message fetch batches.
+- A first run of a mailbox, a manual sync, and a cursor written before
+  `unreadUids` read the stored state of only the tracked UIDs, by index.
+  A manual sync therefore also re-imports a tracked message missing locally.
 - A UIDVALIDITY change retires identifiers from the previous generation and
   imports the current one.
 - Source reads are capped at 5 MB per message and normalized plain text at

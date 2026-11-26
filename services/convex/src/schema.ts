@@ -10,6 +10,8 @@ import { vArchivedMessageTombstone } from "./mail/archive";
 import {
   vAttachment,
   vDraftAttachment,
+  vInboxUnreadCounts,
+  vInboxUnreadThread,
   vMailAccount,
   vMailFolder,
   vMessage,
@@ -113,6 +115,12 @@ export default defineSchema(
     attachments: defineTable(vAttachment)
       .index("by_message", ["messageId"])
       .index("by_message_remote", ["messageId", "remoteAttachmentId"]),
+    inboxUnreadThreads: defineTable(vInboxUnreadThread)
+      .index("by_thread", ["threadId"])
+      .index("by_owner_account", ["ownerId", "accountId"]),
+    inboxUnreadCounts: defineTable(vInboxUnreadCounts).index("by_owner", [
+      "ownerId",
+    ]),
     messageClassifications: defineTable(vMessageClassification)
       .index("by_message", ["messageId"])
       .index("by_status", ["status"])

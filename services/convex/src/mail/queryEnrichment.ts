@@ -3,13 +3,15 @@ import type { QueryCtx } from "../_generated/server";
 import type { AuthedQueryCtx } from "../utils";
 import {
   createListReads,
-  getClassificationForMessage,
-  getLatestInboxMessage,
   isActiveAccount,
   toAllMailThreadListItem,
   toMessageListItem,
   toThreadListItem,
 } from "./helpers";
+import {
+  countsAsUnreadInboxThread,
+  readInboxUnreadCounts,
+} from "./inboxUnread";
 import { toListRow } from "./listRows";
 import { isAllMailLocation } from "./location";
 import { getUnreadCountSummary } from "./unreadCounts";
@@ -17,8 +19,9 @@ import { getUnreadCountSummary } from "./unreadCounts";
 export type MailSearchScope = "all" | "inbox";
 
 export async function getVisibleUnreadCountSummary(ctx: AuthedQueryCtx) {
-  return getUnreadCountSummary(
-    await getVisibleUnreadInboxThreads(ctx, ctx.ownerId),
+  return (
+    (await readInboxUnreadCounts(ctx, ctx.ownerId)) ??
+    getUnreadCountSummary(await getVisibleUnreadInboxThreads(ctx, ctx.ownerId))
   );
 }
 
@@ -45,10 +48,6 @@ export async function getVisibleUnreadInboxThreads(
       .filter(isActiveAccount)
       .map((account) => account._id),
   );
-  // A thread counts when the inbox would show its row: it has a message in
-  // the inbox, and that message isn't spam. Only that message's
-  // classification is read, not the row, and the thread's projection names
-  // the message (INBOX.md); threads from before it read the message too.
   const visibleThreads = await Promise.all(
     threads
       .filter(
@@ -56,18 +55,9 @@ export async function getVisibleUnreadInboxThreads(
           activeAccountIds.has(thread.accountId) &&
           (accountId === undefined || thread.accountId === accountId),
       )
-      .map(async (thread) => {
-        const messageId =
-          thread.inInbox === true && thread.latestInboxMessageId
-            ? thread.latestInboxMessageId
-            : (await getLatestInboxMessage(ctx, thread))?._id;
-        if (!messageId) return null;
-        const classification = await getClassificationForMessage(
-          ctx,
-          messageId,
-        );
-        return classification?.isSpam === true ? null : thread;
-      }),
+      .map(async (thread) =>
+        (await countsAsUnreadInboxThread(ctx, thread)) ? thread : null,
+      ),
   );
   return visibleThreads.filter((thread) => thread !== null);
 }

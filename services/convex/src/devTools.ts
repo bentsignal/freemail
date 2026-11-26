@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
 import type { Id } from "./_generated/dataModel";
-import { internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { createAuth } from "./auth";
 import { env } from "./convex.env";
 import { bulkMailbox } from "./devSeedBulk";
@@ -19,6 +19,7 @@ import {
 } from "./devSeedWrites";
 import { requireDevTools } from "./devSignIn";
 import { DEV_USER_EMAIL } from "./devToolsPolicy";
+import { internalMutation } from "./functions";
 
 /**
  * Isolated backends only (`scripts/backend.sh isolate`): the test owner the
@@ -89,6 +90,11 @@ export const seed = internalMutation({
     }
     await projectDemoInboxMessages(ctx, accountIds.values());
     await seedSentMail(ctx, ownerId, accountIds, Date.now());
+    await ctx.scheduler.runAfter(
+      0,
+      internal.mail.inboxUnreadBackfill.backfill,
+      { ownerId },
+    );
     return { accounts: accountIds.size, messages };
   },
 });
