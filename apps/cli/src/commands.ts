@@ -12,6 +12,9 @@ export type Command =
       limit?: number;
     }
   | { kind: "mail-get"; threadId: string }
+  | { id: string; kind: "mail-delete" }
+  | { id: string; kind: "mail-mark-read" }
+  | ({ kind: "mail-send" } & SendOptions)
   | {
       accountId?: string;
       cursor?: string;
@@ -19,6 +22,18 @@ export type Command =
       limit?: number;
       query: string;
     };
+
+export interface SendOptions {
+  bcc: string[];
+  body?: string;
+  bodyFile?: string;
+  cc: string[];
+  from: string;
+  idempotencyKey?: string;
+  subject: string;
+  to: string[];
+  wait: boolean;
+}
 
 export function parseCommand(arguments_: string[]): Command {
   const normalized = arguments_[0] === "--" ? arguments_.slice(1) : arguments_;
@@ -55,6 +70,14 @@ function parseMailCommand(action: string | undefined, rest: string[]): Command {
     assertNoArguments(extra, "mail get");
     return { kind: "mail-get", threadId };
   }
+  if (action === "delete" || action === "mark-read") {
+    const [id, ...extra] = rest;
+    if (!id) throw new Error(`mail ${action} requires a thread or message ID`);
+    assertNoArguments(extra, `mail ${action}`);
+    return { id, kind: action === "delete" ? "mail-delete" : "mail-mark-read" };
+  }
+  if (action === "send")
+    return { kind: "mail-send", ...parseSendOptions(rest) };
   const { options, positionals } = parseMailOptions(rest);
   if (action === "list") {
     assertNoArguments(positionals, "mail list");
@@ -99,9 +122,72 @@ function parseMailOptions(values: string[]) {
   return { options, positionals };
 }
 
-function requiredOptionValue(values: string[], index: number, option: string) {
+function parseSendOptions(values: string[]): SendOptions {
+  const options: Partial<SendOptions> & {
+    bcc: string[];
+    cc: string[];
+    to: string[];
+  } = { bcc: [], cc: [], to: [] };
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (value === "--to") {
+      options.to.push(...addressesOption(values, ++index, value));
+    } else if (value === "--cc") {
+      options.cc.push(...addressesOption(values, ++index, value));
+    } else if (value === "--bcc") {
+      options.bcc.push(...addressesOption(values, ++index, value));
+    } else if (value === "--from") {
+      options.from = requiredOptionValue(values, ++index, value);
+    } else if (value === "--subject") {
+      options.subject = requiredOptionValue(values, ++index, value, true);
+    } else if (value === "--body") {
+      options.body = requiredOptionValue(values, ++index, value, true);
+    } else if (value === "--body-file") {
+      options.bodyFile = requiredOptionValue(values, ++index, value, true);
+    } else if (value === "--idempotency-key") {
+      options.idempotencyKey = requiredOptionValue(values, ++index, value);
+    } else if (value === "--no-wait") {
+      options.wait = false;
+    } else {
+      throw new Error(`Unknown option for mail send: ${value}`);
+    }
+  }
+  if (!options.from) throw new Error("mail send requires --from <address>");
+  if (options.to.length === 0) {
+    throw new Error("mail send requires --to <address>");
+  }
+  if (options.subject === undefined) {
+    throw new Error("mail send requires --subject <text>");
+  }
+  if ((options.body === undefined) === (options.bodyFile === undefined)) {
+    throw new Error("mail send requires exactly one of --body or --body-file");
+  }
+  return {
+    ...options,
+    from: options.from,
+    subject: options.subject,
+    wait: options.wait ?? true,
+  };
+}
+
+function addressesOption(values: string[], index: number, option: string) {
+  return requiredOptionValue(values, index, option)
+    .split(",")
+    .map((address) => address.trim())
+    .filter(Boolean);
+}
+
+function requiredOptionValue(
+  values: string[],
+  index: number,
+  option: string,
+  allowDashes = false,
+) {
   const value = values[index];
-  if (!value || value.startsWith("--")) {
+  if (
+    value === undefined ||
+    (!allowDashes && (!value || value.startsWith("--")))
+  ) {
     throw new Error(`${option} requires a value`);
   }
   return value;
