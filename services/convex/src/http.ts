@@ -1,6 +1,7 @@
 import { httpRouter } from "convex/server";
 
 import { httpAction } from "./_generated/server";
+import { tools as agentTools } from "./agent/http";
 import {
   authComponent,
   authCorsAllowedOrigins,
@@ -54,6 +55,12 @@ authComponent.registerRoutes(http, createNativeAuth, {
   cors: {
     allowedOrigins: [...new Set(authCorsAllowedOrigins)],
   },
+});
+
+http.route({
+  path: "/agent/v1/tools",
+  method: "POST",
+  handler: agentTools,
 });
 
 http.route({

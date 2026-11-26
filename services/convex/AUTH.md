@@ -153,6 +153,9 @@ factors are submitted in the final POST. The server stores only their
 hashes and atomically consumes the verification record before a separate
 client session is issued, preventing interception and replay.
 
+Other machines don't get a session: they read mail with a read-only agent
+token ([AGENT_ACCESS.md](AGENT_ACCESS.md)).
+
 ## Android
 
 Android also requires `https://<PASSKEY_RP_ID>/.well-known/assetlinks.json`

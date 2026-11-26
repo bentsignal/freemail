@@ -1,8 +1,11 @@
+import type { Command } from "./commands.ts";
+import type { CliUrls } from "./config.ts";
 import { isAuthenticated, login, logout } from "./auth.ts";
 import { parseCommand } from "./commands.ts";
 import { resolveCliUrls } from "./config.ts";
 import { help } from "./help.ts";
-import { createMailClient } from "./mail-client.ts";
+import { createMailClient, createTokenClient } from "./mail-client.ts";
+import { writeNewTokenFile } from "./token-file.ts";
 
 export async function main(arguments_: string[]) {
   const command = parseCommand(arguments_);
@@ -25,6 +28,10 @@ export async function main(arguments_: string[]) {
     writeJson({ authenticated: await isAuthenticated(urls) });
     return;
   }
+  if (isTokensCommand(command)) {
+    writeJson(await runTokensCommand(command, urls));
+    return;
+  }
   const client = await createMailClient(urls);
   if (command.kind === "accounts") {
     writeJson(await client.listAccounts());
@@ -37,6 +44,27 @@ export async function main(arguments_: string[]) {
   } else {
     writeJson(await client.listMail(mailPageArguments(command)));
   }
+}
+
+type TokensCommand = Extract<
+  Command,
+  { kind: "tokens-create" | "tokens-list" | "tokens-revoke" }
+>;
+
+function isTokensCommand(command: Command): command is TokensCommand {
+  return command.kind.startsWith("tokens-");
+}
+
+async function runTokensCommand(command: TokensCommand, urls: CliUrls) {
+  const tokens = await createTokenClient(urls);
+  if (command.kind === "tokens-list") return await tokens.list();
+  if (command.kind === "tokens-revoke") {
+    return { revoked: await tokens.revoke(command.credentialId) };
+  }
+  return await writeNewTokenFile(
+    command.out,
+    async () => await tokens.create(command),
+  );
 }
 
 function mailPageArguments(command: {

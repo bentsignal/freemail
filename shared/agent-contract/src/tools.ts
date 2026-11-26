@@ -1,9 +1,11 @@
 import { z } from "zod";
 
+import type { AgentScope } from "./access";
 import { listAccountsInputSchema, listAccountsOutputSchema } from "./accounts";
 import { UNTRUSTED_MAIL_NOTICE } from "./common";
 import { searchMailInputSchema, searchMailOutputSchema } from "./search";
 import { getThreadInputSchema, getThreadOutputSchema } from "./thread";
+import { listUnreadInputSchema, listUnreadOutputSchema } from "./unread";
 
 export const readOnlyToolAnnotations = {
   readOnlyHint: true,
@@ -40,12 +42,22 @@ export const agentToolDefinitions = [
     outputSchema: getThreadOutputSchema,
     annotations: readOnlyToolAnnotations,
   },
+  {
+    name: "list_unread",
+    title: "List unread mail",
+    description: `List the unread conversations the inbox shows, newest first, without marking them read. ${UNTRUSTED_MAIL_NOTICE}`,
+    requiredScope: "mail:unread",
+    inputSchema: listUnreadInputSchema,
+    outputSchema: listUnreadOutputSchema,
+    annotations: readOnlyToolAnnotations,
+  },
 ] as const satisfies readonly AgentToolDefinition[];
 
 export const agentToolNameSchema = z.enum([
   "list_accounts",
   "search_mail",
   "get_thread",
+  "list_unread",
 ]);
 
 export type AgentToolName = (typeof agentToolDefinitions)[number]["name"];
@@ -56,6 +68,6 @@ interface AgentToolDefinition {
   inputSchema: z.ZodType;
   name: string;
   outputSchema: z.ZodType;
-  requiredScope: "accounts:read" | "mail:search" | "threads:read";
+  requiredScope: AgentScope;
   title: string;
 }

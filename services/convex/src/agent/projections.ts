@@ -1,6 +1,7 @@
 import type {
   AgentSearchHit,
   AgentThreadMessage,
+  AgentUnreadThread,
   MailboxAddress,
 } from "@freemail/agent-contract";
 import {
@@ -55,6 +56,30 @@ export function projectSearchHit(args: {
     matchKind,
     score: score === undefined ? undefined : clampScore(score),
   } satisfies AgentSearchHit;
+}
+
+export function projectUnreadThread(args: {
+  account: Doc<"mailAccounts">;
+  classification: Doc<"messageClassifications"> | null;
+  message: Doc<"messages">;
+  thread: Doc<"threads">;
+}) {
+  const { account, classification, message, thread } = args;
+  return {
+    threadId: thread._id,
+    accountId: account._id,
+    accountAddress: bounded(account.address, 320),
+    from: projectAddress(message.from),
+    subject: bounded(thread.subject || message.subject, 2_000),
+    snippet: bounded(message.snippet, 2_000),
+    receivedAt: Math.max(0, Math.floor(message.receivedAt)),
+    unreadCount: Math.max(1, Math.floor(thread.unreadCount)),
+    messageCount: Math.max(0, Math.floor(thread.messageCount)),
+    hasAttachments: thread.hasAttachments,
+    importance: classification?.importance,
+    category: classification?.category,
+    classificationSummary: optionalBounded(classification?.summary, 280),
+  } satisfies AgentUnreadThread;
 }
 
 export function projectThreadMessage(args: {

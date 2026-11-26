@@ -11,6 +11,7 @@ const TOOL_SCOPE = {
   list_accounts: "accounts:read",
   search_mail: "mail:search",
   get_thread: "threads:read",
+  list_unread: "mail:unread",
 } as const satisfies Record<AgentToolName, AgentScope>;
 
 export function requiredScope(tool: AgentToolName) {
@@ -64,5 +65,6 @@ export function resolveAgentTool(value: string) {
   if (value === "list_accounts") return value;
   if (value === "search_mail") return value;
   if (value === "get_thread") return value;
+  if (value === "list_unread") return value;
   return undefined;
 }

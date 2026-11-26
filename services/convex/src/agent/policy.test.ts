@@ -11,10 +11,12 @@ import {
 } from "./policy";
 
 describe("agent credential policy", () => {
-  it("recognizes only the three read-only tools", () => {
+  it("recognizes only the four read-only tools", () => {
     expect(resolveAgentTool("list_accounts")).toBe("list_accounts");
     expect(resolveAgentTool("search_mail")).toBe("search_mail");
     expect(resolveAgentTool("get_thread")).toBe("get_thread");
+    expect(resolveAgentTool("list_unread")).toBe("list_unread");
+    expect(resolveAgentTool("mark_read")).toBeUndefined();
     expect(resolveAgentTool("send_mail")).toBeUndefined();
     expect(resolveAgentTool("delete_message")).toBeUndefined();
   });
@@ -22,6 +24,8 @@ describe("agent credential policy", () => {
   it("requires the exact scope for each tool", () => {
     expect(hasRequiredScope(["mail:search"], "search_mail")).toBe(true);
     expect(hasRequiredScope(["mail:search"], "get_thread")).toBe(false);
+    expect(hasRequiredScope(["mail:unread"], "list_unread")).toBe(true);
+    expect(hasRequiredScope(["mail:search"], "list_unread")).toBe(false);
   });
 
   it("enforces revocation and the exclusive expiry boundary", () => {

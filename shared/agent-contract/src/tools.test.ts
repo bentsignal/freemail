@@ -8,14 +8,16 @@ import {
 } from "./tools";
 
 describe("agent tool surface", () => {
-  it("registers exactly the three read-only tools", () => {
+  it("registers exactly the four read-only tools", () => {
     expect(agentToolDefinitions.map((tool) => tool.name)).toEqual([
       "list_accounts",
       "search_mail",
       "get_thread",
+      "list_unread",
     ]);
     expect(agentToolNameSchema.safeParse("send_mail").success).toBe(false);
     expect(agentToolNameSchema.safeParse("set_read").success).toBe(false);
+    expect(agentToolNameSchema.safeParse("mark_read").success).toBe(false);
   });
 
   it("marks every tool as read-only, idempotent, and closed-world", () => {

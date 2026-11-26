@@ -7,7 +7,7 @@ import {
 } from "./access";
 
 describe("agent access grants", () => {
-  it.each(["accounts:read", "mail:search", "threads:read"])(
+  it.each(["accounts:read", "mail:search", "threads:read", "mail:unread"])(
     "accepts the literal %s scope",
     (scope) => {
       expect(agentScopeSchema.parse(scope)).toBe(scope);

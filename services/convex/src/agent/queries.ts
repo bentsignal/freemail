@@ -3,22 +3,30 @@ import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 
 import {
+  DEFAULT_AGENT_UNREAD_THREADS,
   MAX_AGENT_MESSAGE_ATTACHMENTS,
   MAX_AGENT_THREAD_ATTACHMENTS,
   MAX_AGENT_THREAD_BODY_LENGTH,
   MAX_AGENT_THREAD_MESSAGES,
+  MAX_AGENT_UNREAD_THREADS,
 } from "@freemail/agent-contract";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { internalQuery } from "../_generated/server";
-import { getActiveAccount, isActiveAccount } from "../mail/helpers";
+import {
+  getActiveAccount,
+  getLatestInboxMessage,
+  isActiveAccount,
+} from "../mail/helpers";
+import { getVisibleUnreadInboxThreads } from "../mail/queryEnrichment";
 import { matchesMailSearch, parseMailSearch } from "../mail/search";
 import { filterAllowedAccountIds } from "./policy";
 import {
   projectAccount,
   projectSearchHit,
   projectThreadMessage,
+  projectUnreadThread,
   untrustedMailContent,
 } from "./projections";
 import { vAgentAccountAccess } from "./validators";
@@ -116,6 +124,67 @@ export const getThread = internalQuery({
         messages: projectedMessages,
         messagesTruncated: messages.length > MAX_AGENT_THREAD_MESSAGES,
       },
+    };
+  },
+});
+
+/** The unread conversations the inbox shows (getUnreadCounts' threads), newest first. Reads only. */
+export const listUnread = internalQuery({
+  args: {
+    ownerId: v.string(),
+    accountAccess: vAgentAccountAccess,
+    accountId: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const accounts = await ownedAllowedAccounts(
+      ctx,
+      args.ownerId,
+      args.accountAccess,
+    );
+    const accountById = new Map(
+      accounts.map((account) => [account._id, account]),
+    );
+    let accountId: Id<"mailAccounts"> | undefined;
+    if (args.accountId !== undefined) {
+      const normalized = ctx.db.normalizeId("mailAccounts", args.accountId);
+      if (!normalized || !accountById.has(normalized)) return null;
+      accountId = normalized;
+    }
+    const limit = Math.max(
+      1,
+      Math.min(
+        MAX_AGENT_UNREAD_THREADS,
+        Math.floor(args.limit ?? DEFAULT_AGENT_UNREAD_THREADS),
+      ),
+    );
+    const threads = (
+      await getVisibleUnreadInboxThreads(ctx, args.ownerId, accountId)
+    )
+      .filter((thread) => accountById.has(thread.accountId))
+      .sort(
+        (left, right) =>
+          (right.latestInboxMessageAt ?? right.latestMessageAt) -
+          (left.latestInboxMessageAt ?? left.latestMessageAt),
+      );
+    const projected = [];
+    for (const thread of threads.slice(0, limit)) {
+      const account = accountById.get(thread.accountId);
+      const message = await getLatestInboxMessage(ctx, thread);
+      if (!account || message?.ownerId !== args.ownerId) continue;
+      const classification = await ownedClassification(
+        ctx,
+        args.ownerId,
+        message._id,
+      );
+      projected.push(
+        projectUnreadThread({ account, classification, message, thread }),
+      );
+    }
+    return {
+      content: untrustedMailContent,
+      totalUnreadThreads: threads.length,
+      threads: projected,
     };
   },
 });

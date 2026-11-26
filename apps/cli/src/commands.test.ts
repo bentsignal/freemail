@@ -41,4 +41,33 @@ describe("CLI command parsing", () => {
       "between 1 and 25",
     );
   });
+
+  it("parses read-only token commands", () => {
+    expect(parseCommand(["tokens", "create", "--out", "vera-token"])).toEqual({
+      days: 90,
+      kind: "tokens-create",
+      label: "Read-only mail reader",
+      out: "vera-token",
+    });
+    expect(
+      parseCommand([
+        "tokens",
+        "create",
+        "--out",
+        "t",
+        "--label",
+        "Vera on GamerBox",
+        "--days",
+        "30",
+      ]),
+    ).toMatchObject({ days: 30, label: "Vera on GamerBox" });
+    expect(parseCommand(["tokens", "revoke", "abc"])).toEqual({
+      credentialId: "abc",
+      kind: "tokens-revoke",
+    });
+    expect(() => parseCommand(["tokens", "create"])).toThrow("--out");
+    expect(() =>
+      parseCommand(["tokens", "create", "--out", "t", "--days", "91"]),
+    ).toThrow("between 1 and 90");
+  });
 });

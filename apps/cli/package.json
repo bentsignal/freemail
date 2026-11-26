@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "bin": {
-    "freemail": "./src/index.ts"
+    "freemail": "./src/index.ts",
+    "freemail-read": "./src/freemail-read.ts"
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",

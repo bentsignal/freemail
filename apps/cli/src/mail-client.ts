@@ -37,6 +37,76 @@ const GET_THREAD = makeFunctionReference<
   GetThreadOutput | null
 >("cli/commands:getThread");
 
+type ReadOnlyScope =
+  | "accounts:read"
+  | "mail:search"
+  | "mail:unread"
+  | "threads:read";
+
+interface CreatedToken {
+  createdAt: number;
+  credentialId: string;
+  expiresAt: number;
+  label: string;
+  token: string;
+}
+
+interface TokenSummary {
+  _id: string;
+  createdAt: number;
+  expiresAt: number;
+  label: string;
+  lastUsedAt?: number;
+  revokedAt?: number;
+  scopes: ReadOnlyScope[];
+}
+
+export const READ_ONLY_SCOPES = [
+  "accounts:read",
+  "mail:unread",
+  "mail:search",
+  "threads:read",
+] satisfies ReadOnlyScope[];
+
+const CREATE_TOKEN = makeFunctionReference<
+  "action",
+  {
+    accountAccess: { mode: "all" };
+    expiresInDays: number;
+    label: string;
+    scopes: ReadOnlyScope[];
+  },
+  CreatedToken
+>("agent/credentials:create");
+const LIST_TOKENS = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  TokenSummary[]
+>("agent/credentials:list");
+const REVOKE_TOKEN = makeFunctionReference<
+  "mutation",
+  { credentialId: string },
+  boolean
+>("agent/credentials:revoke");
+
+export async function createTokenClient(urls: CliUrls) {
+  const { token } = await authenticatedSession(urls);
+  const client = new ConvexHttpClient(urls.convexCloud);
+  client.setAuth(token);
+  return {
+    create: async (args: { days: number; label: string }) =>
+      await client.action(CREATE_TOKEN, {
+        accountAccess: { mode: "all" },
+        expiresInDays: args.days,
+        label: args.label,
+        scopes: READ_ONLY_SCOPES,
+      }),
+    list: async () => await client.query(LIST_TOKENS, {}),
+    revoke: async (credentialId: string) =>
+      await client.mutation(REVOKE_TOKEN, { credentialId }),
+  };
+}
+
 export async function createMailClient(urls: CliUrls) {
   const { token } = await authenticatedSession(urls);
   const client = new ConvexHttpClient(urls.convexCloud);

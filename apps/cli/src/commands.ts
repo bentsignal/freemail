@@ -4,7 +4,7 @@ export type Command =
   | { kind: "auth-login" }
   | { kind: "auth-logout" }
   | { kind: "auth-status" }
-  | { kind: "help"; topic?: "auth" | "mail" }
+  | { kind: "help"; topic?: "auth" | "mail" | "tokens" }
   | {
       accountId?: string;
       cursor?: string;
@@ -12,6 +12,9 @@ export type Command =
       limit?: number;
     }
   | { kind: "mail-get"; threadId: string }
+  | { days: number; kind: "tokens-create"; label: string; out: string }
+  | { kind: "tokens-list" }
+  | { credentialId: string; kind: "tokens-revoke" }
   | {
       accountId?: string;
       cursor?: string;
@@ -29,6 +32,7 @@ export function parseCommand(arguments_: string[]): Command {
   if (group === "auth") return parseAuthCommand(action, rest);
   if (group === "accounts") return { kind: "accounts" };
   if (group === "mail") return parseMailCommand(action, rest);
+  if (group === "tokens") return parseTokensCommand(action, rest);
   throw new Error(`Unknown command: ${group}. Run \`freemail help\`.`);
 }
 
@@ -73,6 +77,62 @@ function parseMailCommand(action: string | undefined, rest: string[]): Command {
   throw new Error(
     `Unknown mail command: ${action}. Run \`freemail mail help\`.`,
   );
+}
+
+const DEFAULT_TOKEN_LABEL = "Read-only mail reader";
+const DEFAULT_TOKEN_DAYS = 90;
+
+function parseTokensCommand(
+  action: string | undefined,
+  rest: string[],
+): Command {
+  if (!action || action === "help" || action === "--help") {
+    return { kind: "help", topic: "tokens" };
+  }
+  if (action === "list") {
+    assertNoArguments(rest, "tokens list");
+    return { kind: "tokens-list" };
+  }
+  if (action === "revoke") {
+    const [credentialId, ...extra] = rest;
+    if (!credentialId) throw new Error("tokens revoke requires a token ID");
+    assertNoArguments(extra, "tokens revoke");
+    return { kind: "tokens-revoke", credentialId };
+  }
+  if (action === "create") return parseTokensCreate(rest);
+  throw new Error(
+    `Unknown tokens command: ${action}. Run \`freemail tokens help\`.`,
+  );
+}
+
+function parseTokensCreate(values: string[]): Command {
+  let days = DEFAULT_TOKEN_DAYS;
+  let label = DEFAULT_TOKEN_LABEL;
+  let out: string | undefined;
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (value === "--out") {
+      out = requiredOptionValue(values, ++index, value);
+    } else if (value === "--label") {
+      label = requiredOptionValue(values, ++index, value).trim();
+    } else if (value === "--days") {
+      days = Number(requiredOptionValue(values, ++index, value));
+      if (!Number.isInteger(days) || days < 1 || days > 90) {
+        throw new Error("--days must be an integer between 1 and 90");
+      }
+    } else {
+      throw new Error(`tokens create does not accept: ${value}`);
+    }
+  }
+  if (!out) {
+    throw new Error(
+      "tokens create requires --out FILE: the token is written there, never printed",
+    );
+  }
+  if (label.length < 1 || label.length > 80) {
+    throw new Error("--label must be between 1 and 80 characters");
+  }
+  return { days, kind: "tokens-create", label, out };
 }
 
 function parseMailOptions(values: string[]) {

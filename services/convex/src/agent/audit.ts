@@ -28,6 +28,7 @@ export function resultCount(value: unknown) {
   if (!isRecord(value)) return undefined;
   if (Array.isArray(value.accounts)) return value.accounts.length;
   if (Array.isArray(value.messages)) return value.messages.length;
+  if (Array.isArray(value.threads)) return value.threads.length;
   if (isRecord(value.thread) && Array.isArray(value.thread.messages)) {
     return value.thread.messages.length;
   }

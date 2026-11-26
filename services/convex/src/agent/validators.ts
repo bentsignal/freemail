@@ -4,6 +4,7 @@ export const vAgentScope = v.union(
   v.literal("accounts:read"),
   v.literal("mail:search"),
   v.literal("threads:read"),
+  v.literal("mail:unread"),
 );
 
 export const vAgentAccountAccess = v.union(
@@ -31,6 +32,7 @@ export const vAgentToolName = v.union(
   v.literal("list_accounts"),
   v.literal("search_mail"),
   v.literal("get_thread"),
+  v.literal("list_unread"),
 );
 
 export const vAgentAuditOutcome = v.union(

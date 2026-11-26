@@ -6,6 +6,7 @@ export const agentScopeSchema = z.enum([
   "accounts:read",
   "mail:search",
   "threads:read",
+  "mail:unread",
 ]);
 
 export const agentAccountAccessSchema = z.discriminatedUnion("mode", [
@@ -28,7 +29,7 @@ export const agentCredentialGrantSchema = z
     scopes: z
       .array(agentScopeSchema)
       .min(1)
-      .max(3)
+      .max(4)
       .refine(allUnique, "Scopes must be unique"),
     accountAccess: agentAccountAccessSchema,
     expiresInDays: z.number().int().min(1).max(90),
