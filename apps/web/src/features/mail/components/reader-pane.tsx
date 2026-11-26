@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
-import { Code2, LoaderCircle, RefreshCw, Reply, Sparkles } from "lucide-react";
+import { Code2, LoaderCircle, RefreshCw, Sparkles } from "lucide-react";
 
 import { api } from "@freemail/convex/api";
 import {
@@ -19,6 +19,7 @@ import { useUnsubscribe } from "../use-unsubscribe";
 import { CleanViewCodeCard } from "./reader-clean-view-code-card";
 import { EmptyReader, ReaderSkeleton } from "./reader-empty-states";
 import { ReaderMessage } from "./reader-message";
+import { ReaderReply } from "./reader-reply";
 import { ReaderToolbar } from "./reader-toolbar";
 
 export function ReaderPane() {
@@ -150,14 +151,11 @@ function ReaderArticle({
           />
         ))}
 
-        <button
-          className="bg-background text-foreground hover:bg-accent mt-10 flex h-11 items-center gap-2 rounded-lg border px-4 text-sm font-semibold transition"
-          onClick={replyToSelectedThread}
-          type="button"
-        >
-          <Reply className="size-4" />
-          Reply to {getSenderFirstName(selectedMessage)}
-        </button>
+        <ReaderReply
+          onReply={replyToSelectedThread}
+          selectedMessage={selectedMessage}
+          threadId={selectedThread._id}
+        />
       </article>
     </div>
   );
@@ -270,12 +268,6 @@ function ReaderViewButton({
   );
 }
 
-function getSenderFirstName(message: ThreadMessageDetail | undefined) {
-  if (!message) return "sender";
-  const sender = getAddressName(message.from);
-  return sender.split(/[\s@]/)[0];
-}
-
 function getSelectedMessage(
   thread: MailThreadDetail,
   messageId: ThreadMessageDetail["_id"] | undefined,
@@ -284,10 +276,4 @@ function getSelectedMessage(
     thread.messages.find((message) => message._id === messageId) ??
     thread.messages.at(-1)
   );
-}
-
-function getAddressName(address: ThreadMessageDetail["from"]) {
-  const name = address.name?.trim();
-  if (name) return name;
-  return address.address;
 }

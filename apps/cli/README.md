@@ -12,6 +12,39 @@ pnpm --filter @freemail/cli start -- mail search "flight receipt"
 pnpm --filter @freemail/cli start -- mail get THREAD_ID
 ```
 
+## Sending, deleting, and marking read
+
+These commands act on the signed-in owner's real mail, with the same rules as
+the app. Each prints one JSON object.
+
+```sh
+freemail mail send --from shawn@rodgers.dev --to friend@example.com \
+  --subject "Lunch" --body "Noon works."
+freemail mail delete THREAD_OR_MESSAGE_ID
+freemail mail mark-read THREAD_OR_MESSAGE_ID
+```
+
+- `mail send` picks the connected account whose address is `--from` (an
+  account ID from `freemail accounts` works too) and queues the message in the
+  same outbox as the app's composer, so it goes out through that account's
+  provider (Gmail, Microsoft 365, iCloud, or Amazon SES for hosted mailboxes)
+  and shows in Sent. `--to`, `--cc`, and `--bcc` repeat or take
+  comma-separated addresses. `--body-file PATH` reads the body from a file, and
+  `--body-file -` from stdin, which avoids shell quoting for multi-line text.
+  It waits up to 30 seconds and prints `status: "sent"` or `"failed"` (with
+  `error`); `timedOut: true` means it is still queued and will keep trying.
+  `--no-wait` returns as soon as it is queued. Pass the same
+  `--idempotency-key` when retrying a send that may have gone through, and the
+  first attempt is returned instead of sending twice.
+- `mail delete` does what Archive does in the app: the whole conversation
+  leaves the inbox and waits in Freemail's archive for 30 days
+  (`restorableUntil`), where it can be restored. The provider's copy is
+  unchanged. Given a message ID, it deletes that message's conversation.
+- `mail mark-read` marks every message in the conversation read, in Freemail
+  and at the provider.
+
+Errors go to stderr as `freemail: <message>` with exit code 1.
+
 For a directly runnable development command, link the workspace package with
 `pnpm --filter @freemail/cli link --global` and then run `freemail help`.
 

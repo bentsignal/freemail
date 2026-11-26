@@ -5,6 +5,7 @@ import { completeAuthSession } from "@freemail/std/auth-session";
 import { useLoading } from "@freemail/std/use-loading";
 import { toast } from "@freemail/ui-web/toast";
 
+import { forgetReplyDrafts } from "../mail/reply-drafts";
 import { rememberCliAuthAfterSignIn } from "./lib/cli-auto-authorize";
 import { authClient } from "./lib/client";
 import { completeEmailCodeSignIn } from "./lib/email-code-sign-in";
@@ -180,7 +181,10 @@ async function addPasskey() {
 async function signOutAndRedirect() {
   await authClient.signOut({
     fetchOptions: {
-      onSuccess: () => window.location.replace("/login"),
+      onSuccess: () => {
+        forgetReplyDrafts();
+        window.location.replace("/login");
+      },
       onError: () => {
         toast.error("Failed to sign out");
       },

@@ -23,7 +23,7 @@ export function ArchiveDeleteDialog({
   }
   return (
     <Dialog.Container onOpenChange={onOpenChange} open={message !== undefined}>
-      <Dialog.Content className="mail-dialog bg-background max-w-md overflow-hidden rounded-[18px] border p-0">
+      <Dialog.Content className="mail-dialog bg-background max-w-md gap-0 overflow-hidden rounded-[18px] border p-0">
         <div className="border-b p-6">
           <Dialog.Title className="text-2xl font-semibold tracking-tight">
             Delete permanently?

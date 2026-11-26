@@ -11,6 +11,7 @@ import {
   getSendingAccount,
 } from "./compose-account-field";
 import { DraftAttachments } from "./compose-attachment-list";
+import { DeleteDraftButton } from "./compose-delete-draft";
 import { ComposeRow } from "./compose-row";
 import { useComposeSend } from "./use-compose-send";
 
@@ -92,6 +93,7 @@ function ComposeHeader({
 }) {
   const closeComposer = useMailStore((store) => store.closeComposer);
   const subject = useMailStore((store) => store.composerDraft.subject);
+  const replyName = useMailStore((store) => store.composerReply?.name);
 
   return (
     <header className="border-border flex h-14 shrink-0 items-center gap-1 border-b-[0.5px] pr-3 pl-2">
@@ -105,11 +107,12 @@ function ComposeHeader({
         <X className="size-4" />
       </button>
       <Dialog.Title className="min-w-0 flex-1 truncate px-1 text-[15px] font-semibold">
-        {subject.trim() || "New Message"}
+        {getComposeTitle(replyName, subject)}
       </Dialog.Title>
       <Dialog.Description className="sr-only">
         Write a new email message.
       </Dialog.Description>
+      <DeleteDraftButton />
       <AttachButton onAttach={onAttach} />
       <button
         aria-keyshortcuts="Meta+Enter"
@@ -124,6 +127,11 @@ function ComposeHeader({
       </button>
     </header>
   );
+}
+
+function getComposeTitle(replyName: string | undefined, subject: string) {
+  if (replyName) return `Reply to ${replyName}`;
+  return subject.trim() || "New Message";
 }
 
 function AttachButton({ onAttach }: { onAttach: (files: File[]) => void }) {

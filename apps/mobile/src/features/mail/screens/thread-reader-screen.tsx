@@ -9,7 +9,7 @@ import { api } from "@freemail/convex/api";
 import {
   canMoveMailThreadToInbox,
   getMailThreadPlacement,
-  getReplyAddress,
+  getReplyRecipient,
 } from "@freemail/features/mail";
 
 import type { MobileMailbox } from "../store";
@@ -27,6 +27,7 @@ import {
 } from "./clean-view-status";
 import { parseMobileMailbox } from "./mailbox-controls";
 import { MessageViewToolbar } from "./message-view-toolbar";
+import { ReplyDraftCard } from "./reply-draft-card";
 import { ThreadMessageBody } from "./thread-message-body";
 import {
   ThreadReaderLoadingToolbar,
@@ -178,14 +179,16 @@ function ThreadReader({
   function reply() {
     const latestMessage = thread.messages.at(-1);
     if (!latestMessage) return;
-    const address = getReplyAddress(thread.messages, accountAddress);
-    if (!address) return;
+    const recipient = getReplyRecipient(thread.messages, accountAddress);
+    if (!recipient) return;
     router.push({
       pathname: "/compose",
       params: {
         accountId: thread.accountId,
+        replyName: recipient.name ?? recipient.address,
         replyToMessageId: latestMessage.id,
-        to: address,
+        threadId: thread.id,
+        to: recipient.address,
         subject: thread.subject.startsWith("Re:")
           ? thread.subject
           : `Re: ${thread.subject}`,
@@ -244,6 +247,7 @@ function ThreadReader({
               }
             />
           ))}
+          <ReplyDraftCard threadId={thread.id} onPress={reply} />
         </ScrollView>
       </PostalPaperBackground>
     </>
