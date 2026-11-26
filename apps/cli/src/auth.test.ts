@@ -47,4 +47,12 @@ describe("CLI browser authentication", () => {
       arguments: ["https://mail.test/auth"],
     });
   });
+
+  it("opens URLs without a shell on Windows", () => {
+    const url = "https://mail.test/auth?request_id=a&callback_url=b";
+    expect(browserCommand(url, "win32")).toEqual({
+      executable: "rundll32",
+      arguments: ["url.dll,FileProtocolHandler", url],
+    });
+  });
 });
