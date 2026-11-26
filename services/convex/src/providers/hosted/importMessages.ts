@@ -3,7 +3,8 @@ import { v } from "convex/values";
 import type { Doc } from "../../_generated/dataModel";
 import type { MutationCtx } from "../../_generated/server";
 import type { NormalizedMessage } from "../types";
-import { internalMutation, internalQuery } from "../../_generated/server";
+import { internalQuery } from "../../_generated/server";
+import { internalMutation } from "../../functions";
 import { vNormalizedMessage, writeProviderMessage } from "../../sync/internal";
 
 // Mail that both the old provider and SES received while DNS moved.

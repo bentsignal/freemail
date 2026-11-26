@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import type { Doc, Id, TableNames } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { internal } from "../_generated/api";
-import { internalMutation } from "../_generated/server";
+import { internalMutation } from "../functions";
 
 export const REMOVAL_MESSAGE_BATCH_SIZE = 20;
 export const REMOVAL_ROW_BATCH_SIZE = 200;

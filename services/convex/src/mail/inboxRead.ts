@@ -3,9 +3,10 @@ import { v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { internal } from "../_generated/api";
-import { internalMutation } from "../_generated/server";
+import { internalMutation } from "../functions";
 import { authedMutation } from "../utils";
 import { ensureListableAccount, getActiveAccount } from "./helpers";
+import { readInboxUnreadThreadIds } from "./inboxUnread";
 import { getVisibleUnreadInboxThreads } from "./queryEnrichment";
 import { setOwnedThreadRead } from "./threadMutations";
 
@@ -27,17 +28,17 @@ export const markInboxRead = authedMutation({
     if (args.accountId) {
       await ensureListableAccount(ctx, ctx.ownerId, args.accountId);
     }
-    const threads = await getVisibleUnreadInboxThreads(
-      ctx,
-      ctx.ownerId,
-      args.accountId,
-    );
+    const threadIds =
+      (await readInboxUnreadThreadIds(ctx, ctx.ownerId, args.accountId)) ??
+      (
+        await getVisibleUnreadInboxThreads(ctx, ctx.ownerId, args.accountId)
+      ).map((thread) => thread._id);
     await markThreadsReadInBatches(ctx, {
       ownerId: ctx.ownerId,
       providerDelay: 0,
-      threadIds: threads.map((thread) => thread._id),
+      threadIds,
     });
-    return { threads: threads.length };
+    return { threads: threadIds.length };
   },
 });
 

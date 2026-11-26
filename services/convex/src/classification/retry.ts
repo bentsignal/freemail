@@ -2,7 +2,7 @@ import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import { internalMutation } from "../_generated/server";
+import { internalMutation } from "../functions";
 import { RECENT_BACKFILL_LIMIT, recentBackfillBounds } from "./backfill";
 import { isRetryableRuleFallback } from "./retryPolicy";
 

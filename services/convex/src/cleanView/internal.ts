@@ -2,7 +2,8 @@ import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { internalMutation, internalQuery } from "../_generated/server";
+import { internalQuery } from "../_generated/server";
+import { internalMutation } from "../functions";
 
 export const getJobInput = internalQuery({
   args: { messageId: v.id("messages"), jobKey: v.string() },

@@ -2,10 +2,11 @@ import { makeFunctionReference } from "convex/server";
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import { internalMutation, internalQuery } from "../_generated/server";
+import { internalQuery } from "../_generated/server";
 import { shouldAutoGenerateCleanView } from "../cleanView/policy";
 import { queueCleanViewForMessage } from "../cleanView/queue";
 import { reconcileEmbeddingSelection } from "../embedding/internal";
+import { internalMutation } from "../functions";
 import { rateLimiter } from "../limiter";
 import {
   vClassificationCategory,

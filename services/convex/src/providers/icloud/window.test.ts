@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getCursorMessageStates,
   getTrackedReadStateChanges,
   ICLOUD_SYNC_LOOKBACK_MS,
+  initialTrackedUids,
   parseICloudSyncCursor,
   planIncrementalMailboxSync,
   planInitialMailboxSync,
   recentWindowCutoff,
+  withTrackedReadState,
 } from "./window";
 
 describe("iCloud recent sync window initialization", () => {
@@ -156,6 +159,91 @@ describe("iCloud recent sync window progression", () => {
       { remoteMessageId: "remote-200", isRead: true },
       { remoteMessageId: "remote-202", isRead: false },
     ]);
+  });
+});
+
+describe("iCloud read state kept in the cursor", () => {
+  const cursor = {
+    uidValidity: "42",
+    highWaterUid: 250,
+    trackedUids: [200, 201, 202],
+  };
+
+  it("asks for a stored baseline when the cursor predates read state", () => {
+    expect(getCursorMessageStates(cursor)).toBeUndefined();
+    expect(getCursorMessageStates({ ...cursor, unreadUids: [201] })).toEqual([
+      { uid: 200, isRead: true },
+      { uid: 201, isRead: false },
+      { uid: 202, isRead: true },
+    ]);
+  });
+
+  it("records what the server showed, else what storage holds", () => {
+    expect(
+      withTrackedReadState(
+        cursor,
+        new Map([[200, false]]),
+        new Map([
+          [200, true],
+          [201, false],
+        ]),
+      ),
+    ).toEqual({ ...cursor, unreadUids: [200, 201] });
+  });
+
+  it("finds a read change on the server against the cursor alone", () => {
+    const previous = { ...cursor, unreadUids: [200, 201] };
+    const states = getCursorMessageStates(previous) ?? [];
+    const changes = getTrackedReadStateChanges({
+      cursor: previous,
+      imported: states.map((state) => ({ ...imported(state.uid), ...state })),
+      observed: [
+        { uid: 200, isRead: true },
+        { uid: 201, isRead: false },
+        { uid: 202, isRead: true },
+      ],
+    });
+    expect(changes).toEqual([{ remoteMessageId: "remote-200", isRead: true }]);
+  });
+
+  it("deletes only tracked messages that left the server", () => {
+    const previous = { ...cursor, unreadUids: [] };
+    const states = getCursorMessageStates(previous) ?? [];
+    const plan = planIncrementalMailboxSync({
+      cursor: previous,
+      existingTrackedUids: [200, 202],
+      imported: states.map((state) => ({ ...imported(state.uid), ...state })),
+      mailboxHighWaterUid: 250,
+      newUids: [],
+    });
+    expect(plan.deletedRemoteMessageIds).toEqual(["remote-201"]);
+    expect(plan.pendingUids).toEqual([]);
+  });
+
+  it("keeps only tracked unread UIDs when parsing", () => {
+    const parsed = parseICloudSyncCursor(
+      JSON.stringify({
+        version: 3,
+        completedAt: 1,
+        mailboxes: { INBOX: { ...cursor, unreadUids: [202, 9, 200, 200] } },
+      }),
+    );
+    expect(parsed?.mailboxes.INBOX).toEqual({
+      ...cursor,
+      unreadUids: [200, 202],
+    });
+    const legacy = parseICloudSyncCursor(
+      JSON.stringify({
+        version: 3,
+        completedAt: 1,
+        mailboxes: { INBOX: cursor },
+      }),
+    );
+    expect(legacy?.mailboxes.INBOX).toEqual(cursor);
+  });
+
+  it("tracks the same UIDs it plans to import on a first run", () => {
+    expect(initialTrackedUids(range(1, 250))).toEqual(range(51, 250));
   });
 });
 

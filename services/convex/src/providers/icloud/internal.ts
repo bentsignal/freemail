@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
-import { internalMutation, internalQuery } from "../../_generated/server";
+import { internalQuery } from "../../_generated/server";
+import { internalMutation } from "../../functions";
 import { getActiveAccount } from "../../mail/helpers";
 
 export const upsertAccount = internalMutation({

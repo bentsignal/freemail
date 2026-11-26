@@ -16,7 +16,7 @@ export default defineConfig(
   ...convexPlugin.configs.recommended,
   {
     files: ["src/**/*.ts"],
-    ignores: ["src/_generated/**", "src/utils.ts"],
+    ignores: ["src/_generated/**", "src/utils.ts", "src/functions.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -27,6 +27,12 @@ export default defineConfig(
               importNames: ["action", "mutation", "query"],
               message:
                 "Use authedAction, authedMutation, or authedQuery from utils for public Convex functions.",
+            },
+            {
+              group: ["**/_generated/server"],
+              importNames: ["internalMutation"],
+              message:
+                "Use internalMutation from functions, so table triggers run.",
             },
           ],
         },

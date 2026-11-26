@@ -233,6 +233,22 @@ export const vMessageClassification = v.object({
   updatedAt: v.number(),
 });
 
+/** One per thread the inbox counts as unread (see `inboxUnread.ts`). */
+export const vInboxUnreadThread = v.object({
+  ownerId: v.string(),
+  accountId: v.id("mailAccounts"),
+  threadId: v.id("threads"),
+});
+
+/** Each account's count of `inboxUnreadThreads`, one document per owner. */
+export const vInboxUnreadCounts = v.object({
+  ownerId: v.string(),
+  byAccount: v.record(v.string(), v.number()),
+  /** Set once every unread thread has been counted; until then reads scan. */
+  readyAt: v.optional(v.number()),
+  updatedAt: v.number(),
+});
+
 export const vCleanViewStatus = v.union(
   v.literal("pending"),
   v.literal("running"),

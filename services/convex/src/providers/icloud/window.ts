@@ -18,6 +18,12 @@ export interface ICloudMailboxCursor {
   uidValidity: string;
   highWaterUid: number;
   trackedUids: number[];
+  /**
+   * Tracked UIDs that were unread on the server when the last run saw them,
+   * so the next run finds read changes without reading stored messages.
+   * Cursors written before this field read their baseline from storage once.
+   */
+  unreadUids?: number[];
 }
 
 export interface ICloudSyncCursor {
@@ -30,6 +36,7 @@ const mailboxCursorSchema = z.object({
   uidValidity: z.string(),
   highWaterUid: z.number().int().nonnegative(),
   trackedUids: z.array(z.number().int().positive()),
+  unreadUids: z.array(z.number().int().positive()).optional(),
 });
 
 const syncCursorSchema = z.object({
@@ -46,15 +53,27 @@ export function parseICloudSyncCursor(value: string | undefined) {
     return {
       ...parsed.data,
       mailboxes: Object.fromEntries(
-        Object.entries(parsed.data.mailboxes).map(([path, mailbox]) => [
-          path,
-          {
-            ...mailbox,
-            trackedUids: normalizeUids(mailbox.trackedUids).slice(
-              -ICLOUD_SYNC_MESSAGE_LIMIT,
-            ),
-          },
-        ]),
+        Object.entries(parsed.data.mailboxes).map(([path, mailbox]) => {
+          const trackedUids = normalizeUids(mailbox.trackedUids).slice(
+            -ICLOUD_SYNC_MESSAGE_LIMIT,
+          );
+          const tracked = new Set(trackedUids);
+          return [
+            path,
+            {
+              uidValidity: mailbox.uidValidity,
+              highWaterUid: mailbox.highWaterUid,
+              trackedUids,
+              ...(mailbox.unreadUids
+                ? {
+                    unreadUids: normalizeUids(mailbox.unreadUids).filter(
+                      (uid) => tracked.has(uid),
+                    ),
+                  }
+                : {}),
+            } satisfies ICloudMailboxCursor,
+          ];
+        }),
       ),
     } satisfies ICloudSyncCursor;
   } catch {
@@ -66,15 +85,18 @@ export function recentWindowCutoff(now: number) {
   return new Date(now - ICLOUD_SYNC_LOOKBACK_MS);
 }
 
+/** The UIDs a first run of a mailbox tracks: the newest of the recent ones. */
+export function initialTrackedUids(recentUids: number[]) {
+  return normalizeUids(recentUids).slice(-ICLOUD_SYNC_MESSAGE_LIMIT);
+}
+
 export function planInitialMailboxSync(args: {
   recentUids: number[];
   importedUids: Set<number>;
   mailboxHighWaterUid: number;
   uidValidity: string;
 }) {
-  const trackedUids = normalizeUids(args.recentUids).slice(
-    -ICLOUD_SYNC_MESSAGE_LIMIT,
-  );
+  const trackedUids = initialTrackedUids(args.recentUids);
   return {
     deletedRemoteMessageIds: new Array<string>(),
     pendingUids: trackedUids.filter((uid) => !args.importedUids.has(uid)),
@@ -156,6 +178,34 @@ export function getTrackedReadStateChanges(args: {
       ? [{ remoteMessageId: item.remoteMessageId, isRead }]
       : [];
   });
+}
+
+/**
+ * The tracked UIDs a scheduled run treats as imported, with the read state
+ * the last run saw on the server, or undefined when the cursor predates
+ * `unreadUids` and the baseline has to come from storage.
+ */
+export function getCursorMessageStates(cursor: ICloudMailboxCursor) {
+  if (!cursor.unreadUids) return undefined;
+  const unread = new Set(cursor.unreadUids);
+  return cursor.trackedUids.map((uid) => ({ uid, isRead: !unread.has(uid) }));
+}
+
+/**
+ * Records which tracked UIDs are unread: what this run saw on the server,
+ * else what storage holds, else read (a UID with neither has no message).
+ */
+export function withTrackedReadState(
+  cursor: ICloudMailboxCursor,
+  observed: Map<number, boolean>,
+  stored: Map<number, boolean>,
+) {
+  return {
+    ...cursor,
+    unreadUids: cursor.trackedUids.filter(
+      (uid) => !(observed.get(uid) ?? stored.get(uid) ?? true),
+    ),
+  } satisfies ICloudMailboxCursor;
 }
 
 export function toUidSequence(uids: number[]) {

@@ -3,11 +3,11 @@ import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { internalMutation } from "../_generated/server";
 import {
   CLASSIFICATION_OUTPUT_SCHEMA_VERSION,
   CLASSIFICATION_PROMPT_VERSION,
 } from "../classification/constants";
+import { internalMutation } from "../functions";
 import {
   LEGACY_EMBEDDING_REASONS,
   legacyEmbeddingCleanupPlan,
