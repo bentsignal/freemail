@@ -286,6 +286,9 @@ async function deleteMessageRecords(
       .withIndex("by_message", (q) => q.eq("messageId", messageId))
       .collect(),
   ]);
+  for (const attachment of attachments) {
+    if (attachment.storageId) await ctx.storage.delete(attachment.storageId);
+  }
   for (const row of [
     ...contents,
     ...attachments,

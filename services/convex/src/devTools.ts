@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import type { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
+import { internalAction, internalQuery } from "./_generated/server";
 import { createAuth } from "./auth";
 import { env } from "./convex.env";
 import { bulkMailbox } from "./devSeedBulk";
@@ -96,5 +97,63 @@ export const seed = internalMutation({
       { ownerId },
     );
     return { accounts: accountIds.size, messages };
+  },
+});
+
+/**
+ * Gives every seeded attachment a placeholder file in storage, so tapping one
+ * downloads and opens the share sheet as real mail does. Run after `seed`.
+ */
+export const storeSeedAttachmentFiles = internalAction({
+  args: {},
+  handler: async (ctx): Promise<number> => {
+    requireDevTools();
+    const ownerId = env.AUTH_ALLOWED_USER_ID;
+    const attachments = await ctx.runQuery(
+      internal.devTools.seedAttachmentsWithoutFiles,
+      { ownerId },
+    );
+    for (const attachment of attachments) {
+      const storageId = await ctx.storage.store(
+        new Blob([`Placeholder for ${attachment.fileName}\n`]),
+      );
+      await ctx.runMutation(
+        internal.attachments.internal.commitDownloadedFile,
+        { ownerId, attachmentId: attachment._id, storageId },
+      );
+    }
+    return attachments.length;
+  },
+});
+
+export const seedAttachmentsWithoutFiles = internalQuery({
+  args: { ownerId: v.string() },
+  handler: async (ctx, args) => {
+    requireDevTools();
+    const accounts = await ctx.db
+      .query("mailAccounts")
+      .withIndex("by_owner", (q) => q.eq("ownerId", args.ownerId))
+      .collect();
+    const messages = await Promise.all(
+      accounts
+        .filter((account) => account.isDemo === true)
+        .map((account) =>
+          ctx.db
+            .query("messages")
+            .withIndex("by_account_received", (q) =>
+              q.eq("accountId", account._id),
+            )
+            .collect(),
+        ),
+    );
+    const attachments = await Promise.all(
+      messages.flat().map((message) =>
+        ctx.db
+          .query("attachments")
+          .withIndex("by_message", (q) => q.eq("messageId", message._id))
+          .collect(),
+      ),
+    );
+    return attachments.flat().filter((attachment) => !attachment.storageId);
   },
 });
