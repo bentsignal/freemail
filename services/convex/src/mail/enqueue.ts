@@ -4,6 +4,7 @@ import type { Id } from "../_generated/dataModel";
 import type { AuthedMutationCtx } from "../utils";
 import type { vMailboxAddress } from "./validators";
 import { internal } from "../_generated/api";
+import { deleteDraft } from "../replyDrafts/model";
 import { ensureOwnedAccount, ensureOwnedMessage } from "./helpers";
 import {
   getIdempotentEnqueueResult,
@@ -92,6 +93,9 @@ export async function enqueueOwnedPlainText(
       });
     }),
   );
+  if (replyMessage) {
+    await deleteDraft(ctx, ctx.ownerId, replyMessage.threadId);
+  }
   await ctx.scheduler.runAfter(
     0,
     internal.sync.internal.deliverProviderOutbox,

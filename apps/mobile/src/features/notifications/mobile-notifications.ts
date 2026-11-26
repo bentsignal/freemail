@@ -46,7 +46,6 @@ Notifications.setNotificationHandler({
 });
 
 export function useMobileNotifications(isAuthenticated: boolean) {
-  useNotificationActions(isAuthenticated);
   const registerPushToken = useMutation(
     api.notifications.mutations.registerPushToken,
   );
@@ -55,6 +54,9 @@ export function useMobileNotifications(isAuthenticated: boolean) {
   // a query running while auth is cleared (signing out) throws.
   const inboxIsLive = useInboxIsLive();
   const serverAuthenticated = useConvexAuth().isAuthenticated;
+  // A tapped notification opens its thread once the server has the session:
+  // the inbox under the thread subscribes the moment it mounts.
+  useNotificationActions(isAuthenticated && serverAuthenticated);
   const queriesReady = isAuthenticated && serverAuthenticated && inboxIsLive;
   const preferences = useQuery(
     api.notifications.queries.getPreferences,

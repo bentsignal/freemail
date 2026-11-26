@@ -9,17 +9,20 @@ import type { MobileMailAccount } from "../lib/convex-mail";
 import type { ComposerFieldName } from "./composer-helpers";
 import type { NativeComposerAttachment } from "./use-native-attachments";
 import { useColor } from "~/hooks/use-color";
+import { useReplyDraftEditVersion } from "../reply-drafts";
 import { useMailStore } from "../store";
 import { ComposerAttachmentList } from "./composer-attachment-list";
 import { ComposerRow, ComposerTextField } from "./composer-field";
 import {
   canSendFromAccount,
-  createComposerDraft,
+  getComposerTitle,
+  getInitialFocus,
   getSelectedAccount,
 } from "./composer-helpers";
 import { ComposerNavigationHeader } from "./composer-navigation-header";
 import { ComposerRecipientField } from "./composer-recipient-field";
 import { ComposerSenderField, SenderPicker } from "./composer-sender-field";
+import { useComposerDraft } from "./use-composer-draft";
 import { useNativeAttachments } from "./use-native-attachments";
 import { useSendMessage } from "./use-send-message";
 
@@ -29,8 +32,10 @@ type ComposerParams = {
   bcc?: string;
   body?: string;
   cc?: string;
+  replyName?: string;
   replyToMessageId?: string;
   subject?: string;
+  threadId?: string;
   to?: string;
 };
 
@@ -40,13 +45,29 @@ export function ComposerScreen({
   variant?: "modal" | "tab";
 }) {
   const params = useLocalSearchParams<ComposerParams>();
+  // Another device's edit to this reply starts the form over with it.
+  const editVersion = useReplyDraftEditVersion(params.threadId);
+  return <ComposerForm key={editVersion} params={params} variant={variant} />;
+}
+
+function ComposerForm({
+  params,
+  variant,
+}: {
+  params: ComposerParams;
+  variant: "modal" | "tab";
+}) {
   const router = useRouter();
   const accounts = useMailStore((store) => store.accounts);
   const accountFilter = useMailStore((store) => store.accountFilter);
-  const [selectedAccountId, setSelectedAccountId] = useState<
-    string | undefined
-  >(params.accountId);
-  const [draft, setDraft] = useState(() => createComposerDraft(params));
+  const {
+    cancel,
+    draft,
+    onSent,
+    selectedAccountId,
+    setDraft,
+    setSelectedAccountId,
+  } = useComposerDraft(params);
   const sendingAccounts = accounts.filter(canSendFromAccount);
   const selectedAccount = getSelectedAccount(
     sendingAccounts,
@@ -60,6 +81,7 @@ export function ComposerScreen({
   });
   const { canSend, idempotencyKey, recipientErrors, send } = useSendMessage({
     draft,
+    onSent,
     replyToMessageId: params.replyToMessageId,
     selectedAccount,
     setDraft,
@@ -76,11 +98,11 @@ export function ComposerScreen({
     <View style={{ backgroundColor, flex: 1 }}>
       <ComposerNavigationHeader
         canSend={canSend}
-        title={draft.subject.trim() || "New Message"}
+        title={getComposerTitle(params.replyName, draft.subject)}
         variant={variant}
         onAttachFiles={() => void attachFiles()}
         onAttachPhotos={() => void attachImages()}
-        onCancel={router.back}
+        onCancel={cancel}
         onSend={send}
       />
       <ComposerBody
@@ -97,11 +119,6 @@ export function ComposerScreen({
       />
     </View>
   );
-}
-
-function getInitialFocus(variant: "modal" | "tab", to: string | undefined) {
-  if (variant === "tab") return undefined;
-  return to ? "body" : "to";
 }
 
 function ComposerBody({

@@ -11,6 +11,7 @@ import { createUrls } from "@freemail/config/urls";
 
 import { isFreemailDev } from "../dev/app-variant";
 import { markStartup } from "../dev/startup-timing";
+import { forgetReplyDrafts } from "../mail/reply-drafts";
 import { forgetSavedInbox, rememberInbox } from "../mail/saved-inbox";
 import {
   forgetSavedToken,
@@ -96,6 +97,7 @@ function hasSession(data: unknown) {
 function forgetSavedSession() {
   forgetSavedToken();
   forgetSavedInbox();
+  forgetReplyDrafts();
 }
 
 /**

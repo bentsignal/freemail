@@ -23,6 +23,7 @@ type Draft = ComposerDraft<NativeComposerAttachment>;
  */
 export function useSendMessage({
   draft,
+  onSent,
   replyToMessageId,
   selectedAccount,
   setDraft,
@@ -30,6 +31,7 @@ export function useSendMessage({
   variant,
 }: {
   draft: Draft;
+  onSent: () => void;
   replyToMessageId?: string;
   selectedAccount: MobileMailAccount | undefined;
   setDraft: Dispatch<SetStateAction<Draft>>;
@@ -66,6 +68,7 @@ export function useSendMessage({
       subject: draft.subject.trim(),
       to: parsedRecipients.recipients.to,
     });
+    onSent();
     if (variant === "modal") {
       router.back();
       return;

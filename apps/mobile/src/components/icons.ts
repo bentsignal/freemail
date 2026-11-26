@@ -18,6 +18,7 @@ export { default as Image } from "lucide-react-native/icons/image";
 export { default as Inbox } from "lucide-react-native/icons/inbox";
 export { default as Mail } from "lucide-react-native/icons/mail";
 export { default as MailOpen } from "lucide-react-native/icons/mail-open";
+export { default as PencilLine } from "lucide-react-native/icons/pencil-line";
 export { default as Paperclip } from "lucide-react-native/icons/paperclip";
 export { default as Pin } from "lucide-react-native/icons/pin";
 export { default as RotateCcw } from "lucide-react-native/icons/rotate-ccw";
